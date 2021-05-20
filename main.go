@@ -1,10 +1,14 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"text/template"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 var data []string
@@ -12,6 +16,20 @@ var data []string
 const LocalhostPort = ":8000"
 
 func main() {
+	database, _ := sql.Open("sqlite3", "./users.db")
+	statement, _ := database.Prepare("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, pseudo TEXT, email TEXT)")
+	statement.Exec()
+	statement, _ = database.Prepare("INSERT INTO users (pseudo, email) VALUES (?, ?)")
+	statement.Exec("svenickx", "bg@gmail.com")
+	rows, _ := database.Query("SELECT id, pseudo, email FROM users")
+	var id int
+	var pseudo string
+	var email string
+	for rows.Next() {
+		rows.Scan(&id, &pseudo, &email)
+		fmt.Println(strconv.Itoa(id) + ": " + pseudo + " " + email)
+	}
+
 	fmt.Println("Please connect to\u001b[31m localhost", LocalhostPort, "\u001b[0m")
 
 	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets")))) // Join Assets Directory to the server
