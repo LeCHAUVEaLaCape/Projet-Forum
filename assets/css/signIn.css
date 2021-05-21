@@ -83,3 +83,22 @@ form button:hover {
   cursor: pointer;
   text-decoration: underline;
 }
+span {
+  color: red;
+}
+
+.account-created {
+  width: 100%;
+}
+.account-created div {
+  font-size: 21px;
+  padding: 10px 0px 0px 12px;
+  color: green;
+  text-decoration: underline;
+}
+.input-taken {
+  color: #c10000;
+  text-decoration: underline;
+  font-size: 12px;
+  padding: 3px 0px 0px 0px;
+}
