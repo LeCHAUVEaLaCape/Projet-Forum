@@ -48,15 +48,15 @@ func index(w http.ResponseWriter, r *http.Request) {
 
 // Generate the sign in page
 func signIn(w http.ResponseWriter, r *http.Request) {
+	// Open the database
+	database, _ := sql.Open("sqlite3", "./users.db")
+	defer database.Close()
+
 	info_creation_account := map[string]bool{
 		"accountCreated": false,
 		"username_used":  false,
 		"email_used":     false,
 	}
-
-	// Open the database
-	database, _ := sql.Open("sqlite3", "./users.db")
-	defer database.Close()
 
 	// Get the inputs
 	input_username := r.FormValue("username")
@@ -67,7 +67,13 @@ func signIn(w http.ResponseWriter, r *http.Request) {
 	hash, _ := HashPassword(input_password) // ./config/HashPassword.go
 
 	// Call the function to add users
-	AddUser(database, input_username, input_email, hash, info_creation_account) // ./config/AddUser.go
+	if input_email != "" || input_username != "" || input_password != "" {
+		AddUser(database, input_username, input_email, hash, info_creation_account) // ./config/AddUser.go
+	}
+	fmt.Println("Account Created : ", info_creation_account["accountCreated"])
+	fmt.Println("Username Used : ", info_creation_account["username_used"])
+	fmt.Println("Email used : ", info_creation_account["email_used"])
+	fmt.Println("--------------")
 
 	t := template.New("signIn-template")
 	t = template.Must(t.ParseFiles("./html/signIn.html", "./html/header&footer.html"))

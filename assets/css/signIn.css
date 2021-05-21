@@ -99,6 +99,6 @@ span {
 .input-taken {
   color: #c10000;
   text-decoration: underline;
-  font-size: 12px;
-  padding: 3px 0px 0px 0px;
+      font-size: 12px;
+    padding: 3px 0px 0px 0px;
 }
