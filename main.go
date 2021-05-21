@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"text/template"
 
+	. "./config"
+
 	_ "github.com/mattn/go-sqlite3"
-	uuid "github.com/satori/go.uuid"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type Data struct {
@@ -19,8 +19,6 @@ type Data struct {
 }
 
 var data []Data
-var id int
-var username, email string
 
 const LocalhostPort = ":8000"
 
@@ -50,7 +48,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 
 // Generate the sign in page
 func signIn(w http.ResponseWriter, r *http.Request) {
-	info := map[string]bool{
+	info_creation_account := map[string]bool{
 		"accountCreated": false,
 		"username_used":  false,
 		"email_used":     false,
@@ -66,74 +64,12 @@ func signIn(w http.ResponseWriter, r *http.Request) {
 	input_password := r.FormValue("password")
 
 	// Crypt the password
-	hash, _ := HashPassword(input_password)
+	hash, _ := HashPassword(input_password) // ./config/HashPassword.go
 
 	// Call the function to add users
-	addUser(database, input_username, input_email, hash, info)
+	AddUser(database, input_username, input_email, hash, info_creation_account) // ./config/AddUser.go
 
 	t := template.New("signIn-template")
 	t = template.Must(t.ParseFiles("./html/signIn.html", "./html/header&footer.html"))
-	t.ExecuteTemplate(w, "signIn", info)
+	t.ExecuteTemplate(w, "signIn", info_creation_account)
 }
-
-// Fill the database with the input of the users
-func addUser(db *sql.DB, input_username string, input_email string, input_password string, info map[string]bool) {
-
-	if input_email == "" || input_username == "" || input_password == "" {
-		return
-	}
-
-	tx, _ := db.Begin()
-	// range over the database and check if there is double username/email
-	rows, _ := db.Query("SELECT username, email FROM users")
-	for rows.Next() {
-		rows.Scan(&username, &email)
-		//stop the function if a double is found
-		if username == input_username {
-			info["username_used"] = true
-			fmt.Println("username utilisé")
-			return
-		}
-		if email == input_email {
-			info["email_used"] = true
-			fmt.Println("email utilisé")
-			return
-		}
-	}
-
-	// create UUID
-	u1, err := uuid.NewV4()
-	if err != nil {
-		fmt.Printf("Something went wrong: %s", err)
-		return
-	}
-
-	// add the inputs to the database and a UUID
-	stmt, _ := tx.Prepare("insert into users (username, email, password, uuid) values (?, ?, ?, ?)")
-	_, err = stmt.Exec(input_username, input_email, input_password, u1)
-	checkError(err)
-	tx.Commit()
-	fmt.Println("account created")
-	info["accountCreated"] = true
-}
-
-func checkError(err error) {
-	if err != nil {
-		panic(err)
-	}
-}
-
-// encrypt password
-func HashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
-	return string(bytes), err
-}
-func CheckPasswordHash(password, hash string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	return err == nil
-}
-
-// booléen dans Data qu'on envoie sur la page sign in
-// vrai si inscription réussi sinon false
-
-// dans le html, utiliser les template pour voir le boolean, effectuer certaines action en fonction
