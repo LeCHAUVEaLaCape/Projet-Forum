@@ -1,28 +1,56 @@
 {{define "signIn"}}
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Forum - Sign In</title>
+    <link rel="stylesheet" href="../assets/css/signIn.css" />
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Forum - Sign In</title>
-  <link rel="stylesheet" href="../assets/css/signIn.css" />
-</head>
+  <body>
+    {{template "header"}}
+    <div class="page">
 
-<body>
-  {{template "header"}}
-  <div class="page">
-    <form method="POST" action="./verif">
-      <label for="pseudo">Enter you pseudo</label>
-      <input type="text" name="pseudo" id="pseudo">
-      <label for="email">Enter your mail</label>
-      <input type="text" name="email" id="email">
-      <button type="submit">Submit</button>
-    </form>
-  </div>
-  {{template "footer"}}
-</body>
+      <div class="title">
+        <div class="join">Join Us</div>
+        <div class="create">Create your account</div>
+      </div>
 
+      <div class="formulaire">
+        <form method="POST" action="./verif">
+
+          <div class="username">
+          <label for="username">Username <span style="color: rgb(194, 0, 0)">*</span></label>
+            <!-- prettier-ignore -->
+            <input type="text" name="username" id="username" minlength="3" pattern="^[A-Za-z0-9]{3}[A-Za-z0-9]*$" required>
+            <p>Make sure it's at least 3 characters</p>
+          </div>
+          
+          <div class="email">
+            <label for="email">Email address <span style="color: rgb(194, 0, 0)">*</span></label>
+            <!-- prettier-ignore -->
+            <input type="email" name="email" id="email" pattern=".*@.*\..*" required />
+          </div>
+          
+          <div class="passwd">
+            <label for="password">Password <span style="color: rgb(194, 0, 0)">*</span> </label>
+            <!-- prettier-ignore -->
+            <input type="password" name="password" id="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" required />
+            <p>Make sure it's at least 8 characters, at least one number, one uppercase and lowercase letter</p>
+          </div>
+          <p class="logIn">Already have an account? <a href="#">Click here</a></p>
+
+          <div class="sub">
+            <button type="submit">Create account</button>
+          </div>
+        </form>
+        
+      </div>
+      </div>
+    </div>
+    {{template "footer"}}
+  </body>
 </html>
 {{end}}
