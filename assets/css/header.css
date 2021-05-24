@@ -38,6 +38,12 @@
   justify-content: center;
   align-items: center;
 }
+.auth p {
+  font-size: 12px;
+}
+.auth div {
+  text-align: center;
+}
 .sign-in,
 .log-out {
   border: solid 1px black;
@@ -64,4 +70,7 @@
   padding: 0px 25px 0px 25px;
   font-size: 30px;
   font-family: cursive;
+}
+.active {
+  border-bottom: solid 3px blue;
 }

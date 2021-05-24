@@ -1,0 +1,33 @@
+{{define "allUsers"}}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../assets/css/allUsers.css" />
+    <title>Faux Rhum - All Users</title>
+  </head>
+  <body>
+    {{template "header" .}}
+    <div class="page">
+        <div class="users-container">
+            <div class="all-users">
+                    {{template "aUser" .}}
+            </div>
+        </div>
+    </div>
+    {{template "footer"}}
+  </body>
+</html>
+<script>document.getElementById("all-users").classList.add("active");</script>
+{{end}}
+
+{{define "aUser"}}
+    {{range $k, $v := .allUsers}}
+    <div class="user-card">
+        {{$k}}
+        {{$v}}
+    </div>
+    {{end}}
+{{end}}

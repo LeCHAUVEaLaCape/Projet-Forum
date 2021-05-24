@@ -6,16 +6,22 @@ import (
 	"log"
 	"net/http"
 	"text/template"
-	"time"
 
 	. "./config"
+	. "./cookies"
 
 	_ "github.com/mattn/go-sqlite3"
-	uuid "github.com/satori/go.uuid"
 )
 
-var username, password, email string
+var id int
+var username, password, email, age string
 var create_cookie, userFound = false, false
+
+type singleUser struct {
+	username string
+	email    string
+	age      string
+}
 
 var data = make(map[string]interface{})
 
@@ -36,6 +42,7 @@ func main() {
 	http.HandleFunc("/logIn", logIn)
 	http.HandleFunc("/logOut", logOut)
 	http.HandleFunc("/welcome", welcome)
+	http.HandleFunc("/allUsers", allUsers)
 	http.HandleFunc("/user", user)
 	err := http.ListenAndServe(":8000", nil) // Set listen port
 	if err != nil {
@@ -51,7 +58,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 		data_index[k] = v
 	}
 	data_index["cookieExist"] = false
-	getCookie(data_index, r)
+	GetCookie(data_index, r)
 
 	t := template.New("index-template")
 	t = template.Must(t.ParseFiles("index.html", "./html/header&footer.html"))
@@ -68,7 +75,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 
 	// Check if a cookie exist
 	data_SignUp["cookieExist"] = false
-	getCookie(data_SignUp, r)
+	GetCookie(data_SignUp, r)
 
 	// if a cookie already exist, redirect
 	if data_SignUp["cookieExist"] == true {
@@ -105,7 +112,11 @@ func logIn(w http.ResponseWriter, r *http.Request) {
 		data_logIn[k] = v
 	}
 	data_logIn["cookieExist"] = false
-	getCookie(data_logIn, r)
+	GetCookie(data_logIn, r)
+
+	if data_logIn["cookieExist"] == true {
+		http.Redirect(w, r, "/index", http.StatusSeeOther)
+	}
 
 	// get user input to log in
 	user_login := r.FormValue("user-login")
@@ -128,6 +139,7 @@ func logIn(w http.ResponseWriter, r *http.Request) {
 			if ComparePasswords(password, []byte(password_login)) {
 				create_cookie = true
 				data["user"] = username
+				data["cookieExist"] = true
 				break
 			}
 		}
@@ -135,14 +147,11 @@ func logIn(w http.ResponseWriter, r *http.Request) {
 
 	if create_cookie {
 		// Créé un cookie si user bien authentifié
-		createCookie(w, r)
+		CreateCookie(w, r)
 		data["cookieExist"] = true
+		http.Redirect(w, r, "/index", http.StatusSeeOther)
 	} else {
 		fmt.Println("connexion failed")
-	}
-
-	if data_logIn["cookieExist"] == true {
-		http.Redirect(w, r, "/index", http.StatusSeeOther)
 	}
 
 	fmt.Println(data_logIn)
@@ -159,7 +168,7 @@ func welcome(w http.ResponseWriter, r *http.Request) {
 		data_welcome[k] = v
 	}
 
-	getCookie(data_welcome, r)
+	GetCookie(data_welcome, r)
 
 	t := template.New("welcome-template")
 	t = template.Must(t.ParseFiles("./html/welcome.html", "./html/header&footer.html"))
@@ -176,7 +185,7 @@ func user(w http.ResponseWriter, r *http.Request) {
 		data_user[k] = v
 	}
 	data_user["cookieExist"] = false
-	getCookie(data_user, r)
+	GetCookie(data_user, r)
 
 	user := r.FormValue("user")
 
@@ -233,53 +242,47 @@ func user(w http.ResponseWriter, r *http.Request) {
 	t.ExecuteTemplate(w, "user", data_user)
 }
 
+func allUsers(w http.ResponseWriter, r *http.Request) {
+	// initiate the data that will be send to html
+	var aUser singleUser
+	var all_users []singleUser
+	data_allUsers := make(map[string]interface{})
+	for k, v := range data {
+		data_allUsers[k] = v
+	}
+	GetCookie(data_allUsers, r)
+
+	// Open the database
+	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	defer database.Close()
+
+	// Parcourir la BDD
+	rows, _ := database.Query("SELECT username, email, age FROM users")
+	defer rows.Close()
+	for rows.Next() {
+		rows.Scan(&username, &email, &age)
+		aUser.username = username
+		aUser.age = age
+		aUser.email = email
+		all_users = append(all_users, aUser)
+	}
+	data_allUsers["allUsers"] = all_users
+
+	test := data_allUsers["allUsers"].([]singleUser)
+	fmt.Println(test[0].username)
+
+	t := template.New("allUsers-template")
+	t = template.Must(t.ParseFiles("./html/allUsers.html", "./html/header&footer.html"))
+	t.ExecuteTemplate(w, "allUsers", data_allUsers)
+}
+
 // Delete the cookie to disconnect the user
 func logOut(w http.ResponseWriter, r *http.Request) {
 	_, err := r.Cookie("session")
 	if err != nil {
 		http.Redirect(w, r, "/index", http.StatusSeeOther)
 	}
-	deleteCookie(w)
+	DeleteCookie(w)
 	http.Redirect(w, r, "/index", http.StatusSeeOther)
 	delete(data, "user")
-}
-
-// Verify if a cookie exist, add a boolean Value to the map
-func getCookie(data_info map[string]interface{}, r *http.Request) {
-	// get cookie
-	_, err := r.Cookie("session")
-	if err == nil {
-		data_info["cookieExist"] = true
-	} else {
-		data_info["cookieExist"] = false
-	}
-}
-
-// Create a cookie
-func createCookie(w http.ResponseWriter, r *http.Request) {
-	cookie, err := r.Cookie("session")
-	if err != nil {
-		id, _ := uuid.NewV4()
-		cookie = &http.Cookie{
-			Name:     "session",   // nom du cookie
-			Value:    id.String(), // uuid pour le cookie
-			HttpOnly: true,        // protection pour que le cookie ne soit pas visible par le JS
-			Path:     "/",         // cookie valable de puis la racine du serveur
-			MaxAge:   900,         // cookie valable 15 minutes (900 secondes)
-		}
-		http.SetCookie(w, cookie)
-	}
-	fmt.Println(cookie)
-}
-
-// Delete a cookie
-func deleteCookie(w http.ResponseWriter) {
-	cookie := &http.Cookie{
-		Name:     "session",
-		Value:    "",
-		Path:     "/",
-		Expires:  time.Unix(0, 0),
-		HttpOnly: true,
-	}
-	http.SetCookie(w, cookie)
 }
