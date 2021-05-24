@@ -2,26 +2,34 @@
 <link rel="stylesheet" href="../assets/css/header.css" />
 <div class="header">
   <div class="header-container">
-    <a href="index.html" class="home-page">
-      <div class="PF">Projet forum</div>
+    <a href="/index" class="home-page">
+      <img class="header-logo" src="../assets/images/logo.png" alt="logo">
+      <div class="PF"><p>Faux</p><p>Rhum</p></div>
     </a>
     <div class="all-pages">
       <div class="pages-container">
         <div class="pages">
-          <div class="lien1">lien 1</div>
+          <a href="/welcome" class="lien1">Welcome</a>
           <div class="lien2">lien 2</div>
           <div class="lien3">lien 3</div>
           <div class="lien4">lien 4</div>
         </div>
         <div class="auth">
-          <div class="log in">Log in</div>
-          <a href="/signIn" class="sign in">Sign in</a>
+          {{if not .cookieExist}}
+          <a href="/logIn" class="log-in">Se connecter</a>
+          <a href="/SignUp" class="sign-in">S'inscrire</a>
+          {{else}}
+          <a class="log-out" href="/logOut">Log out</a>
+          <p>Logged as : <a class="account" href="/user?user={{.user}}">{{.user}}</a></p>
+          {{end}}
         </div>
       </div>
     </div>
   </div>
 </div>
-{{end}} {{define "footer"}}
+{{end}} 
+
+{{define "footer"}}
 <link rel="stylesheet" href="../assets/css/footer.css" />
 <div class="footer"></div>
 {{end}}

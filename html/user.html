@@ -1,0 +1,63 @@
+{{define "user"}}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Forum - User</title>
+    <link rel="stylesheet" href="../assets/css/user.css" />
+  </head>
+  <body>
+    {{template "header" .}}
+
+    <div class="page">
+      <p>User</p>
+      <br /><br />
+      <div class="user-info">
+        <div class="username">
+          <p class="title">Username :</p>
+          <p>{{.username}}</p>
+        </div>
+        <div class="email">
+          <p class="title">Email :</p>
+          <p>{{.email}}</p>
+        </div>
+      </div>
+      <div class="info">
+        <div class="age">
+          <p class="title">Age :</p>
+          <p>{{.age}}</p>
+        </div>
+        <div class="address">
+          <p class="title">Address :</p>
+          <p>{{.address}}</p>
+        </div>
+        <div class="fewWords">
+          <p class="title">Few Words :</p>
+          <p>{{.fewWords}}</p>
+        </div>
+      </div>
+    </div>
+
+    {{if .sameUser}}
+    <form action="/user?user={{.user}}" method="post">
+      <div>
+        <label for="age">Add your age</label>
+        <input type="text" name="age"/>
+      </div>
+      <div >
+        <label for="address">Add your address</label>
+        <input type="text" name="address"/>
+      </div>
+      <div>
+        <label for="addFewWords">Add few words about you</label>
+        <input type="text" name="addFewWords"/>
+      </div>
+      <button type="submit">Submit</button>
+    </form>
+    {{end}}
+    {{template "footer"}}
+  </body>
+</html>
+{{end}}

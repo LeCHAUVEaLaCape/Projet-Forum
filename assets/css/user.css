@@ -1,0 +1,38 @@
+body, * {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: black;
+    text-decoration: none;
+    overflow-x: hidden;
+  }
+  .page {
+    height: 1000px;
+    width: 100vw;
+    background-color: #eee;
+    padding-top: 60px;
+    font-size: 60px;
+  }
+  .user-info {
+    display: flex;
+    width: 100vw;
+    justify-content: space-evenly;
+    text-align: center;
+  }
+  .info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    height: 400px;
+  }
+  .title {
+    font-size: 21px;
+  }
+  .age, .address, .fewWords {
+    height: 60px;
+    width: 150px;
+    margin: 20px;
+    border: solid 1px black;
+    text-align: center;
+  }
