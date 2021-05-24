@@ -7,7 +7,7 @@ body, * {
     overflow-x: hidden;
   }
   .page {
-    height: 1000px;
+    min-height: 800px;
     width: 100vw;
     background-color: #eee;
     padding-top: 60px;
@@ -15,8 +15,19 @@ body, * {
   }
   .users-container {
     width: 100vw;
-    min-height: 1000px;
+    min-height: 800px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
   .all-users {
     width: 70%;
+    display: flex;
+    flex-wrap: wrap;
   }
+  .user-card  {
+    font-size: 18px;
+    width: 100%;
+    text-align: center;
+    padding: 15px;
+}

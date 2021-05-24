@@ -268,9 +268,6 @@ func allUsers(w http.ResponseWriter, r *http.Request) {
 	}
 	data_allUsers["allUsers"] = all_users
 
-	test := data_allUsers["allUsers"].([]singleUser)
-	fmt.Println(test[0].username)
-
 	t := template.New("allUsers-template")
 	t = template.Must(t.ParseFiles("./html/allUsers.html", "./html/header&footer.html"))
 	t.ExecuteTemplate(w, "allUsers", data_allUsers)

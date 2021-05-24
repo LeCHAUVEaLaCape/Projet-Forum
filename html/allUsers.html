@@ -11,23 +11,28 @@
   <body>
     {{template "header" .}}
     <div class="page">
-        <div class="users-container">
-            <div class="all-users">
-                    {{template "aUser" .}}
-            </div>
+      <div class="users-container">
+        <div class="all-users">
+          {{$length := len .}} {{if gt $length 0}} {{template "aUser" .}}
+          {{else}}
+          <p>Aucun utilisateur enregistré</p>
+          {{end}}
         </div>
+      </div>
     </div>
     {{template "footer"}}
   </body>
 </html>
-<script>document.getElementById("all-users").classList.add("active");</script>
-{{end}}
+<script>
+  document.getElementById("all-users").classList.add("active");
+</script>
+{{end}} 
 
-{{define "aUser"}}
-    {{range $k, $v := .allUsers}}
+<!-- template for each user -->
+{{define "aUser"}} 
+  {{range $k, $v := .allUsers}}
     <div class="user-card">
-        {{$k}}
-        {{$v}}
-    </div>
-    {{end}}
+    {{$k}} 
+    {{$v}}</div>
+  {{end}} 
 {{end}}
