@@ -30,10 +30,11 @@
 
 <!-- template for each user -->
 {{define "aUser"}} 
-  {{range $k, $v := .allUsers}}
+  {{range .allUsers}}
     <div class="user-card">
-    {{$k}} 
-    {{$v}}
+    {{index . 0}}
+    {{index . 1}}
+    {{index . 2}}
   </div>
   {{end}} 
 {{end}}

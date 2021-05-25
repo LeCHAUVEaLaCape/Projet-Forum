@@ -17,17 +17,6 @@ var id int
 var username, password, email, age, fewWords, address, photo, state, title, body, author string
 var create_cookie, userFound = false, false
 
-type singleUser struct {
-	username string
-	email    string
-	age      string
-}
-type typepost struct {
-	title  string
-	body   string
-	author string
-}
-
 var data = make(map[string]interface{})
 
 func main() {
@@ -66,8 +55,8 @@ func main() {
 
 // Generate the main page when first loading the site
 func index(w http.ResponseWriter, r *http.Request) {
-	var aPost typepost
-	var post []typepost
+	var aPost [3]string
+	var post [][3]string
 
 	// initiate the data that will be send to html
 	data_index := make(map[string]interface{})
@@ -84,13 +73,13 @@ func index(w http.ResponseWriter, r *http.Request) {
 	defer rows.Close()
 	for rows.Next() {
 		rows.Scan(&title, &body, &author)
-		aPost.title = title
-		aPost.body = body
-		aPost.author = author
+		aPost[0] = title
+		aPost[1] = body
+		aPost[2] = author
 		post = append(post, aPost)
 	}
 	data_index["allposts"] = post
-	fmt.Println(data_index)
+
 	t := template.New("index-template")
 	t = template.Must(t.ParseFiles("index.html", "./html/header&footer.html"))
 	t.ExecuteTemplate(w, "index", data_index)
@@ -282,8 +271,8 @@ func user(w http.ResponseWriter, r *http.Request) {
 
 func allUsers(w http.ResponseWriter, r *http.Request) {
 	// initiate the data that will be send to html
-	var aUser singleUser
-	var all_users []singleUser
+	var aUser [3]string
+	var all_users [][3]string
 	data_allUsers := make(map[string]interface{})
 	for k, v := range data {
 		data_allUsers[k] = v
@@ -299,12 +288,13 @@ func allUsers(w http.ResponseWriter, r *http.Request) {
 	defer rows.Close()
 	for rows.Next() {
 		rows.Scan(&username, &email, &age)
-		aUser.username = username
-		aUser.age = age
-		aUser.email = email
+		aUser[0] = username
+		aUser[1] = email
+		aUser[2] = age
 		all_users = append(all_users, aUser)
 	}
 	data_allUsers["allUsers"] = all_users
+	fmt.Println(data_allUsers)
 
 	t := template.New("allUsers-template")
 	t = template.Must(t.ParseFiles("./html/allUsers.html", "./html/header&footer.html"))
