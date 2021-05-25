@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 	"text/template"
 
 	. "./config"
@@ -15,7 +14,7 @@ import (
 )
 
 var id int
-var username, password, email, age, fewWords, address string
+var username, password, email, age, fewWords, address, photo, state string
 var create_cookie, userFound = false, false
 
 type singleUser struct {
@@ -33,7 +32,7 @@ func main() {
 	defer database.Close()
 
 	// Create users table in the database
-	statement, _ := database.Prepare("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username TEXT, email TEXT, password TEXT, fewWords TEXT, age TEXT, address TEXT)")
+	statement, _ := database.Prepare("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username TEXT, email TEXT, password TEXT, fewWords TEXT, age TEXT, address TEXT, photo TEXT)")
 	statement.Exec()
 
 	fmt.Println("Please connect to http://localhost:8000")
@@ -196,10 +195,10 @@ func user(w http.ResponseWriter, r *http.Request) {
 
 	// tx, _ := database.Begin()
 	// Parcourir la BDD
-	rows, _ := database.Query("SELECT id, username, email, fewWords, address, age FROM users")
+	rows, _ := database.Query("SELECT id, username, email, fewWords, address, age, photo FROM users")
 	defer rows.Close()
 	for rows.Next() {
-		rows.Scan(&id, &username, &email, &fewWords, &address, &age)
+		rows.Scan(&id, &username, &email, &fewWords, &address, &age, &photo)
 		// Si l'input username est trouvé
 		if user == username {
 			userFound = true
@@ -208,6 +207,7 @@ func user(w http.ResponseWriter, r *http.Request) {
 			data_user["fewWords"] = fewWords
 			data_user["address"] = address
 			data_user["age"] = age
+			data_user["photo"] = photo
 			break
 		}
 	}
@@ -219,31 +219,30 @@ func user(w http.ResponseWriter, r *http.Request) {
 	} else {
 		data_user["sameUser"] = false
 	}
-	fmt.Println(data_user)
 
 	// get input age/address/FewWords of the user
 	add_few_words := r.FormValue("addFewWords")
 	add_age := r.FormValue("age")
 	add_address := r.FormValue("address")
-	fmt.Println(add_few_words, add_age, add_address)
+	change_photo := r.FormValue("photo")
 	// add the input to his data in the DB
-	if add_few_words != "" || add_age != "" || add_address != "" {
-		tx, err := database.Begin()
-		if err != nil {
-			fmt.Println(err)
-		}
-		query := "UPDATE users SET fewWords = ?, age = ?, address = ? WHERE id = " + strconv.Itoa(id)
-		stmt, err := tx.Prepare(query)
-		if err != nil {
-			fmt.Println(err)
-		}
-		_, err = stmt.Exec(add_few_words, add_age, add_address)
-		if err != nil {
-			fmt.Println(err)
-		}
-		tx.Commit()
+	if add_few_words != "" {
+		state = "fewWords"
+		UpdateInfoUser(database, add_few_words, state, id)
 	}
-	fmt.Println(data_user)
+	if add_address != "" {
+		state = "address"
+		UpdateInfoUser(database, add_address, state, id)
+	}
+	if add_age != "" {
+		state = "age"
+		UpdateInfoUser(database, add_age, state, id)
+	}
+	fmt.Println(change_photo)
+	if change_photo != "" {
+		state = "photo"
+		UpdateInfoUser(database, change_photo, state, id)
+	}
 
 	t := template.New("user-template")
 	t = template.Must(t.ParseFiles("./html/user.html", "./html/header&footer.html"))
