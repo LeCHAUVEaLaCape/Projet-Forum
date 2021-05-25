@@ -35,6 +35,14 @@ func main() {
 	statement, _ := database.Prepare("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username TEXT, email TEXT, password TEXT, fewWords TEXT, age TEXT, address TEXT, photo TEXT)")
 	statement.Exec()
 
+	// Open the database_post and create it if needed
+	database_post, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	defer database_post.Close()
+
+	// Create post table in the database_post
+	statement_post, _ := database_post.Prepare("CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY, title TEXT, body TEXT, like INTEGER, type TEXT, idMainPost INTEGER)")
+	statement_post.Exec()
+
 	fmt.Println("Please connect to http://localhost:8000")
 	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets")))) // Join Assets Directory to the server
 	http.HandleFunc("/", index)
@@ -44,6 +52,7 @@ func main() {
 	http.HandleFunc("/welcome", welcome)
 	http.HandleFunc("/allUsers", allUsers)
 	http.HandleFunc("/user", user)
+	http.HandleFunc("/newPost", newPost)
 	err := http.ListenAndServe(":8000", nil) // Set listen port
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
@@ -289,4 +298,48 @@ func logOut(w http.ResponseWriter, r *http.Request) {
 	DeleteCookie(w)
 	http.Redirect(w, r, "/index", http.StatusSeeOther)
 	delete(data, "user")
+}
+
+// Generate the Welcome page (accessible only to logged in users)
+func newPost(w http.ResponseWriter, r *http.Request) {
+	// initiate the data that will be send to html
+	data_newPost := make(map[string]interface{})
+	for k, v := range data {
+		data_newPost[k] = v
+	}
+	GetCookie(data_newPost, r)
+
+	title := r.FormValue("title")
+	body := r.FormValue("body")
+	fmt.Println(title)
+	fmt.Println(body)
+	typeOfPost := "Main"
+	addNewPost(title, body, typeOfPost)
+
+	t := template.New("newPost-template")
+	t = template.Must(t.ParseFiles("./html/newPost.html", "./html/header&footer.html"))
+	t.ExecuteTemplate(w, "newPost", data_newPost)
+}
+
+func addNewPost(title string, body string, typeOfPost string) {
+	// Open the database
+	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	defer database.Close()
+
+	// add the inputs to the database
+	tx, err := database.Begin()
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println("balise")
+	stmt, err := tx.Prepare("INSERT INTO posts (title, body, type) VALUES (?, ?, ?)")
+	if err != nil {
+		fmt.Println(err)
+	}
+	_, err = stmt.Exec(title, body, typeOfPost)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		tx.Commit()
+	}
 }
