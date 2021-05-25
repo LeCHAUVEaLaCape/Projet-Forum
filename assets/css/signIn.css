@@ -1,0 +1,15 @@
+body, * {
+    margin: 0;
+    padding: 0;
+    font-family: cursive;
+    color: black;
+    text-decoration: none;
+    overflow-x: hidden;
+  }
+  .page {
+    height: 1000px;
+    width: 100vw;
+    background-color: #eee;
+    padding-top: 60px;
+    font-size: 60px;
+  }

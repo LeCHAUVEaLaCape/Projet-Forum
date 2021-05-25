@@ -1,29 +1,37 @@
-{{define "index"}}<!DOCTYPE html>
+{{define "index"}}
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Faux Rhum</title>
-    <link rel="shortcut icon" href="./assets/images/logo.png" />
-    <link rel="stylesheet" href="./assets/css/index.css" />
-  </head>
-  <body>
-    {{template "header" .}}
-    <div class="page">
-        index
-        <form action="/user" method="get">
-        <label for="user">Search a User</label>
-        <input type="text" name="user" id="user">
-        <button type="submit">submit</button>
-        </form>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Faux Rhum</title>
+  <link rel="shortcut icon" href="./assets/images/logo.png" />
+  <link rel="stylesheet" href="./assets/css/index.css" />
+</head>
+
+<body>
+  {{template "header" .}}
+  <div class="page">
+    index
+    <form action="/user" method="get">
+      <label for="user">Search a User</label>
+      <input type="text" name="user" id="user">
+      <button type="submit">submit</button>
+    </form>
+    <div class="post-container">
+      <div class="all-posts">
         {{range .allposts}}
-        {{.title}}
-
-
+          <div class="singlePost-container">
+            {{.}}
+          </div>
         {{end}}
+      </div>
     </div>
-    {{template "footer"}}
-  </body>
+  </div>
+  {{template "footer"}}
+</body>
+
 </html>
 {{end}}
