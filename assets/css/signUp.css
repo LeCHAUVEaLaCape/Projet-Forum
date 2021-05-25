@@ -7,12 +7,39 @@ body,
   overflow-x: hidden;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
-.page {
-  height: 85vh;
+section{
   width: 100vw;
+  height: 100vh;
+}
+/*------------------------------------------------------------- 
+|
+|font-face
+|
+ ------------------------------------------------------------- */
+@font-face {
+  font-family: 'Modusa';
+  src: url('../font/Modusa.ttf');
+}
+/*------------------------------------------------------------- 
+|
+|autentification
+|
+ ------------------------------------------------------------- */
+.page2{
+  height: 85%;
+  overflow: hidden;
+  margin: auto 35%;
+  margin-top: 5%;
+  border-radius: 20%;
+  border: black solid 3px;
+  box-shadow: 5px 10px 20px aqua inset ,0px 0px 10px  black;
+}
+.page {
+  height: 100%;
+  width: 100%;
   background-color: #eee;
-  padding-top: 15vh;
   font-size: 60px;
+  overflow: hidden;
 }
 .title {
   display: grid;
@@ -83,6 +110,11 @@ form button:hover {
   cursor: pointer;
   text-decoration: underline;
 }
+.logIn a:hover {
+  color: aqua;
+  cursor: pointer;
+  text-decoration: underline;
+}
 span {
   color: red;
 }
@@ -102,3 +134,4 @@ span {
       font-size: 12px;
     padding: 3px 0px 0px 0px;
 }
+

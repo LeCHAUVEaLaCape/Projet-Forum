@@ -69,8 +69,41 @@
 .PF p {
   padding: 0px 25px 0px 25px;
   font-size: 30px;
-  font-family: cursive;
+  font-family: 'Modusa';
+  font-weight: bold;
+  background: -webkit-linear-gradient(#DFA003, brown, yellow);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.PF strong {
+  font-family: 'Modusa';
+  font-size: 30px;
+  font-weight: bold;
+  border-style:solid;
 }
 .active {
   border-bottom: solid 3px blue;
+}
+/*------------------------------------------------------------- 
+|
+|font-face
+|
+ ------------------------------------------------------------- */
+@font-face {
+  font-family: 'Modusa';
+  src: url('../font/Modusa.ttf');
+}
+/* 
++----------------------------------------------------------------------+
+| Pour les sélections
++----------------------------------------------------------------------+
+*/
+::-moz-selection {
+  color: white;
+  background-color: black;
+}
+
+::selection {
+  color: white;
+  background-color: black;
 }
