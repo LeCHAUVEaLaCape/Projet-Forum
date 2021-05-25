@@ -5,8 +5,8 @@
     <a href="/index" class="home-page">
       <img class="header-logo" src="../assets/images/logoforum.svg" alt="logo" />
       <div class="PF">
-        <p><strong>Fa</strong>ux</p>
-        <p>Rh<strong>um</strong></p>
+        <p><strong>Faux</strong></p>
+        <p><strong>Rhum</strong></p>
       </div>
     </a>
     <div class="all-pages">
@@ -14,12 +14,12 @@
         <div class="pages">
           <a href="/welcome" id="welcome">Welcome</a>
           <a href="/allUsers" id="all-users">All Users</a>
-          <div class="lien3">lien 3</div>
-          <div class="lien4">lien 4</div>
+          <a href="/newPost" id="post">Post</a>
+          <div class="lien4">POST 1</div>
         </div>
         <div class="auth">
           {{if not .cookieExist}}
-          <a href="/logIn" class="log-in">Se connecter</a>
+          <button  class="login-btn"><a href="/logIn">Login</a></button>
           <a href="/SignUp" class="sign-in">S'inscrire</a>
           {{else}}
           <div>

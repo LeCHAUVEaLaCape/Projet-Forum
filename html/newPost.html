@@ -1,0 +1,38 @@
+{{define "newPost"}}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../assets/css/newPost.css" />
+    <link rel="shortcut icon" href="../assets/images/icone.png" />
+    <title>Faux Rhum - New Post</title>
+  </head>
+  <body>
+    {{template "header" .}}
+    <div class="page">
+      New Post
+      <form action="?" method="POST" autocomplete="off">
+        <div class="title">
+          <div>
+            <label for="title">Title of the post</label>
+            <input type="text" name="title" />
+          </div>
+        </div>
+        <div class="body">
+          <div class="body-container">
+            <label for="body">body</label>
+            <textarea type="text" name="body"></textarea>
+          </div>
+        </div>
+        <div class="button">
+          <button type="submit">Submit</button>
+        </div>
+      </form>
+    </div>
+    {{template "footer"}}
+  </body>
+</html>
+<script>document.getElementById("post").classList.add("active");</script>
+{{end}}
