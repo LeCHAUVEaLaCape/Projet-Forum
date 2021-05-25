@@ -17,6 +17,11 @@
         <input type="text" name="user" id="user">
         <button type="submit">submit</button>
         </form>
+        {{range .allposts}}
+        {{.title}}
+
+
+        {{end}}
     </div>
     {{template "footer"}}
   </body>
