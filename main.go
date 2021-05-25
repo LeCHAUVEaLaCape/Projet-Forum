@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"text/template"
 
 	. "./config"
@@ -14,7 +15,7 @@ import (
 )
 
 var id int
-var username, password, email, age string
+var username, password, email, age, fewWords, address string
 var create_cookie, userFound = false, false
 
 type singleUser struct {
@@ -195,18 +196,22 @@ func user(w http.ResponseWriter, r *http.Request) {
 
 	// tx, _ := database.Begin()
 	// Parcourir la BDD
-	rows, _ := database.Query("SELECT username, email FROM users")
+	rows, _ := database.Query("SELECT id, username, email, fewWords, address, age FROM users")
 	defer rows.Close()
 	for rows.Next() {
-		rows.Scan(&username, &email)
+		rows.Scan(&id, &username, &email, &fewWords, &address, &age)
 		// Si l'input username est trouvé
 		if user == username {
 			userFound = true
 			data_user["username"] = username
 			data_user["email"] = email
+			data_user["fewWords"] = fewWords
+			data_user["address"] = address
+			data_user["age"] = age
 			break
 		}
 	}
+	rows.Close()
 
 	// Check if the user logged is on his personnal page
 	if data_user["username"] == data_user["user"] {
@@ -220,13 +225,15 @@ func user(w http.ResponseWriter, r *http.Request) {
 	add_few_words := r.FormValue("addFewWords")
 	add_age := r.FormValue("age")
 	add_address := r.FormValue("address")
+	fmt.Println(add_few_words, add_age, add_address)
 	// add the input to his data in the DB
 	if add_few_words != "" || add_age != "" || add_address != "" {
 		tx, err := database.Begin()
 		if err != nil {
 			fmt.Println(err)
 		}
-		stmt, err := database.Prepare("INSERT OR REPLACE INTO users(fewWords, age, address) values(?,?,?)")
+		query := "UPDATE users SET fewWords = ?, age = ?, address = ? WHERE id = " + strconv.Itoa(id)
+		stmt, err := tx.Prepare(query)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -236,6 +243,7 @@ func user(w http.ResponseWriter, r *http.Request) {
 		}
 		tx.Commit()
 	}
+	fmt.Println(data_user)
 
 	t := template.New("user-template")
 	t = template.Must(t.ParseFiles("./html/user.html", "./html/header&footer.html"))
