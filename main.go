@@ -90,7 +90,6 @@ func index(w http.ResponseWriter, r *http.Request) {
 		post = append(post, aPost)
 	}
 	data_index["allposts"] = post
-	fmt.Println(data_index)
 	t := template.New("index-template")
 	t = template.Must(t.ParseFiles("index.html", "./html/header&footer.html"))
 	t.ExecuteTemplate(w, "index", data_index)
@@ -285,6 +284,7 @@ func allUsers(w http.ResponseWriter, r *http.Request) {
 	var aUser singleUser
 	var all_users []singleUser
 	data_allUsers := make(map[string]interface{})
+	fmt.Println(data_allUsers)
 	for k, v := range data {
 		data_allUsers[k] = v
 	}
@@ -330,20 +330,22 @@ func newPost(w http.ResponseWriter, r *http.Request) {
 		data_newPost[k] = v
 	}
 	GetCookie(data_newPost, r)
+	if data_newPost["cookieExist"] == false {
+		http.Redirect(w, r, "/logIn", http.StatusSeeOther)
+	}
 
 	title := r.FormValue("title")
 	body := r.FormValue("body")
-	fmt.Println(title)
-	fmt.Println(body)
 	typeOfPost := "Main"
-	addNewPost(title, body, typeOfPost)
-
+	if title != "" && body != "" {
+		addNewPost(title, body, typeOfPost, data_newPost)
+	}
 	t := template.New("newPost-template")
 	t = template.Must(t.ParseFiles("./html/newPost.html", "./html/header&footer.html"))
 	t.ExecuteTemplate(w, "newPost", data_newPost)
 }
 
-func addNewPost(title string, body string, typeOfPost string) {
+func addNewPost(title string, body string, typeOfPost string, data_newPost map[string]interface{}) {
 	// Open the database
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
 	defer database.Close()
@@ -353,12 +355,13 @@ func addNewPost(title string, body string, typeOfPost string) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println("balise")
 	stmt, err := tx.Prepare("INSERT INTO posts (title, body, type, author) VALUES (?, ?, ?, ?)")
 	if err != nil {
 		fmt.Println(err)
 	}
-	_, err = stmt.Exec(title, body, typeOfPost, "Anonyme")
+	auteur := data_newPost["user"]
+	fmt.Println(auteur)
+	_, err = stmt.Exec(title, body, typeOfPost, auteur)
 	if err != nil {
 		fmt.Println(err)
 	} else {
