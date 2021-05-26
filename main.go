@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 	"text/template"
 	"time"
@@ -49,6 +50,8 @@ func main() {
 	http.HandleFunc("/allUsers", allUsers)
 	http.HandleFunc("/user", user)
 	http.HandleFunc("/newPost", newPost)
+	http.HandleFunc("/post", post)
+
 	err := http.ListenAndServe(":8000", nil) // Set listen port
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
@@ -57,8 +60,7 @@ func main() {
 
 // Generate the main page when first loading the site
 func index(w http.ResponseWriter, r *http.Request) {
-	var aPost [5]string
-	var post [][5]string
+	var post [][6]string
 
 	// initiate the data that will be send to html
 	data_index := make(map[string]interface{})
@@ -71,10 +73,11 @@ func index(w http.ResponseWriter, r *http.Request) {
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
 	defer database.Close()
 	//range over database
-	rows, _ := database.Query("SELECT title, body, author, date FROM posts")
+	rows, _ := database.Query("SELECT title, body, author, date, id FROM posts")
 	defer rows.Close()
 	for rows.Next() {
-		rows.Scan(&title, &body, &author, &date)
+		var aPost [6]string
+		rows.Scan(&title, &body, &author, &date, &id)
 		aPost[0] = title
 		aPost[1] = body
 		// Remplace les \n par des <br> pour sauter des lignes en html
@@ -82,6 +85,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 		aPost[1] = strings.Replace(aPost[1], string('\n'), "<br>", -1)
 		aPost[2] = author
 		aPost[3] = date
+		aPost[5] = strconv.Itoa(id)
 		post = append(post, aPost)
 	}
 
@@ -364,4 +368,59 @@ func newPost(w http.ResponseWriter, r *http.Request) {
 	t := template.New("newPost-template")
 	t = template.Must(t.ParseFiles("./html/newPost.html", "./html/header&footer.html"))
 	t.ExecuteTemplate(w, "newPost", data_newPost)
+}
+func post(w http.ResponseWriter, r *http.Request) {
+	post_id := r.FormValue("id")
+	var post [5]string
+
+	// initiate the data that will be send to html
+	data_post := make(map[string]interface{})
+	for k, v := range data {
+		data_post[k] = v
+	}
+	data_post["cookieExist"] = false
+	GetCookie(data_post, r)
+
+	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	defer database.Close()
+	//range over database
+	rows, _ := database.Query("SELECT title, body, author, date FROM posts WHERE id = ?", post_id)
+	defer rows.Close()
+
+	for rows.Next() {
+		err := rows.Scan(&title, &body, &author, &date)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	post[0] = title
+	// Remplace les \n par des <br> pour sauter des lignes en html
+	post[1] = strings.Replace(body, string('\r'), "", -1)
+	post[1] = strings.Replace(body, string('\n'), "<br>", -1)
+	post[2] = author
+	post[3] = date
+
+	// Ajoute le chemin de la photo qui a été choisit par l'utilisateur
+
+	rows, err := database.Query("SELECT photo FROM users WHERE username = ?", post[2])
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		err := rows.Scan(&photo)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	err = rows.Err()
+	if err != nil {
+		log.Fatal(err)
+	}
+	post[4] = photo
+
+	data_post["main_post"] = post
+	t := template.New("post-template")
+	t = template.Must(t.ParseFiles("./html/post.html", "./html/header&footer.html"))
+	t.ExecuteTemplate(w, "post", data_post)
 }

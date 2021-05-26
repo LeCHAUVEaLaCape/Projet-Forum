@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {{define "LogIn"}}
 <!DOCTYPE html>
 <html lang="en">
@@ -42,4 +43,50 @@
 </body>
 
 </html>
+=======
+{{define "LogIn"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Log in to Forum - Forum</title>
+    <link rel="stylesheet" href="../assets/css/logIn.css" />
+    <link rel="shortcut icon" href="../assets/images/logo.png" />
+</head>
+
+<body>
+    {{template "header" .}}
+    <div class="page">
+
+        <h1>Log in to Forum</h1>
+
+        <div class="formulaire">
+            <form method="POST" action="?">
+                <div class="enter-username">
+                    <label for="user-login">Username</label>
+                    <input type="text" name="user-login">
+                </div>
+                <div class="enter-password">
+                    <label for="password-login">Password</label>
+                    <input type="password" name="password-login">
+                </div>
+                <div class="submit">
+                    <button type="submit">Log In</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="create-account">
+            <div>
+                <p>New to the Forum ? <br><a href="/SignUp">Create an account</a>.</p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+>>>>>>> e15988c516b8e3526cd0bfecdda163bdf43cc2c7
 {{end}}

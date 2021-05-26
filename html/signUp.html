@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {{define "SignUp"}}
 <!DOCTYPE html>
 <html lang="en">
@@ -85,3 +86,76 @@
 
 </html>
 {{end}}
+=======
+{{define "SignUp"}}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Forum - Sign Up</title>
+    <link rel="stylesheet" href="../assets/css/SignUp.css" />
+    <link rel="shortcut icon" href="../assets/images/logo.png" />
+  </head>
+
+  <body>
+    {{template "header" .}}
+    <div class="page">
+
+      <div class="title">
+        <div class="join">Join Us</div>
+        <div class="create">Create your account</div>
+      </div>
+
+      <div class="formulaire">
+        <form method="POST" action="?" autocomplete="off">
+
+          <div class="username">
+          <label for="username">Username <span>*</span></label>
+            <!-- prettier-ignore -->
+            <input type="text" name="username" id="username" minlength="3" pattern="^[A-Za-z0-9]{3}[A-Za-z0-9]*$" required>
+            <p>Make sure it's at least 3 characters</p>
+            {{if .username_used}}
+            <div class="username-taken"  id="username-taken">
+              <div><p class="input-taken">Username already taken</p></div>
+            </div>
+            {{end}}  
+            </div>
+
+          <div class="email">
+            <label for="email">Email address <span>*</span></label>
+            <!-- prettier-ignore -->
+            <input type="email" name="email" id="email" pattern=".*@.*\..*" required />
+            {{if .email_used}}
+            <div class="email-taken"  id="email-taken">
+              <div><p class="input-taken">Email already taken</p></div>
+          </div>
+          {{end}}  
+          </div>
+          
+          <div class="passwd">
+            <label for="password">Password <span>*</span> </label>
+            <!-- prettier-ignore -->
+            <input type="password" name="password" id="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" required />
+            <p>Make sure it's at least 8 characters, at least one number, one uppercase and lowercase letter</p>
+          </div>
+          <p class="logIn">Already have an account? <a href="/logIn">Click here</a></p>
+
+          {{if .accountCreated}}
+          <div class="account-created" id="account-created">
+            <div ><p>Account successfully created !</p></div>
+        </div>
+          {{end}}
+
+          <div class="sub">
+            <button type="submit">Create account</button>
+          </div>
+        </form>
+      </div>
+      </div>
+    </div>
+  </body>
+</html>
+{{end}}
+>>>>>>> e15988c516b8e3526cd0bfecdda163bdf43cc2c7
