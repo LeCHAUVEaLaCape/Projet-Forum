@@ -1,12 +1,10 @@
-<svg width="71" height="78" viewBox="0 0 71 78" fill="none" xmlns="http://www.w3.org/2000/svg">
-<line y1="-7.5" x2="10" y2="-7.5" transform="matrix(0 -1 -1 0 4 62)" stroke="black" stroke-width="15"/>
-<line y1="-7.5" x2="10" y2="-7.5" transform="matrix(0 -1 -1 0 4 31)" stroke="black" stroke-width="15"/>
-<line y1="-7.5" x2="10" y2="-7.5" transform="matrix(0 -1 -1 0 4 46)" stroke="black" stroke-width="15"/>
-<line y1="-7.5" x2="10" y2="-7.5" transform="matrix(0 -1 -1 0 19 46)" stroke="black" stroke-width="15"/>
-<line y1="-7.5" x2="10" y2="-7.5" transform="matrix(0 -1 -1 0 34 46)" stroke="black" stroke-width="15"/>
-<line y1="-5" x2="25" y2="-5" transform="matrix(-0.707107 -0.707107 -0.707107 0.707107 46.6777 47.6776)" stroke="black" stroke-width="10"/>
-<line y1="-5" x2="25" y2="-5" transform="matrix(0.707107 -0.707107 -0.707107 -0.707107 29 51.6776)" stroke="black" stroke-width="10"/>
-<line y1="-7.5" x2="50" y2="-7.5" transform="matrix(1 0 0 -1 4 6)" stroke="black" stroke-width="15"/>
-<line y1="-7.5" x2="50" y2="-7.5" transform="matrix(1 0 0 -1 4 61)" stroke="black" stroke-width="15"/>
-<line y1="-7.5" x2="70" y2="-7.5" transform="matrix(0 -1 -1 0 54 76)" stroke="black" stroke-width="15"/>
+<svg width="41" height="47" viewBox="0 0 41 47" fill="none" xmlns="http://www.w3.org/2000/svg">
+<line y1="-3.5" x2="10" y2="-3.5" transform="matrix(0 -1 -1 0 2 40)" stroke="black" stroke-width="7"/>
+<line y1="-3.5" x2="10" y2="-3.5" transform="matrix(0 -1 -1 0 2 19)" stroke="black" stroke-width="7"/>
+<line y1="-3.5" x2="30" y2="-3.5" transform="matrix(1 0 0 -1 2 2)" stroke="black" stroke-width="7"/>
+<line y1="-3.5" x2="30" y2="-3.5" transform="matrix(1 0 0 -1 2 40)" stroke="black" stroke-width="7"/>
+<line y1="-2.5" x2="25" y2="-2.5" transform="matrix(1 0 0 -1 2 22)" stroke="black" stroke-width="5"/>
+<line y1="-3.5" x2="45" y2="-3.5" transform="matrix(0 -1 -1 0 32 47)" stroke="black" stroke-width="7"/>
+<line y1="-2.5" x2="15" y2="-2.5" transform="matrix(0.707107 -0.707107 -0.707107 -0.707107 16 31.6066)" stroke="black" stroke-width="5"/>
+<line y1="-2.5" x2="15" y2="-2.5" transform="matrix(-0.707107 -0.707107 -0.707107 0.707107 26.6067 27.6066)" stroke="black" stroke-width="5"/>
 </svg>

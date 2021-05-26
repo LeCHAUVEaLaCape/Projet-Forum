@@ -1,37 +1,55 @@
 {{define "index"}}
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Faux Rhum</title>
+    <link rel="shortcut icon" href="./assets/images/logo.png" />
+    <link rel="stylesheet" href="./assets/css/index.css" />
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Faux Rhum</title>
-  <link rel="shortcut icon" href="./assets/images/baptiste.jpg" />
-  <link rel="stylesheet" href="./assets/css/index.css" />
-</head>
+  <body>
+    {{template "header" .}}
 
-<body>
-  {{template "header" .}}
-  <div class="page">
-    index
-    <form action="/user" method="get">
-      <label for="user">Search a User</label>
-      <input type="text" name="user" id="user">
-      <button type="submit">submit</button>
-    </form>
-    <div class="post-container">
-      <div class="all-posts">
-        {{range .allposts}}
+    <div class="page">
+      <div class="latest-container">
+        <div class="latest-post">
+          <p>Latest Posts</p>
+        </div>
+      </div>
+      {{if .cookieExist}}
+      <div class="newpost-container">
+        <a href="/newPost" class="newpost-redirect">
+          <div>Ajouter un nouveau poste</div>
+        </a>
+      </div>
+      {{end}}
+      <div class="post-container">
+        <div class="all-posts">
+          {{range .allposts}}
           <div class="singlePost-container">
-            {{.}}
+            <div class="title-post">{{index . 0}}</div>
+            <div class="body-post">
+              <div class="message">
+                <p>{{index . 1}}</p>
+              </div>
+            </div>
+            <div class="author-post">
+              <p class="author">
+                <span>post created by : </span
+                ><a id="user" href="/user?user={{index . 2}}">{{index . 2}}</a>
+                <img src="{{index . 4}}">
+              </p>
+              <span>{{index . 3}}</span>
+            </div>
           </div>
-        {{end}}
+          {{end}}
+        </div>
       </div>
     </div>
-  </div>
-  {{template "footer"}}
-</body>
-
+    {{template "footer"}}
+  </body>
 </html>
 {{end}}

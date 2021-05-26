@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 	"text/template"
+	"time"
 
 	. "./config"
 	. "./cookies"
@@ -14,7 +16,7 @@ import (
 )
 
 var id int
-var username, password, email, age, fewWords, address, photo, state, title, body, author string
+var username, password, email, age, fewWords, address, photo, state, title, body, author, date string
 var create_cookie, userFound = false, false
 
 var data = make(map[string]interface{})
@@ -34,7 +36,7 @@ func main() {
 	defer database_post.Close()
 
 	// Create post table in the database_post
-	statement_post, _ := database_post.Prepare("CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY, title TEXT, body TEXT, like INTEGER, type TEXT, idMainPost INTEGER, author TEXT)")
+	statement_post, _ := database_post.Prepare("CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY, title TEXT, body TEXT, like INTEGER, type TEXT, idMainPost INTEGER, author TEXT, date TEXT)")
 	statement_post.Exec()
 
 	fmt.Println("Please connect to http://localhost:8000")
@@ -55,8 +57,8 @@ func main() {
 
 // Generate the main page when first loading the site
 func index(w http.ResponseWriter, r *http.Request) {
-	var aPost [3]string
-	var post [][3]string
+	var aPost [5]string
+	var post [][5]string
 
 	// initiate the data that will be send to html
 	data_index := make(map[string]interface{})
@@ -69,15 +71,40 @@ func index(w http.ResponseWriter, r *http.Request) {
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
 	defer database.Close()
 	//range over database
-	rows, _ := database.Query("SELECT title, body, author FROM posts")
+	rows, _ := database.Query("SELECT title, body, author, date FROM posts")
 	defer rows.Close()
 	for rows.Next() {
-		rows.Scan(&title, &body, &author)
+		rows.Scan(&title, &body, &author, &date)
 		aPost[0] = title
 		aPost[1] = body
+		// Remplace les \n par des <br> pour sauter des lignes en html
+		aPost[1] = strings.Replace(aPost[1], string('\r'), "", -1)
+		aPost[1] = strings.Replace(aPost[1], string('\n'), "<br>", -1)
 		aPost[2] = author
+		aPost[3] = date
 		post = append(post, aPost)
 	}
+
+	// Ajoute le chemin de la photo qui a été choisit par l'utilisateur
+	for i := 0; i < len(post); i++ {
+		rows, err := database.Query("SELECT photo FROM users WHERE username = ?", post[i][2])
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer rows.Close()
+		for rows.Next() {
+			err := rows.Scan(&photo)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+		err = rows.Err()
+		if err != nil {
+			log.Fatal(err)
+		}
+		post[i][4] = photo
+	}
+
 	data_index["allposts"] = post
 	t := template.New("index-template")
 	t = template.Must(t.ParseFiles("index.html", "./html/header&footer.html"))
@@ -153,7 +180,6 @@ func logIn(w http.ResponseWriter, r *http.Request) {
 		rows.Scan(&username, &password)
 		// Si l'input username est trouvé
 		if user_login == username {
-			fmt.Println("username ok ", username)
 			// Compare l'input password avec celui de la BDD
 			if ComparePasswords(password, []byte(password_login)) {
 				create_cookie = true
@@ -169,11 +195,8 @@ func logIn(w http.ResponseWriter, r *http.Request) {
 		CreateCookie(w, r)
 		data["cookieExist"] = true
 		http.Redirect(w, r, "/index", http.StatusSeeOther)
-	} else {
-		fmt.Println("connexion failed")
 	}
 
-	fmt.Println(data_logIn)
 	t := template.New("logIn-template")
 	t = template.Must(t.ParseFiles("./html/LogIn.html", "./html/header&footer.html"))
 	t.ExecuteTemplate(w, "LogIn", data_logIn)
@@ -191,8 +214,6 @@ func welcome(w http.ResponseWriter, r *http.Request) {
 
 	t := template.New("welcome-template")
 	t = template.Must(t.ParseFiles("./html/welcome.html", "./html/header&footer.html"))
-	fmt.Println("data : ", data)
-	fmt.Println("data_welcome : ", data_welcome)
 	t.ExecuteTemplate(w, "welcome", data_welcome)
 }
 
@@ -204,6 +225,7 @@ func user(w http.ResponseWriter, r *http.Request) {
 		data_user[k] = v
 	}
 	data_user["cookieExist"] = false
+	data_user["username"] = ""
 	GetCookie(data_user, r)
 
 	user := r.FormValue("user")
@@ -233,7 +255,7 @@ func user(w http.ResponseWriter, r *http.Request) {
 	rows.Close()
 
 	// Check if the user logged is on his personnal page
-	if data_user["username"] == data_user["user"] {
+	if data_user["username"] == data_user["user"] && data_user["cookieExist"] != false {
 		data_user["sameUser"] = true
 	} else {
 		data_user["sameUser"] = false
@@ -248,19 +270,22 @@ func user(w http.ResponseWriter, r *http.Request) {
 	if add_few_words != "" {
 		state = "fewWords"
 		UpdateInfoUser(database, add_few_words, state, id)
+		http.Redirect(w, r, "/user?user="+username, http.StatusSeeOther)
 	}
 	if add_address != "" {
 		state = "address"
 		UpdateInfoUser(database, add_address, state, id)
+		http.Redirect(w, r, "/user?user="+username, http.StatusSeeOther)
 	}
 	if add_age != "" {
 		state = "age"
 		UpdateInfoUser(database, add_age, state, id)
+		http.Redirect(w, r, "/user?user="+username, http.StatusSeeOther)
 	}
-	fmt.Println(change_photo)
 	if change_photo != "" {
 		state = "photo"
 		UpdateInfoUser(database, change_photo, state, id)
+		http.Redirect(w, r, "/user?user="+username, http.StatusSeeOther)
 	}
 
 	t := template.New("user-template")
@@ -273,7 +298,6 @@ func allUsers(w http.ResponseWriter, r *http.Request) {
 	var aUser [3]string
 	var all_users [][3]string
 	data_allUsers := make(map[string]interface{})
-	fmt.Println(data_allUsers)
 	for k, v := range data {
 		data_allUsers[k] = v
 	}
@@ -294,7 +318,6 @@ func allUsers(w http.ResponseWriter, r *http.Request) {
 		all_users = append(all_users, aUser)
 	}
 	data_allUsers["allUsers"] = all_users
-	fmt.Println(data_allUsers)
 
 	t := template.New("allUsers-template")
 	t = template.Must(t.ParseFiles("./html/allUsers.html", "./html/header&footer.html"))
@@ -320,41 +343,25 @@ func newPost(w http.ResponseWriter, r *http.Request) {
 		data_newPost[k] = v
 	}
 	GetCookie(data_newPost, r)
+	// Redirection pour ceux qui ne sont pas connecté
 	if data_newPost["cookieExist"] == false {
 		http.Redirect(w, r, "/logIn", http.StatusSeeOther)
 	}
 
+	// type main = post / "comment" = commentaire
+	typeOfPost := "Main"
+	// Input de la page
 	title := r.FormValue("title")
 	body := r.FormValue("body")
-	typeOfPost := "Main"
+
 	if title != "" && body != "" {
-		addNewPost(title, body, typeOfPost, data_newPost)
+		// Capture la date de submit
+		dt := time.Now()
+		// appel de la fonction pour créer le post
+		AddNewPost(title, body, typeOfPost, dt.Format("02-01-2006 15:04:05"), data_newPost)
 	}
+
 	t := template.New("newPost-template")
 	t = template.Must(t.ParseFiles("./html/newPost.html", "./html/header&footer.html"))
 	t.ExecuteTemplate(w, "newPost", data_newPost)
-}
-
-func addNewPost(title string, body string, typeOfPost string, data_newPost map[string]interface{}) {
-	// Open the database
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
-	defer database.Close()
-
-	// add the inputs to the database
-	tx, err := database.Begin()
-	if err != nil {
-		fmt.Println(err)
-	}
-	stmt, err := tx.Prepare("INSERT INTO posts (title, body, type, author) VALUES (?, ?, ?, ?)")
-	if err != nil {
-		fmt.Println(err)
-	}
-	auteur := data_newPost["user"]
-	fmt.Println(auteur)
-	_, err = stmt.Exec(title, body, typeOfPost, auteur)
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		tx.Commit()
-	}
 }
