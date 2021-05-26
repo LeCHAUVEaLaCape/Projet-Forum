@@ -1,3 +1,123 @@
+<<<<<<< HEAD
+{{define "user"}}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Forum - {{.username}}</title>
+    <link rel="stylesheet" href="../assets/css/user.css" />
+    <link rel="shortcut icon" href="../assets/images/icone.png" />
+  </head>
+  <body>
+    {{template "header" .}}
+
+    <div class="page">
+      <br /><br />
+      <div class="user-info">
+        <div class="username">
+          <p class="title">Username :</p>
+          <p>{{.username}}</p>
+        </div>
+
+        <div class="email">
+          <p class="title">Email :</p>
+          <p>{{.email}}</p>
+        </div>
+      </div>
+
+      <!-- block PHOTO -->
+      <div class="photo">
+        <div class="photo-defini">
+          <img src="{{.photo}}" />
+          {{if .sameUser}}
+          <div class="modify">X</div>
+          {{end}}
+        </div>
+        {{if .sameUser}}
+        <div class="photo-container">
+          <form action="/user?user={{.user}}" method="post" class="input-photo">
+            <div>
+              <button>
+                <img src="../assets/images/svenLeBg.jpg">
+                <input type="hidden" name="photo" value="../assets/images/svenLeBg.jpg"/>
+              </button>
+            </div>
+          </form>
+          <form action="/user?user={{.user}}" method="post" class="input-photo">
+            <div>
+              <button>
+                <img src="../assets/images/baptiste.jpg">
+                <input type="hidden" name="photo" value="../assets/images/baptiste.jpg"/>
+              </button>
+            </div>
+          </form>
+        </div>
+        {{end}}
+      </div>
+
+      <div class="info">
+        <!-- block AGE -->
+        <div class="age">
+          <div class="age-database">
+            <p class="title">Age :</p>
+            <p>{{.age}}</p>
+          </div>
+          {{if .sameUser}}
+          <form action="/user?user={{.user}}" method="post" class="input-age">
+            <div>
+              <input type="text" name="age" value="{{.age}}"/>
+            </div>
+            <button type="submit">Submit</button>
+          </form>
+          <div class="modify">X</div>
+          {{end}}
+        </div>
+
+        <!-- Block ADDRESS -->
+        <div class="address">
+          <div class="address-database">
+            <p class="title">Address :</p>
+            <p>{{.address}}</p>
+          </div>
+          {{if .sameUser}}
+          <form action="/user?user={{.user}}" method="post" class="input-address">
+            <div>
+              <input type="text" name="address" value="{{.address}}" />
+            </div>
+            <button type="submit">Submit</button>
+          </form>
+          <div class="modify">X</div>
+          {{end}}
+        </div>
+
+        <!-- Block Few Words -->
+        <div class="fewWords">
+          <div class="fewWords-database">
+            <p class="title">Few Words :</p>
+            <p>{{.fewWords}}</p>
+          </div>
+          {{if .sameUser}}
+          <form action="/user?user={{.user}}" method="post" class="input-fewWords">
+            <div>
+              <input type="text" name="addFewWords" value="{{.fewWords}}" />
+            </div>
+            <button type="submit">Submit</button>
+          </form>
+          <div class="modify">X</div>
+          {{end}}
+        </div>
+      </div>
+
+
+    </div>
+{{template "footer"}}
+  </body>
+</html>
+<script src="../assets/js/user.js"></script>
+{{end}}
+=======
 {{define "user"}}
 <!DOCTYPE html>
 <html lang="en">
@@ -116,3 +236,4 @@
 </html>
 <script src="../assets/js/user.js"></script>
 {{end}}
+>>>>>>> e15988c516b8e3526cd0bfecdda163bdf43cc2c7

@@ -1,3 +1,142 @@
+<<<<<<< HEAD
+body,
+* {
+  margin: 0;
+  padding: 0;
+  color: black;
+  text-decoration: none;
+  overflow-x: hidden;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+section{
+  width: 100vw;
+  height: 100vh;
+}
+/*------------------------------------------------------------- 
+|
+|font-face
+|
+ ------------------------------------------------------------- */
+@font-face {
+  font-family: 'Modusa';
+  src: url('../font/Modusa.ttf');
+}
+/*------------------------------------------------------------- 
+|
+|autentification
+|
+ ------------------------------------------------------------- */
+.page2{
+  height: 85%;
+  overflow: hidden;
+  margin: auto 35%;
+  margin-top: 5%;
+  border-radius: 20%;
+  border: black solid 3px;
+  box-shadow: 5px 10px 20px aqua inset ,0px 0px 10px  black;
+}
+.page {
+  height: 100%;
+  width: 100%;
+  background-color: #eee;
+  font-size: 60px;
+  overflow: hidden;
+}
+.title {
+  display: grid;
+  justify-content: center;
+}
+.title div {
+  text-align: center;
+  font-size: 32px;
+}
+.join {
+  font-size: 16px !important;
+}
+.formulaire {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 600px;
+}
+.username,
+.email,
+.passwd {
+  display: grid;
+  font-size: 18px;
+  padding: 11px;
+}
+.username label,
+.email label,
+.passwd label {
+  padding: 0px 0px 7px 0px;
+}
+input {
+  padding: 5px 9px 5px 9px;
+  width: 400px;
+  border-radius: 6px;
+  border: 1px solid;
+}
+.username p,
+.passwd p {
+  font-size: 12px;
+  padding: 3px 0px 0px 0px;
+}
+.passwd p {
+  width: 380px;
+}
+.sub {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  height: 130px;
+}
+form button {
+  padding: 0.75em 1.5em;
+  font-size: 17px;
+  line-height: 1.5;
+  border-radius: 0.5em;
+  cursor: pointer;
+  background-color: rgb(148, 211, 162);
+}
+form button:hover {
+  background-color: rgb(115, 185, 131);
+}
+.logIn {
+  font-size: 12px;
+  padding: 12px;
+}
+.logIn a {
+  color: blue;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.logIn a:hover {
+  color: aqua;
+  cursor: pointer;
+  text-decoration: underline;
+}
+span {
+  color: red;
+}
+
+.account-created {
+  width: 100%;
+}
+.account-created div {
+  font-size: 21px;
+  padding: 10px 0px 0px 12px;
+  color: green;
+  text-decoration: underline;
+}
+.input-taken {
+  color: #c10000;
+  text-decoration: underline;
+      font-size: 12px;
+    padding: 3px 0px 0px 0px;
+}
+
+=======
 body,
 * {
   margin: 0;
@@ -238,4 +377,9 @@ span {
   text-decoration: underline;
       font-size: 12px;
     padding: 3px 0px 0px 0px;
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> e15988c516b8e3526cd0bfecdda163bdf43cc2c7
+>>>>>>> 80a2cce52766c1fb1a48ab271556267122d226ba
