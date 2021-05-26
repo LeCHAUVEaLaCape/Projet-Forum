@@ -11,6 +11,11 @@
   <body>
     {{template "header" .}}
     <div class="page">
+        <form action="/user" method="get">
+          <label for="user">Search a User</label>
+          <input type="text" name="user" id="user">
+          <button type="submit">submit</button>
+        </form>
       <div class="users-container">
         <div class="all-users">
           {{$length := len .}} {{if gt $length 0}} {{template "aUser" .}}

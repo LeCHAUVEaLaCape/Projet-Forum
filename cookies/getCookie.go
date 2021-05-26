@@ -12,5 +12,6 @@ func GetCookie(data_info map[string]interface{}, r *http.Request) {
 		data_info["cookieExist"] = true
 	} else {
 		data_info["cookieExist"] = false
+		data_info["username"] = ""
 	}
 }
