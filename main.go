@@ -37,7 +37,7 @@ func main() {
 	defer database_post.Close()
 
 	// Create post table in the database_post
-	statement_post, _ := database_post.Prepare("CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY, title TEXT, body TEXT, like INTEGER, type TEXT, idMainPost INTEGER, author TEXT, date TEXT)")
+	statement_post, _ := database_post.Prepare("CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY, title TEXT, body TEXT, like INTEGER, type TEXT, idMainPost INTEGER, author TEXT, date TEXT, category TEXT)")
 	statement_post.Exec()
 	//
 	database_comment, _ := sql.Open("sqlite3", "./db-sqlite.db")
@@ -67,7 +67,7 @@ func main() {
 
 // Generate the main page when first loading the site
 func index(w http.ResponseWriter, r *http.Request) {
-	var post [][6]string
+	var post [][7]string
 
 	// initiate the data that will be send to html
 	data_index := make(map[string]interface{})
@@ -80,20 +80,20 @@ func index(w http.ResponseWriter, r *http.Request) {
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
 	defer database.Close()
 	//range over database
-	rows, _ := database.Query("SELECT title, body, author, date, id FROM posts")
+	rows, _ := database.Query("SELECT title, body, author, date, id, category FROM posts")
 	defer rows.Close()
 
 	for rows.Next() {
-		var aPost [6]string
-		rows.Scan(&title, &body, &author, &date, &id)
-		aPost[0] = title
-		aPost[1] = body
+		var aPost [7]string
+		rows.Scan(&aPost[0], &aPost[1], &aPost[2], &aPost[3], &id, &aPost[6])
 		// Remplace les \n par des <br> pour sauter des lignes en html
 		aPost[1] = strings.Replace(aPost[1], string('\r'), "", -1)
 		aPost[1] = strings.Replace(aPost[1], string('\n'), "<br>", -1)
-		aPost[2] = author
-		aPost[3] = date
 		aPost[5] = strconv.Itoa(id)
+
+		if strings.Contains(aPost[6], "0") {
+
+		}
 		post = append(post, aPost)
 	}
 
@@ -365,12 +365,16 @@ func newPost(w http.ResponseWriter, r *http.Request) {
 	// Input de la page
 	title := r.FormValue("title")
 	body := r.FormValue("body")
-
+	gaming := r.FormValue("gaming")
+	code := r.FormValue("code")
+	informatique := r.FormValue("info")
+	category := []string{gaming, code, informatique}
+	fmt.Println(category)
 	if title != "" && body != "" {
 		// Capture la date de submit
 		dt := time.Now()
 		// appel de la fonction pour créer le post
-		AddNewPost(title, body, typeOfPost, dt.Format("02-01-2006 15:04:05"), data_newPost)
+		AddNewPost(title, body, typeOfPost, dt.Format("02-01-2006 15:04:05"), data_newPost, category)
 	}
 
 	t := template.New("newPost-template")
