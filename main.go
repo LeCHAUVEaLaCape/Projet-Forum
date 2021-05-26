@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 	"text/template"
 	"time"
@@ -15,8 +16,8 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-var id int
-var username, password, email, age, fewWords, address, photo, state, title, body, author, date string
+var id, like int
+var username, password, email, age, fewWords, address, photo, state, title, body, author, date, content string
 var create_cookie, userFound = false, false
 
 var data = make(map[string]interface{})
@@ -30,7 +31,7 @@ func main() {
 	// Create users table in the database
 	statement, _ := database.Prepare("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username TEXT, email TEXT, password TEXT, fewWords TEXT, age TEXT, address TEXT, photo TEXT)")
 	statement.Exec()
-
+	//
 	// Open the database_post and create it if needed
 	database_post, _ := sql.Open("sqlite3", "./db-sqlite.db")
 	defer database_post.Close()
@@ -38,6 +39,13 @@ func main() {
 	// Create post table in the database_post
 	statement_post, _ := database_post.Prepare("CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY, title TEXT, body TEXT, like INTEGER, type TEXT, idMainPost INTEGER, author TEXT, date TEXT)")
 	statement_post.Exec()
+	//
+	database_comment, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	defer database_comment.Close()
+
+	// Create users table in the database
+	statement_comment, _ := database_comment.Prepare("CREATE TABLE IF NOT EXISTS comments (id INTEGER PRIMARY KEY, idMainPost TEXT, content TEXT, like INTEGER, author TEXT, date TEXT)")
+	statement_comment.Exec()
 
 	fmt.Println("Please connect to http://localhost:8000")
 	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets")))) // Join Assets Directory to the server
@@ -49,6 +57,8 @@ func main() {
 	http.HandleFunc("/allUsers", allUsers)
 	http.HandleFunc("/user", user)
 	http.HandleFunc("/newPost", newPost)
+	http.HandleFunc("/post", post)
+
 	err := http.ListenAndServe(":8000", nil) // Set listen port
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
@@ -57,8 +67,7 @@ func main() {
 
 // Generate the main page when first loading the site
 func index(w http.ResponseWriter, r *http.Request) {
-	var aPost [5]string
-	var post [][5]string
+	var post [][6]string
 
 	// initiate the data that will be send to html
 	data_index := make(map[string]interface{})
@@ -71,10 +80,12 @@ func index(w http.ResponseWriter, r *http.Request) {
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
 	defer database.Close()
 	//range over database
-	rows, _ := database.Query("SELECT title, body, author, date FROM posts")
+	rows, _ := database.Query("SELECT title, body, author, date, id FROM posts")
 	defer rows.Close()
+
 	for rows.Next() {
-		rows.Scan(&title, &body, &author, &date)
+		var aPost [6]string
+		rows.Scan(&title, &body, &author, &date, &id)
 		aPost[0] = title
 		aPost[1] = body
 		// Remplace les \n par des <br> pour sauter des lignes en html
@@ -82,6 +93,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 		aPost[1] = strings.Replace(aPost[1], string('\n'), "<br>", -1)
 		aPost[2] = author
 		aPost[3] = date
+		aPost[5] = strconv.Itoa(id)
 		post = append(post, aPost)
 	}
 
@@ -364,4 +376,29 @@ func newPost(w http.ResponseWriter, r *http.Request) {
 	t := template.New("newPost-template")
 	t = template.Must(t.ParseFiles("./html/newPost.html", "./html/header&footer.html"))
 	t.ExecuteTemplate(w, "newPost", data_newPost)
+}
+func post(w http.ResponseWriter, r *http.Request) {
+	post_id := r.FormValue("id")
+	add_comment := r.FormValue("add_comment")
+
+	// initiate the data that will be send to html
+	data_post := make(map[string]interface{})
+	for k, v := range data {
+		data_post[k] = v
+	}
+	data_post["cookieExist"] = false
+	GetCookie(data_post, r)
+
+	var post = Display_post(post_id, data_post, body)
+
+	Display_comments(data_post, post_id)
+
+	if add_comment != "" {
+		Adding_comment(add_comment, &post, data_post["user"].(string))
+		http.Redirect(w, r, "/post?id="+post_id, http.StatusSeeOther)
+	}
+
+	t := template.New("post-template")
+	t = template.Must(t.ParseFiles("./html/post.html", "./html/header&footer.html"))
+	t.ExecuteTemplate(w, "post", data_post)
 }

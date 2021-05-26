@@ -1,0 +1,43 @@
+{{define "post"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faux Rhum - ??</title>
+    <link rel="stylesheet" href="./assets/css/post.css" />
+</head>
+<body>
+    {{template "header" .}}
+    <div class="page">
+        <div class="title-post">{{index .main_post 1}}</div>
+        <div class="body-post">
+            <div class="message">
+              <p>{{index .main_post 2}}</p>
+            </div>
+          </div>
+          <div class="author-post">
+            <p class="author">
+              <span>post created by : </span
+              ><a id="user" href="/user?user={{index .main_post 3}}">{{index .main_post 3}}</a>
+              <img src="{{index .main_post 5}}">
+            </p>
+            <span>{{index .main_post 4}}</span>
+          </div>
+        {{if .cookieExist}}
+        <div>
+            <form action="/post?id={{index .main_post 0}}" method="POST" >
+                <input type="text" name="add_comment">
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+        {{end}}
+        {{range .comments}}
+        <div>{{.}}</div>
+        {{end}}
+    </div>
+    {{template "footer"}}
+</body>
+</html>
+{{end}}
