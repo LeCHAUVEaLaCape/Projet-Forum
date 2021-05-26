@@ -21,7 +21,7 @@ func AddNewPost(title string, body string, typeOfPost string, dt string, data_ne
 	if err != nil {
 		fmt.Println(err)
 	}
-	_, err = stmt.Exec(title, body, typeOfPost, data_newPost["user"], dt, strings.Join(category, ","))
+	_, err = stmt.Exec(title, body, typeOfPost, data_newPost["user"], dt, strings.Join(category, ""))
 	if err != nil {
 		fmt.Println(err)
 	} else {

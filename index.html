@@ -51,12 +51,9 @@
                 <img src="{{index . 4}}">
               </p>
               <span>{{index . 3}}</span>
-              {{range $key := .}}
-                {{if eq $key 6}}
-                  {{.}}
-                  {{end}}
+              {{range index . 7}}
+              {{.}}
               {{end}}
-              
             </div>
           </div>
           {{end}}

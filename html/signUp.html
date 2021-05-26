@@ -13,6 +13,7 @@
 
 <body>
   {{template "header" .}}
+  
   <section>
     <div class="page">
       <div class="page2">
@@ -23,6 +24,9 @@
 
         <div class="formulaire">
           <form method="POST" action="?" autocomplete="off">
+            <div class="sub">
+              <button type="submit">Create account</button>
+            </div>
 
             <div class="username">
               <label for="username">Username <span>*</span></label>
@@ -61,6 +65,7 @@
             </div>
             <p class="logIn">Already have an account? <a href="/logIn">Click here</a></p>
 
+            
             {{if .accountCreated}}
             <div class="account-created" id="account-created">
               <div>
@@ -69,9 +74,6 @@
             </div>
             {{end}}
 
-            <div class="sub">
-              <button type="submit">Create account</button>
-            </div>
           </form>
         </div>
 
@@ -80,8 +82,9 @@
     </div>
 
   </section>
-  <script type="text/javascript" src="../js/script.js"></script>
+  {{template "footer"}}
 </body>
+<script type="text/javascript" src="../js/script.js"></script>
 
 </html>
 {{end}}

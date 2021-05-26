@@ -90,21 +90,22 @@ func index(w http.ResponseWriter, r *http.Request) {
 		aPost[1] = strings.Replace(aPost[1].(string), string('\r'), "", -1)
 		aPost[1] = strings.Replace(aPost[1].(string), string('\n'), "<br>", -1)
 		aPost[5] = strconv.Itoa(id)
+
 		if aPost[6] != nil {
 			temp := []interface{}{} // string
 			for _, e := range aPost[6].(string) {
 				j, _ := strconv.Atoi(string(e))
 				temp = append(temp, categories[j])
 			}
-
 			aPost = append(aPost, temp)
 		} else {
-			aPost[6] = ""
+			aPost[6] = []string{}
+			aPost = append(aPost, []string{})
 		}
+
 		post = append(post, aPost)
 
 	}
-	fmt.Println(post)
 	// Ajoute le chemin de la photo qui a été choisit par l'utilisateur
 	for i := 0; i < len(post); i++ {
 		rows, err := database.Query("SELECT photo FROM users WHERE username = ?", post[i][2])
@@ -376,15 +377,16 @@ func newPost(w http.ResponseWriter, r *http.Request) {
 	body := r.FormValue("body")
 	gaming := r.FormValue("gaming")
 	code := r.FormValue("code")
-	informatique := r.FormValue("info")
+	informatique := r.FormValue("informatique")
 	category := []string{gaming, code, informatique}
-	fmt.Println(category)
+
 	if title != "" && body != "" {
 		// Capture la date de submit
 		dt := time.Now()
 		// appel de la fonction pour créer le post
 		AddNewPost(title, body, typeOfPost, dt.Format("02-01-2006 15:04:05"), data_newPost, category)
 	}
+	data_newPost["categorie"] = categories
 
 	t := template.New("newPost-template")
 	t = template.Must(t.ParseFiles("./html/newPost.html", "./html/header&footer.html"))
