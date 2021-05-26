@@ -108,6 +108,7 @@
 #post,
 #all-users,
 #welcome {
+  transition: all 0.5s;
   font-size: 25px;
   font-family: 'Modusa';
 }
@@ -118,11 +119,10 @@
   background: -webkit-linear-gradient(#DFA003, brown, yellow);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  font-size: 28px;
 }
-
+.logout-btn,
 .login-btn {
-  font-family:"Modusa";
-  color: black;
   cursor: pointer;
   font-size: 2em;
   border-style: solid;
@@ -133,41 +133,84 @@
   position: relative;
   overflow: hidden;
 }
-.login-btn a{
-  font-family:"Modusa";
-
-}
-
-.login-btn::after {
-  content:url("../images/login.svg");
+.logout-btn a,
+.login-btn a {
   font-family: "Modusa";
-  font-weight: bold;
+}
+.logout-btn::after{
+  content: url("../images/logout.svg");
   position: absolute;
   left: 30%;
   top: 30%;
   right: 0;
   bottom: 0;
   opacity: 0;
-  transform: translate(30%,-24%);
+  transform: translate(30%, -30%);
 }
-
+.login-btn::after {
+  content: url("../images/login.svg");
+  position: absolute;
+  left: 30%;
+  top: 30%;
+  right: 0;
+  bottom: 0;
+  opacity: 0;
+  transform: translate(30%, -30%);
+}
+.logout-btn:hover,
 .login-btn:hover {
   background: -webkit-linear-gradient(#DFA003, brown, yellow);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   transition: all 0.5s;
-  box-shadow: 0px 6px 15px #0000ff61;
-  padding: 0.5rem 3rem 0.5rem 0.5rem;
-  color: #DFA003;
-
+  box-shadow: 0px 6px 15px #000000;
+  padding: 1px 35px 1px 1px;
 }
+.logout-btn:hover::after,
 .login-btn:hover:after {
   opacity: 1;
   transition: all 0.5s;
   background: -webkit-linear-gradient(#DFA003, brown, yellow);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
 
+.btn {
+  transition: all 0.5s;
+  margin-left: 10px;
+  text-decoration: none;
+  border-style: solid;
+  border-width: 2px;
+  border-image: linear-gradient(45deg, #DFA003, brown, yellow) 1;
+  position: relative;
+  overflow: hidden;
+  font-family: "Modusa";
+  font-size: 40px;
+}
+
+.btn:hover {
+  transition: all 0.5s;
+  box-shadow: 0px 6px 15px #000000;
+  padding: 1px 1px 1px 1px;
+  background: -webkit-linear-gradient(#DFA003, brown, yellow);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  
+}
+
+.btn:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%; 
+  background: linear-gradient(120deg ,transparent, rgba(230, 230, 0, 0.7),transparent);
+  transition: all 650ms;
+}
+
+.btn:hover:before {
+  left: 100%;
 }
 /*------------------------------------------------------------- 
 |
@@ -176,35 +219,35 @@
  ------------------------------------------------------------- */
 .auth {
   display: flex;
-  width: 330px;
+  width: 340px;
   justify-content: center;
   align-items: center;
 }
 
-.auth p {
-  font-size: 12px;
+.auth  div p {
+  font-size: 20px;
+  font-family: "Modusa";
+  
+}
+.auth  div a {
+  transition: all 0.5s;
+  font-size: 20px;
+  font-family: "Modusa";
+  border-bottom-style: solid;
+  border-width: 1px;
+  border-image: linear-gradient(45deg, #DFA003, brown, yellow) 1;
+}
+.auth  div a:hover {
+  background: -webkit-linear-gradient(#DFA003, brown, yellow);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 22px;
 }
 
 .auth div {
   text-align: center;
 }
 
-.sign-in,
-.log-out {
-  border: solid 1px black;
-  padding: 6px;
-  margin: 0px 10px 0px 10px;
-  border-radius: 9px;
-}
-
-.sign-in:hover,
-.log-out:hover {
-  background-color: #eee;
-}
-
-.account {
-  text-decoration: underline;
-}
 
 /* 
 +----------------------------------------------------------------------+

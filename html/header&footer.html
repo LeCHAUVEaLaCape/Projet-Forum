@@ -20,13 +20,13 @@
         <div class="auth">
           {{if not .cookieExist}}
           <button  class="login-btn"><a href="/logIn">Login</a></button>
-          <a href="/SignUp" class="sign-in">S'inscrire</a>
+          <a href="/SignUp" class="btn">Register</a>
           {{else}}
           <div>
             <p>Connecté en tant que :</p>
             <a class="account" href="/user?user={{.user}}">{{.user}}</a>
           </div>
-          <a class="log-out" href="/logOut">Se déconnecter</a>
+          <button  class="logout-btn"><a href="/logOut">Logout</a></button>
           {{end}}
 
         </div>

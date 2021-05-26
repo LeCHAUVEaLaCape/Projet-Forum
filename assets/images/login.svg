@@ -1,10 +1,10 @@
-<svg width="41" height="47" viewBox="0 0 41 47" fill="none" xmlns="http://www.w3.org/2000/svg">
-<line y1="-3.5" x2="10" y2="-3.5" transform="matrix(0 -1 -1 0 2 40)" stroke="black" stroke-width="7"/>
-<line y1="-3.5" x2="10" y2="-3.5" transform="matrix(0 -1 -1 0 2 19)" stroke="black" stroke-width="7"/>
-<line y1="-3.5" x2="30" y2="-3.5" transform="matrix(1 0 0 -1 2 2)" stroke="black" stroke-width="7"/>
-<line y1="-3.5" x2="30" y2="-3.5" transform="matrix(1 0 0 -1 2 40)" stroke="black" stroke-width="7"/>
-<line y1="-2.5" x2="25" y2="-2.5" transform="matrix(1 0 0 -1 2 22)" stroke="black" stroke-width="5"/>
-<line y1="-3.5" x2="45" y2="-3.5" transform="matrix(0 -1 -1 0 32 47)" stroke="black" stroke-width="7"/>
-<line y1="-2.5" x2="15" y2="-2.5" transform="matrix(0.707107 -0.707107 -0.707107 -0.707107 16 31.6066)" stroke="black" stroke-width="5"/>
-<line y1="-2.5" x2="15" y2="-2.5" transform="matrix(-0.707107 -0.707107 -0.707107 0.707107 26.6067 27.6066)" stroke="black" stroke-width="5"/>
+<svg width="27" height="32" viewBox="0 0 27 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<line y1="-2.5" x2="5" y2="-2.5" transform="matrix(0 -1 -1 0 1 26)" stroke="black" stroke-width="5"/>
+<line y1="-2.5" x2="5" y2="-2.5" transform="matrix(0 -1 -1 0 1 11)" stroke="black" stroke-width="5"/>
+<line y1="-2.5" x2="20" y2="-2.5" transform="matrix(1 0 0 -1 1 1)" stroke="black" stroke-width="5"/>
+<line y1="-2.5" x2="20" y2="-2.5" transform="matrix(1 0 0 -1 1 26)" stroke="black" stroke-width="5"/>
+<line y1="-2" x2="15" y2="-2" transform="matrix(1 0 0 -1 1 14)" stroke="black" stroke-width="4"/>
+<line y1="-1.5" x2="10" y2="-1.5" transform="matrix(0.707107 -0.707107 -0.707107 -0.707107 9 21.071)" stroke="black" stroke-width="3"/>
+<line y1="-1.5" x2="10" y2="-1.5" transform="matrix(-0.707107 -0.707107 -0.707107 0.707107 16.071 18.071)" stroke="black" stroke-width="3"/>
+<line y1="-2.5" x2="30" y2="-2.5" transform="matrix(0 -1 -1 0 21 31)" stroke="black" stroke-width="5"/>
 </svg>
