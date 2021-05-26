@@ -30,14 +30,18 @@
         <div class="all-posts">
           {{range .allposts}}
           <div class="singlePost-container">
-            <form action="/post" method="GET">
-              <input type="hidden" name="id" value="{{index . 5}}">
-              <button> <div class="title-post">{{index . 0}}</div> </button>
-            </form>
 
+            <div class="title-post">{{index . 0}}</div>
             <div class="body-post">
               <div class="message">
                 <p>{{index . 1}}</p>
+              </div>
+              <div class="see-more">
+                <form action="/post" method="GET">
+                  <input type="hidden" name="id" value="{{index . 5}}">
+                  <button> Lire la suite... </button>
+                </form>
+                
               </div>
             </div>
             <div class="author-post">

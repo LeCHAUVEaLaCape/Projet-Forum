@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Faux Rhum - ??</title>
+    <title>Faux Rhum - {{index .main_post 1}}</title>
     <link rel="stylesheet" href="./assets/css/post.css" />
 </head>
 <body>
@@ -34,7 +34,15 @@
         </div>
         {{end}}
         {{range .comments}}
-        <div>{{.}}</div>
+        <div class="full-comment">
+          <div class="comment-container">
+            <div class="comment">
+              {{index . 0}}
+            </div>
+          </div>
+          <div class="auteur-comment">post created by : {{index . 1}}</div>
+          <div class="date-comment">{{index . 2}}</div>
+        </div>
         {{end}}
     </div>
     {{template "footer"}}

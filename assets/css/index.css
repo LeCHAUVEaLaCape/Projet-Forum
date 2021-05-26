@@ -29,7 +29,11 @@ body,
 }
 .singlePost-container {
   width: 70%;
-  height: 180px;
+  margin: 10px 0px 25px 0px;
+}
+.singlePost-container form {
+  display: flex;
+  justify-content: center;
 }
 .title-post {
   display: flex;
@@ -41,16 +45,17 @@ body,
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-wrap: wrap;
 }
 .message {
   width: 90%;
-  min-height: 60px;
-  max-height: 90%;
   border: black 1px solid;
   border-radius: 10px;
   padding: 10px;
   font-size: 15px;
   background: #fff;
+  height: 175px;
+  overflow: hidden;
 }
 .message p {
   overflow: auto;
@@ -72,6 +77,10 @@ span {
   justify-content: center;
   align-items: center;
   width: 100vw;
+}
+button {
+  cursor: pointer;
+  border: solid 0px;
 }
 .newpost-redirect {
   height: 50px;
