@@ -30,7 +30,7 @@
         <div class="all-posts">
           {{range .allposts}}
           <div class="singlePost-container">
-
+            
             <div class="title-post">{{index . 0}}</div>
             <div class="body-post">
               <div class="message">
@@ -51,6 +51,12 @@
                 <img src="{{index . 4}}">
               </p>
               <span>{{index . 3}}</span>
+              {{range $key := .}}
+                {{if eq $key 6}}
+                  {{.}}
+                  {{end}}
+              {{end}}
+              
             </div>
           </div>
           {{end}}

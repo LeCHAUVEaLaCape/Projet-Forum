@@ -19,7 +19,7 @@ import (
 var id, like int
 var username, password, email, age, fewWords, address, photo, state, title, body, author, date, content string
 var create_cookie, userFound = false, false
-
+var categories = []string{"gaming", "code", "informatique"}
 var data = make(map[string]interface{})
 
 func main() {
@@ -67,7 +67,7 @@ func main() {
 
 // Generate the main page when first loading the site
 func index(w http.ResponseWriter, r *http.Request) {
-	var post [][7]string
+	var post [][]interface{}
 
 	// initiate the data that will be send to html
 	data_index := make(map[string]interface{})
@@ -82,21 +82,29 @@ func index(w http.ResponseWriter, r *http.Request) {
 	//range over database
 	rows, _ := database.Query("SELECT title, body, author, date, id, category FROM posts")
 	defer rows.Close()
-
+	// categorie := [][]interface{}{}
 	for rows.Next() {
-		var aPost [7]string
+		aPost := []interface{}{"", "", "", "", "", "", ""}
 		rows.Scan(&aPost[0], &aPost[1], &aPost[2], &aPost[3], &id, &aPost[6])
 		// Remplace les \n par des <br> pour sauter des lignes en html
-		aPost[1] = strings.Replace(aPost[1], string('\r'), "", -1)
-		aPost[1] = strings.Replace(aPost[1], string('\n'), "<br>", -1)
+		aPost[1] = strings.Replace(aPost[1].(string), string('\r'), "", -1)
+		aPost[1] = strings.Replace(aPost[1].(string), string('\n'), "<br>", -1)
 		aPost[5] = strconv.Itoa(id)
+		if aPost[6] != nil {
+			temp := []interface{}{} // string
+			for _, e := range aPost[6].(string) {
+				j, _ := strconv.Atoi(string(e))
+				temp = append(temp, categories[j])
+			}
 
-		if strings.Contains(aPost[6], "0") {
-
+			aPost = append(aPost, temp)
+		} else {
+			aPost[6] = ""
 		}
 		post = append(post, aPost)
-	}
 
+	}
+	fmt.Println(post)
 	// Ajoute le chemin de la photo qui a été choisit par l'utilisateur
 	for i := 0; i < len(post); i++ {
 		rows, err := database.Query("SELECT photo FROM users WHERE username = ?", post[i][2])
@@ -118,6 +126,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data_index["allposts"] = post
+
 	t := template.New("index-template")
 	t = template.Must(t.ParseFiles("index.html", "./html/header&footer.html"))
 	t.ExecuteTemplate(w, "index", data_index)
