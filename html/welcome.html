@@ -1,21 +1,52 @@
 {{define "welcome"}}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forum - Welcome</title>
-    <link rel="shortcut icon" href="../assets/images/icone.png" />
+    <title>Faux Rhum - Welcome</title>
+    <link rel="shortcut icon" href="../assets/images/logoforum.png" />
     <link rel="stylesheet" href="../assets/css/welcome.css" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300&display=swap" rel="stylesheet">
 </head>
+
 <body>
-    {{template "header" .}}
+    <section>
+        {{template "header" .}}
         <div class="page">
-            <p>Welcome</p>
+            <h2 data-aos="fade-down" data-aos-duration="3000"><strong>W</strong>elcom<strong>e</strong></h2>
+            <p data-aos="zoom-in-down" data-aos-duration="3000" >Here is our Faux Rhum, here you can speak with other people</p>
+            <p data-aos="zoom-in-right" data-aos-duration="3000">There are Rules :</p>
+            <div data-aos="zoom-in-left" data-aos-duration="3000">
+                <ul>
+                    <li>Dont say bad words</li>
+                    <li>Dont use too much Uppercases</li>
+                    <li>Dont have an abusive language</li>
+                    <li>Have Fun with others</li>
+                </ul>
+            </div>
+            <p data-aos="zoom-in-up" data-aos-duration="3000">Cordially,</p>
+            <p data-aos="zoom-out-up" data-aos-duration="3000">The team</p>
+            <div class="nous">
+                <img data-aos="fade-right" data-aos-duration="3000" src="../assets/images/florian.png" alt="flo">
+                <img data-aos="fade-up-right" data-aos-duration="3000" src="../assets/images/baptiste.png" alt="baptiste">
+                <img data-aos="fade-up-left" data-aos-duration="3000" src="../assets/images/sven.png" alt="sven">
+                <img data-aos="fade-left" data-aos-duration="3000" src="../assets/images/brian.png" alt="brian">
+            </div>
         </div>
-    {{template "footer"}}
+    </section>
 </body>
+
 </html>
-<script>document.getElementById("welcome").classList.add("active");</script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init();
+</script>
+<script>
+    document.getElementById("welcome").classList.add("active");
+</script>
 {{end}}
