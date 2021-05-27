@@ -8,7 +8,7 @@ import (
 )
 
 // verifie Si l'utilisateur connecter à déjà liker le post
-func CheckIfLikedByUser(post_id string, data_post map[string]interface{}) bool {
+func CheckIfLikedByUser(post_id string, data_post map[string]interface{}) (bool, string) {
 	user := data_post["user"].(string)
 
 	// Open the database
@@ -33,30 +33,17 @@ func CheckIfLikedByUser(post_id string, data_post map[string]interface{}) bool {
 		// parcour l'array de ceux qui ont liké pour éviter les doublons
 		for i := 0; i < len(all_likedBy); i++ {
 			if all_likedBy[i] == user {
-				return false
+				return false, likedBy
 			}
 		}
 		likedBy += " " + user
 	}
 
-	tx, err := database.Begin()
-	// Update the users who liked
-	query := "UPDATE posts SET likedBy = ? WHERE id = " + post_id
-	stmt, err := tx.Prepare(query)
-	if err != nil {
-		fmt.Println(err)
-	}
-	_, err = stmt.Exec(likedBy)
-	if err != nil {
-		fmt.Println(err)
-	}
-	tx.Commit()
-
-	return true
+	return true, likedBy
 }
 
 // ajoute un like au post quand l'utilisateur clique sur le bouton
-func AddLike(post_id string, data_post map[string]interface{}) {
+func AddLike(post_id string, data_post map[string]interface{}, likedBy string) {
 	var like int
 
 	// Open the database
@@ -84,10 +71,22 @@ func AddLike(post_id string, data_post map[string]interface{}) {
 	if err != nil {
 		fmt.Println(err)
 	}
+
+	// Update the users who liked
+	query = "UPDATE posts SET likedBy = ? WHERE id = " + post_id
+	stmt, err = tx.Prepare(query)
+	if err != nil {
+		fmt.Println(err)
+	}
+	_, err = stmt.Exec(likedBy)
+	if err != nil {
+		fmt.Println(err)
+	}
 	tx.Commit()
 }
+
 // remove a like on click
-func RemoveLike(post_id string, data_post map[string]interface{}) {
+func RemoveLike(post_id string, data_post map[string]interface{}, likedBy string) {
 	var like int
 
 	// Open the database
@@ -112,6 +111,17 @@ func RemoveLike(post_id string, data_post map[string]interface{}) {
 		fmt.Println(err)
 	}
 	_, err = stmt.Exec()
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	// Update the users who liked
+	query = "UPDATE posts SET likedBy = ? WHERE id = " + post_id
+	stmt, err = tx.Prepare(query)
+	if err != nil {
+		fmt.Println(err)
+	}
+	_, err = stmt.Exec(likedBy)
 	if err != nil {
 		fmt.Println(err)
 	}

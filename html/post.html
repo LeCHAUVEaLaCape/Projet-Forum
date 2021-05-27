@@ -18,7 +18,8 @@
           <div class="message">
             <p>{{index .main_post 2}}</p>
             {{$user := index .main_post 3}}
-            {{if eq .user $user}}
+            {{$userconnect := .user}}
+            {{if eq $userconnect $user}}
             <form action="/delPost" method="POST">
               <input type="hidden" name="delPost" value="{{index .main_post 0}}">
               <button class="del-post">X</button>
@@ -69,6 +70,13 @@
         <div class="full-comment">
           <div class="comment-container">
             <div class="comment">
+              {{$author := index . 1}}
+              {{if eq $author $userconnect}}
+              <form action="/delComment" method="POST">
+                <input type="hidden" name="delComment" value="{{index . 0}}">
+                <button class="del-comment">X</button>
+              </form>
+              {{end}}
               {{index . 0}}
             </div>
           </div>

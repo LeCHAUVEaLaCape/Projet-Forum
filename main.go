@@ -40,6 +40,7 @@ func main() {
 	http.HandleFunc("/newPost", newPost)
 	http.HandleFunc("/post", post)
 	http.HandleFunc("/delPost", delPost)
+	http.HandleFunc("/delComment", delComment)
 
 	err := http.ListenAndServe(":8000", nil) // Set listen port
 	if err != nil {
@@ -411,16 +412,17 @@ func post(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Verifie si l'utilisateur a liké
-	if data_post["user"] != nil {
-		data_post["already_liked"] = CheckIfLikedByUser(post_id, data_post)
-	}
+	var likedBy string
+	data_post["already_liked"], likedBy = CheckIfLikedByUser(post_id, data_post)
+	fmt.Println("already_liked :", data_post["already_liked"])
 
 	change_nmb_like := r.FormValue("Like")
-	if change_nmb_like != "" && change_nmb_like == "1"{
-		AddLike(post_id, data_post)
+	fmt.Println(change_nmb_like)
+	if change_nmb_like == "1" {
+		AddLike(post_id, data_post, likedBy)
 		http.Redirect(w, r, "/post?id="+post_id, http.StatusSeeOther)
-	}else if change_nmb_like != "" && change_nmb_like == "0"{
-		RemoveLike(post_id, data_post)
+	} else if change_nmb_like == "0" {
+		RemoveLike(post_id, data_post, likedBy)
 		http.Redirect(w, r, "/post?id="+post_id, http.StatusSeeOther)
 	}
 
@@ -428,7 +430,6 @@ func post(w http.ResponseWriter, r *http.Request) {
 		data_post["user"] = ""
 	}
 
-	fmt.Println(data_post["already_liked"])
 	t := template.New("post-template")
 	t = template.Must(t.ParseFiles("./html/post.html", "./html/header&footer.html"))
 	t.ExecuteTemplate(w, "post", data_post)
@@ -471,5 +472,29 @@ func delPost(w http.ResponseWriter, r *http.Request) {
 		tx.Commit()
 	}
 
+	http.Redirect(w, r, "/index", http.StatusSeeOther)
+}
+
+func delComment(w http.ResponseWriter, r *http.Request) {
+	delete_comment := r.FormValue("delComment")
+	// Open the database
+	fmt.Println(delete_comment)
+	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	defer database.Close()
+
+	// DELETE the comments of the main post
+	tx, err := database.Begin()
+	if err != nil {
+		fmt.Println(err)
+	}
+	stmt, err := tx.Prepare("DELETE FROM comments WHERE content = ?")
+	if err != nil {
+		fmt.Println(err)
+	}
+	_, err = stmt.Exec(delete_comment)
+	if err != nil {
+		fmt.Println(err)
+	}
+	tx.Commit()
 	http.Redirect(w, r, "/index", http.StatusSeeOther)
 }
