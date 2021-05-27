@@ -250,3 +250,13 @@ button {
   text-decoration: underline;
   color: rgb(0, 54, 201);
 }
+.all {
+  padding: 0 ;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: black;
+}
+.all p {
+  color: white;
+}

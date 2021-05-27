@@ -411,24 +411,25 @@ func post(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/post?id="+post_id, http.StatusSeeOther)
 	}
 
+	change_nmb_like := r.FormValue("Like")
 	// Verifie si l'utilisateur a liké
 	var likedBy string
 	data_post["already_liked"], likedBy = CheckIfLikedByUser(post_id, data_post)
-	fmt.Println("already_liked :", data_post["already_liked"])
 
-	change_nmb_like := r.FormValue("Like")
-	fmt.Println(change_nmb_like)
 	if change_nmb_like == "1" {
-		AddLike(post_id, data_post, likedBy)
+		likedBy = AddLike(post_id, data_post, likedBy)
 		http.Redirect(w, r, "/post?id="+post_id, http.StatusSeeOther)
 	} else if change_nmb_like == "0" {
-		RemoveLike(post_id, data_post, likedBy)
+		likedBy = RemoveLike(post_id, data_post, likedBy)
 		http.Redirect(w, r, "/post?id="+post_id, http.StatusSeeOther)
 	}
 
 	if data_post["user"] == nil {
 		data_post["user"] = ""
 	}
+
+	likedBy = strings.ReplaceAll(likedBy, " ", "<br>")
+	data_post["mainPost_likedBy"] = likedBy
 
 	t := template.New("post-template")
 	t = template.Must(t.ParseFiles("./html/post.html", "./html/header&footer.html"))
@@ -475,10 +476,10 @@ func delPost(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/index", http.StatusSeeOther)
 }
 
+// supprime un commentaire
 func delComment(w http.ResponseWriter, r *http.Request) {
 	delete_comment := r.FormValue("delComment")
 	// Open the database
-	fmt.Println(delete_comment)
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
 	defer database.Close()
 

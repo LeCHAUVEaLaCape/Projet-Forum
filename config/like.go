@@ -25,9 +25,7 @@ func CheckIfLikedByUser(post_id string, data_post map[string]interface{}) (bool,
 		}
 	}
 
-	if likedBy == "" {
-		likedBy = user
-	} else {
+	if likedBy != "" {
 		// Split le string en array
 		all_likedBy := strings.Split(likedBy, " ")
 		// parcour l'array de ceux qui ont liké pour éviter les doublons
@@ -36,15 +34,15 @@ func CheckIfLikedByUser(post_id string, data_post map[string]interface{}) (bool,
 				return false, likedBy
 			}
 		}
-		likedBy += " " + user
 	}
 
 	return true, likedBy
 }
 
 // ajoute un like au post quand l'utilisateur clique sur le bouton
-func AddLike(post_id string, data_post map[string]interface{}, likedBy string) {
+func AddLike(post_id string, data_post map[string]interface{}, likedBy string) string {
 	var like int
+	user := data_post["user"].(string)
 
 	// Open the database
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
@@ -72,6 +70,13 @@ func AddLike(post_id string, data_post map[string]interface{}, likedBy string) {
 		fmt.Println(err)
 	}
 
+	if likedBy == "" {
+		likedBy = user
+	} else {
+
+		likedBy += " " + user
+	}
+
 	// Update the users who liked
 	query = "UPDATE posts SET likedBy = ? WHERE id = " + post_id
 	stmt, err = tx.Prepare(query)
@@ -83,11 +88,14 @@ func AddLike(post_id string, data_post map[string]interface{}, likedBy string) {
 		fmt.Println(err)
 	}
 	tx.Commit()
+
+	return likedBy
 }
 
 // remove a like on click
-func RemoveLike(post_id string, data_post map[string]interface{}, likedBy string) {
+func RemoveLike(post_id string, data_post map[string]interface{}, likedBy string) string {
 	var like int
+	user := data_post["user"].(string)
 
 	// Open the database
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
@@ -115,6 +123,16 @@ func RemoveLike(post_id string, data_post map[string]interface{}, likedBy string
 		fmt.Println(err)
 	}
 
+	all_likedBy := strings.Split(likedBy, " ")
+
+	for i := 0; i < len(all_likedBy); i++ {
+		if user == all_likedBy[i] {
+			all_likedBy = append(all_likedBy[:i], all_likedBy[i+1:]...)
+			break
+		}
+	}
+	likedBy = strings.Join(all_likedBy, " ")
+
 	// Update the users who liked
 	query = "UPDATE posts SET likedBy = ? WHERE id = " + post_id
 	stmt, err = tx.Prepare(query)
@@ -126,4 +144,6 @@ func RemoveLike(post_id string, data_post map[string]interface{}, likedBy string
 		fmt.Println(err)
 	}
 	tx.Commit()
+
+	return likedBy
 }

@@ -133,3 +133,38 @@ form {
   padding: 5px;
   cursor: pointer;
 }
+.like {
+  display: flex;
+  justify-content: flex-end;
+}
+.like-button {
+  justify-content: flex-end !important;
+}
+.nb-like {
+  margin-left: 9px;
+}
+.comment {
+  position: relative;
+}
+.del-comment {
+  position: absolute;
+  top: 0;
+  right: 0;
+  border: solid 1px black;
+  padding: 5px;
+  cursor: pointer;
+}
+.invisible-likers{
+  display: none;
+}
+.nb-like:hover .invisible-likers {
+  display: initial;
+  position: absolute;
+  transform: translate(10px,-20px);
+  background: white;
+  padding: 8px;
+  text-align: center;
+  font-size: 15px;
+  border: solid 1px black;
+  border-radius: 10px;
+}
