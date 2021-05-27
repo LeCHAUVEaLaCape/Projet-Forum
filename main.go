@@ -410,14 +410,17 @@ func post(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/post?id="+post_id, http.StatusSeeOther)
 	}
 
-	// Verifie si le
+	// Verifie si l'utilisateur a liké
 	if data_post["user"] != nil {
 		data_post["already_liked"] = CheckIfLikedByUser(post_id, data_post)
 	}
 
-	add_like := r.FormValue("addLike")
-	if add_like != "" {
+	change_nmb_like := r.FormValue("Like")
+	if change_nmb_like != "" && change_nmb_like == "1"{
 		AddLike(post_id, data_post)
+		http.Redirect(w, r, "/post?id="+post_id, http.StatusSeeOther)
+	}else if change_nmb_like != "" && change_nmb_like == "0"{
+		RemoveLike(post_id, data_post)
 		http.Redirect(w, r, "/post?id="+post_id, http.StatusSeeOther)
 	}
 

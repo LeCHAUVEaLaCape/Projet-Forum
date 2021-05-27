@@ -86,3 +86,34 @@ func AddLike(post_id string, data_post map[string]interface{}) {
 	}
 	tx.Commit()
 }
+// remove a like on click
+func RemoveLike(post_id string, data_post map[string]interface{}) {
+	var like int
+
+	// Open the database
+	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	defer database.Close()
+
+	tx, err := database.Begin()
+	// delete a like
+	rows, _ := database.Query("SELECT like FROM posts WHERE id = ?", post_id)
+	for rows.Next() {
+		err := rows.Scan(&like)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+	like -= 1
+
+	// Update the nb of like
+	query := "UPDATE posts SET like = " + strconv.Itoa(like) + " WHERE id = " + post_id
+	stmt, err := tx.Prepare(query)
+	if err != nil {
+		fmt.Println(err)
+	}
+	_, err = stmt.Exec()
+	if err != nil {
+		fmt.Println(err)
+	}
+	tx.Commit()
+}

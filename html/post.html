@@ -37,8 +37,13 @@
               <div class="like">
                 {{if and .cookieExist .already_liked}}
                 <form action="/post?id={{index .main_post 0}}" method="POST">
-                  <input type="hidden" name="addLike" value="1">
+                  <input type="hidden" name="Like" value="1">
                   <button style="cursor: pointer;">+1</button>
+                </form>
+                {{else if .cookieExist}}
+                <form action="/post?id={{index .main_post 0}}" method="POST">
+                  <input type="hidden" name="Like" value="0">
+                  <button style="cursor: pointer;">-1</button>
                 </form>
                 {{end}}
                 <span class="nb-like">{{index .main_post 6}}</span> Likes</div>
