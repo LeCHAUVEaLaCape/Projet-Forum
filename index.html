@@ -12,30 +12,50 @@
 
   <body>
     {{template "header" .}}
-    <div class="page">
+
+    <div class="full-page">
+      
+    <!-- Filtre par catégories -->
+    <div class="filter">
       {{range $index , $value := .categories}}
       <form action="?" method="GET" >
-        <button >  <input type="hidden" name="{{$value}}" value="{{$index}}"> <p>{{$value}}</p></input></button>
+        <input type="hidden" name="{{$value}}" value="{{$index}}"> 
+        <button  class="cat {{$value}}">
+          <p>{{$value}}</p>
+        </button>
       </form>
       {{end}}
+    </div>
+
+    <div class="page">
+      <!-- Ajoute le titre -->
       <div class="latest-container">
         <div class="latest-post">
           <p>Latest Posts</p>
         </div>
       </div>
+
+      <!-- Ajoute le bouton pour ajouter un commentaire -->
       {{if .cookieExist}}
       <div class="newpost-container">
         <a href="/newPost" class="newpost-redirect">
           <div>Ajouter un nouveau poste</div>
         </a>
       </div>
+      {{else}}
+      <div class="log">
+        <p>Veuillez <a href="/logIn">vous connecter</a> pour ajouter un post</p>
+      </div>
       {{end}}
+
+      <!-- ajoute les POSTS -->
       <div class="post-container">
         <div class="all-posts">
           {{range .allposts}}
           <div class="singlePost-container">
-            
+            <!-- ajoute le titre du poste -->
             <div class="title-post">{{index . 0}}</div>
+            <!-- ajoute le corps du poste -->
             <div class="body-post">
               <div class="message">
                 <p>{{index . 1}}</p>
@@ -49,18 +69,19 @@
                 
               </div>
             </div>
+
+            <!-- Block des POSTS -->
             <div class="author-post">
+              <!-- ajoute les catégorie de trie -->
               <div class="categories">
-              
                 {{range index . 7}}
               <div class="categorie">
                 <div class="{{.}}">{{.}}</div>
               </div>  
               {{end}}
-
               </div>
+              <!-- Ajoute l'auteur du post et le time -->
               <div class="author-time">
-
                 <p class="author">
                   <span>post created by : </span
                   ><a id="user" href="/user?user={{index . 2}}">{{index . 2}}</a>
@@ -69,11 +90,14 @@
                 <span>{{index . 3}}</span>
               </div>
             </div>
+
           </div>
           {{end}}
         </div>
       </div>
     </div>
+    
+  </div>
     {{template "footer"}}
   </body>
 </html>

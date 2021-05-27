@@ -7,19 +7,45 @@ body,
   text-decoration: none;
   overflow-x: hidden;
 }
+.full-page {
+  width: 100vw;
+  display: flex;
+}
 .page {
   min-height: 1000px;
-  width: 100vw;
+  width: 100%;
   background-color: #eee;
   padding-top: 90px;
   padding-bottom: 60px;
   font-size: 20px;
 }
+.filter {
+  width: 17%;
+  height: 55vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 25vh 0vh 0vh 4vh;
+  position: fixed;
+}
+.filter form {
+  width: 50%;
+}
 .post-container {
-  width: 100vw;
+  width: 100%;
   display: flex;
   min-height: 500px;
   justify-content: center;
+}
+.cat {
+  height: 48px;
+  width: 145px;
+  border: solid 1px black;
+  border-radius: 5px;
+  padding: 10px;
+  font-size: 19px;
+  text-transform: capitalize;
 }
 .all-posts {
   width: 70%;
@@ -73,7 +99,7 @@ span {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100vw;
+  width: 100%;
 }
 button {
   cursor: pointer;
@@ -107,7 +133,7 @@ button {
   align-items: flex-end;
 }
 .latest-container {
-  width: 100vw;
+  width: 100%;
   height: 300px;
   display: flex;
   justify-content: center;
@@ -195,4 +221,15 @@ button {
 }
 .see-more button:hover {
   background-color: #cfcfcf;
+}
+.log {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 140px;
+}
+.log a {
+  text-decoration: underline;
+  color: rgb(0, 54, 201);
 }

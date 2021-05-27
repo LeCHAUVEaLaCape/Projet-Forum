@@ -68,6 +68,7 @@ func main() {
 }
 
 // Generate the main page when first loading the site
+// Generate the main page when first loading the site
 func index(w http.ResponseWriter, r *http.Request) {
 	var post [][]interface{}
 
@@ -419,12 +420,14 @@ func post(w http.ResponseWriter, r *http.Request) {
 
 	Display_comments(data_post, post_id)
 
+	// Ajoute un commentaire
 	add_comment := r.FormValue("add_comment")
 	if add_comment != "" {
 		Adding_comment(add_comment, &post, data_post["user"].(string))
 		http.Redirect(w, r, "/post?id="+post_id, http.StatusSeeOther)
 	}
 
+	// Verifie si le
 	if data_post["user"] != nil {
 		data_post["already_liked"] = checkIfLikedByUser(post_id, data_post)
 	}
