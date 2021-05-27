@@ -16,22 +16,45 @@
     <div class="full-page">
       
     <!-- Filtre par catégories -->
-    <div class="filter">
-      {{range $index , $value := .categories}}
-      <form action="?" method="GET" >
-        <input type="hidden" name="{{$value}}" value="{{$index}}"> 
-        <button  class="cat {{$value}}">
-          <p>{{$value}}</p>
-        </button>
-      </form>
-      {{end}}
-    </div>
+      <div class="filter">
+        <div class="filter-title">
+          <p>Trier les posts par catégories</p>
+        </div>
+        {{range $index , $value := .categories}}
+        <form action="?" method="GET" >
+          <input type="hidden" name="{{$value}}" value="{{$index}}"> 
+          <button  class="cat {{$value}}">
+            <p>{{$value}}</p>
+          </button>
+        </form>
+        {{end}}
+      </div>
+
+      <!-- Modifier l'affichage des posts -->
+      <div class="display-post">
+        <div class="display-post-container">
+          <div class="display-title">
+            <p>Changer l'ordre des posts</p>
+          </div>
+          <div class="chane-order-posts">
+            <div id="newest">Newest</div>
+            <div id="latest">Latest</div>
+          </div>
+          <div class="display-title">
+            <p>Changer le format d'affichage</p>
+          </div>
+          <div class="chane-order-posts">
+            <div id="grand">Grand</div>
+            <div id="moyen">Moyen</div>
+          </div>
+        </div>
+      </div>
 
     <div class="page">
       <!-- Ajoute le titre -->
       <div class="latest-container">
         <div class="latest-post">
-          <p>Latest Posts</p>
+          <p id="post-text">Anciens Posts</p>
         </div>
       </div>
 
@@ -83,7 +106,7 @@
               <!-- Ajoute l'auteur du post et le time -->
               <div class="author-time">
                 <p class="author">
-                  <span>post created by : </span
+                  <span>post crée par : </span
                   ><a id="user" href="/user?user={{index . 2}}">{{index . 2}}</a>
                   <img src="{{index . 4}}">
                 </p>
@@ -100,5 +123,6 @@
   </div>
     {{template "footer"}}
   </body>
+  <script src="./assets/js/index.js"></script>
 </html>
 {{end}}

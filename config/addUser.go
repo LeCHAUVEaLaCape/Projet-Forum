@@ -44,7 +44,6 @@ func AddUser(input_username string, input_email string, input_password string, i
 		fmt.Println(err)
 	} else {
 		tx.Commit()
-		fmt.Println("Account created : ", input_username+", "+input_email)
 		info["accountCreated"] = true
 	}
 }

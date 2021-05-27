@@ -25,28 +25,8 @@ var data = make(map[string]interface{})
 
 func main() {
 	data["user"] = ""
-	// Open the database and create it if needed
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
-	defer database.Close()
 
-	// Create users table in the database
-	statement, _ := database.Prepare("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username TEXT, email TEXT, password TEXT, fewWords TEXT, age TEXT, address TEXT, photo TEXT)")
-	statement.Exec()
-	//
-	// Open the database_post and create it if needed
-	database_post, _ := sql.Open("sqlite3", "./db-sqlite.db")
-	defer database_post.Close()
-
-	// Create post table in the database_post
-	statement_post, _ := database_post.Prepare("CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY, title TEXT, body TEXT, like INTEGER, author TEXT, date TEXT, category TEXT, likedBy TEXT)")
-	statement_post.Exec()
-	//
-	database_comment, _ := sql.Open("sqlite3", "./db-sqlite.db")
-	defer database_comment.Close()
-
-	// Create users table in the database
-	statement_comment, _ := database_comment.Prepare("CREATE TABLE IF NOT EXISTS comments (id INTEGER PRIMARY KEY, idMainPost TEXT, content TEXT, like INTEGER, author TEXT, date TEXT)")
-	statement_comment.Exec()
+	CreateDB()
 
 	fmt.Println("Please connect to http://localhost:8000")
 	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets")))) // Join Assets Directory to the server
@@ -67,7 +47,6 @@ func main() {
 	}
 }
 
-// Generate the main page when first loading the site
 // Generate the main page when first loading the site
 func index(w http.ResponseWriter, r *http.Request) {
 	var post [][]interface{}
@@ -188,6 +167,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	t.ExecuteTemplate(w, "SignUp", data_SignUp)
 }
 
+// Generate the log In page
 func logIn(w http.ResponseWriter, r *http.Request) {
 	// initiate the data that will be send to html
 	data_logIn := make(map[string]interface{})
@@ -239,7 +219,7 @@ func logIn(w http.ResponseWriter, r *http.Request) {
 	t.ExecuteTemplate(w, "LogIn", data_logIn)
 }
 
-// Generate the Welcome page (accessible only to logged in users)
+// Generate the Welcome page
 func welcome(w http.ResponseWriter, r *http.Request) {
 	// initiate the data that will be send to html
 	data_welcome := make(map[string]interface{})
@@ -330,6 +310,7 @@ func user(w http.ResponseWriter, r *http.Request) {
 	t.ExecuteTemplate(w, "user", data_user)
 }
 
+// Generate allUsers page
 func allUsers(w http.ResponseWriter, r *http.Request) {
 	// initiate the data that will be send to html
 	var aUser [3]string
@@ -372,7 +353,7 @@ func logOut(w http.ResponseWriter, r *http.Request) {
 	delete(data, "user")
 }
 
-// Generate the Welcome page (accessible only to logged in users)
+// Generate the page to create new Post (accessible only to logged in users)
 func newPost(w http.ResponseWriter, r *http.Request) {
 	// initiate the data that will be send to html
 	data_newPost := make(map[string]interface{})
@@ -395,7 +376,8 @@ func newPost(w http.ResponseWriter, r *http.Request) {
 		// Capture la date de submit
 		dt := time.Now()
 		// appel de la fonction pour créer le post
-		AddNewPost(w, r, title, body, dt.Format("02-01-2006 15:04:05"), data_newPost, category)
+		AddNewPost(title, body, dt.Format("02-01-2006 15:04:05"), data_newPost, category)
+		http.Redirect(w, r, "/index", http.StatusSeeOther)
 	}
 	data_newPost["categorie"] = categories
 
@@ -404,6 +386,7 @@ func newPost(w http.ResponseWriter, r *http.Request) {
 	t.ExecuteTemplate(w, "newPost", data_newPost)
 }
 
+// Generate page des posts avec ses commentaires
 func post(w http.ResponseWriter, r *http.Request) {
 	post_id := r.FormValue("id")
 
@@ -429,12 +412,13 @@ func post(w http.ResponseWriter, r *http.Request) {
 
 	// Verifie si le
 	if data_post["user"] != nil {
-		data_post["already_liked"] = checkIfLikedByUser(post_id, data_post)
+		data_post["already_liked"] = CheckIfLikedByUser(post_id, data_post)
 	}
 
 	add_like := r.FormValue("addLike")
 	if add_like != "" {
-		addLike(w, r, post_id, data_post)
+		AddLike(post_id, data_post)
+		http.Redirect(w, r, "/post?id="+post_id, http.StatusSeeOther)
 	}
 
 	if data_post["user"] == nil {
@@ -447,6 +431,7 @@ func post(w http.ResponseWriter, r *http.Request) {
 	t.ExecuteTemplate(w, "post", data_post)
 }
 
+// supprime un post et ses commentaires
 func delPost(w http.ResponseWriter, r *http.Request) {
 	delete_post := r.FormValue("delPost")
 
@@ -484,82 +469,4 @@ func delPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, "/index", http.StatusSeeOther)
-}
-
-func checkIfLikedByUser(post_id string, data_post map[string]interface{}) bool {
-	user := data_post["user"].(string)
-
-	// Open the database
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
-	defer database.Close()
-
-	// créer un string des personnes qui ont liké
-	var likedBy string
-	rows, _ := database.Query("SELECT likedBy FROM posts WHERE id = ?", post_id)
-	for rows.Next() {
-		err := rows.Scan(&likedBy)
-		if err != nil {
-			fmt.Println(err)
-		}
-	}
-
-	if likedBy == "" {
-		likedBy = user
-	} else {
-		// Split le string en array
-		all_likedBy := strings.Split(likedBy, " ")
-		// parcour l'array de ceux qui ont liké pour éviter les doublons
-		for i := 0; i < len(all_likedBy); i++ {
-			if all_likedBy[i] == user {
-				return false
-			}
-		}
-		likedBy += " " + user
-	}
-
-	tx, err := database.Begin()
-	// Update the users who liked
-	query := "UPDATE posts SET likedBy = ? WHERE id = " + post_id
-	stmt, err := tx.Prepare(query)
-	if err != nil {
-		fmt.Println(err)
-	}
-	_, err = stmt.Exec(likedBy)
-	if err != nil {
-		fmt.Println(err)
-	}
-	tx.Commit()
-
-	return true
-}
-
-func addLike(w http.ResponseWriter, r *http.Request, post_id string, data_post map[string]interface{}) {
-
-	// Open the database
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
-	defer database.Close()
-
-	tx, err := database.Begin()
-	// Ajoute +1 like des POSTS
-	rows, _ := database.Query("SELECT like FROM posts WHERE id = ?", post_id)
-	for rows.Next() {
-		err := rows.Scan(&like)
-		if err != nil {
-			fmt.Println(err)
-		}
-	}
-	like += 1
-
-	// Update the nb of like
-	query := "UPDATE posts SET like = " + strconv.Itoa(like) + " WHERE id = " + post_id
-	stmt, err := tx.Prepare(query)
-	if err != nil {
-		fmt.Println(err)
-	}
-	_, err = stmt.Exec()
-	if err != nil {
-		fmt.Println(err)
-	}
-	tx.Commit()
-	http.Redirect(w, r, "/post?id="+post_id, http.StatusSeeOther)
 }

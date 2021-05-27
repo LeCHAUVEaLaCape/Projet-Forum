@@ -4,11 +4,10 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"net/http"
 	"strings"
 )
 
-func AddNewPost(w http.ResponseWriter, r *http.Request, title string, body string, dt string, data_newPost map[string]interface{}, category []string) {
+func AddNewPost(title string, body string, dt string, data_newPost map[string]interface{}, category []string) {
 	// Open the database
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
 	defer database.Close()
@@ -28,7 +27,6 @@ func AddNewPost(w http.ResponseWriter, r *http.Request, title string, body strin
 	} else {
 		tx.Commit()
 	}
-	http.Redirect(w, r, "/index", http.StatusSeeOther)
 }
 func Display_post(post_id string, data_post map[string]interface{}, body string) [7]string {
 	var post [7]string

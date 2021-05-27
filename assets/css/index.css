@@ -19,18 +19,35 @@ body,
   padding-bottom: 60px;
   font-size: 20px;
 }
-.filter {
-  width: 17%;
-  height: 55vh;
+.filter, .display-post {
+  width: 19%;
+  height: 525px;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
-  margin: 25vh 0vh 0vh 4vh;
   position: fixed;
 }
+.filter {
+  right: 0;
+  margin: 25vh 2vw 0vh 0vw;
+}
+.display-post {
+  margin: 25vh 0vw 0vh 2vw;
+}
+.display-post-container {
+  width: 100%;
+  height: 100%;
+}
+#newest, #latest {
+  width: 56px;
+  cursor: pointer;
+}
 .filter form {
-  width: 50%;
+  width: 155px;
+}
+.filter-title {
+  font-size: 25px;
 }
 .post-container {
   width: 100%;
@@ -48,10 +65,10 @@ body,
   text-transform: capitalize;
 }
 .all-posts {
-  width: 70%;
+  width: 65%;
   display: flex;
   justify-content: center;
-  flex-wrap: wrap-reverse;
+  flex-wrap: wrap;
 }
 .singlePost-container {
   width: 70%;
@@ -141,7 +158,7 @@ button {
 }
 .latest-post {
   height: 70px;
-  width: 260px;
+  width: 377px;
   display: flex;
   justify-content: center;
   align-items: center;
