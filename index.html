@@ -12,8 +12,12 @@
 
   <body>
     {{template "header" .}}
-
     <div class="page">
+      {{range $index , $value := .categories}}
+      <form action="?" method="GET" >
+        <button >  <input type="hidden" name="{{$value}}" value="{{$index}}"> <p>{{$value}}</p></input></button>
+      </form>
+      {{end}}
       <div class="latest-container">
         <div class="latest-post">
           <p>Latest Posts</p>
