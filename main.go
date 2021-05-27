@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
 	"text/template"
@@ -77,34 +78,45 @@ func index(w http.ResponseWriter, r *http.Request) {
 	}
 	data_index["cookieExist"] = false
 	GetCookie(data_index, r)
+	// filtre de categorie
+	selected_categories := ""
+	for i := range categories {
+		tmp := r.FormValue(categories[i])
+		if tmp != "" {
+			selected_categories += strconv.Itoa(i)
+		}
+	}
+	// RegExp
+	var filter = regexp.MustCompile(selected_categories)
 
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
 	defer database.Close()
 	//range over database
 	rows, _ := database.Query("SELECT title, body, author, date, id, category FROM posts")
 	defer rows.Close()
-	// categorie := [][]interface{}{}
+
 	for rows.Next() {
 		aPost := []interface{}{"", "", "", "", "", "", ""}
 		rows.Scan(&aPost[0], &aPost[1], &aPost[2], &aPost[3], &id, &aPost[6])
-		// Remplace les \n par des <br> pour sauter des lignes en html
-		aPost[1] = strings.Replace(aPost[1].(string), string('\r'), "", -1)
-		aPost[1] = strings.Replace(aPost[1].(string), string('\n'), "<br>", -1)
-		aPost[5] = strconv.Itoa(id)
-
-		if aPost[6] != nil {
-			temp := []interface{}{} // string
-			for _, e := range aPost[6].(string) {
-				j, _ := strconv.Atoi(string(e))
-				temp = append(temp, categories[j])
+		// si le RegExp correspond à la DB
+		if filter.MatchString(aPost[6].(string)) {
+			// Remplace les \n par des <br> pour sauter des lignes en html
+			aPost[1] = strings.Replace(aPost[1].(string), string('\r'), "", -1)
+			aPost[1] = strings.Replace(aPost[1].(string), string('\n'), "<br>", -1)
+			aPost[5] = strconv.Itoa(id)
+			if aPost[6] != nil {
+				temp := []interface{}{} // string
+				for _, e := range aPost[6].(string) {
+					j, _ := strconv.Atoi(string(e))
+					temp = append(temp, categories[j])
+				}
+				aPost = append(aPost, temp)
+			} else {
+				aPost[6] = []string{}
+				aPost = append(aPost, []string{})
 			}
-			aPost = append(aPost, temp)
-		} else {
-			aPost[6] = []string{}
-			aPost = append(aPost, []string{})
+			post = append(post, aPost)
 		}
-
-		post = append(post, aPost)
 
 	}
 	// Ajoute le chemin de la photo qui a été choisit par l'utilisateur
@@ -128,7 +140,8 @@ func index(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data_index["allposts"] = post
-
+	// B
+	data_index["categories"] = categories
 	t := template.New("index-template")
 	t = template.Must(t.ParseFiles("index.html", "./html/header&footer.html"))
 	t.ExecuteTemplate(w, "index", data_index)
