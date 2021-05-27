@@ -10,7 +10,6 @@ body, * {
     min-height: 1000px;
     width: 100vw;
     background-color: #eee;
-    padding-top: 60px;
     font-size: 60px;
   }
   .user-info {
@@ -73,7 +72,6 @@ body, * {
   position: relative;
 }
 .photo-container {
-  background-color: pink;
   height: 500px;
   width: 270px;
   display: none;

@@ -18,15 +18,15 @@
           <div class="lien4">POST 1</div>
         </div>
         <div class="auth">
-          {{if not .cookieExist}}
-          <button  class="login-btn"><a href="/logIn">Login</a></button>
-          <a href="/SignUp" class="btn">Register</a>
-          {{else}}
+          {{if .cookieExist}}
           <div>
             <p>Connecté en tant que :</p>
             <a class="account" href="/user?user={{.user}}">{{.user}}</a>
           </div>
-          <button  class="logout-btn"><a href="/logOut">Logout</a></button>
+          <button class="logout-btn" onclick='window.location.href="./logOut"'><a href="/logOut">Logout</a></button>
+          {{else}}
+          <button  class="login-btn" onclick='window.location.href="./logIn"'><a href="/logIn">Login</a></button>
+          <a href="/SignUp" class="btn">Register</a>
           {{end}}
 
         </div>

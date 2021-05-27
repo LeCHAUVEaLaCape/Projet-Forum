@@ -8,7 +8,7 @@ body,
   overflow-x: hidden;
 }
 .page {
-  min-height: 1200px;
+  min-height: 1000px;
   width: 100vw;
   background-color: #eee;
   padding-top: 60px;
@@ -50,7 +50,7 @@ body,
 .message {
   width: 90%;
   border: black 1px solid;
-  border-radius: 10px;
+  border-radius: 10px 10px 0px 0px;
   padding: 10px;
   font-size: 15px;
   background: #fff;
@@ -60,10 +60,6 @@ body,
 }
 .message p {
   overflow: auto;
-}
-.author-post {
-  text-align: end;
-  margin-right: 5%;
 }
 span {
   font-size: 12px;
@@ -127,4 +123,76 @@ button {
   border: solid 1px black;
   border-radius: 10px;
   font-size: 48px;
+}
+.author-post {
+  display: flex;
+  justify-content: space-between;
+}
+.author-time {
+  text-align: end;
+}
+.categories {
+  font-size: 15px;
+  display: flex;
+  width: 280px;
+  flex-wrap: wrap;
+}
+.categorie {
+  width: 33%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.categorie div {
+  font-size: 13px;
+  margin: 5px;
+  width: 83px;
+  height: 27px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: solid 1px black;
+  border-radius: 10px;
+  text-transform: capitalize;
+  cursor: pointer;
+}
+.gaming {
+  background-color: #8a57a5;
+}
+.informatique {
+  background-color: #FABD00;
+}
+.sport {
+  background-color:#2DA49E;
+}
+.culture {
+  background-color: #A58A77;
+}
+.politique {
+  background-color: #738e9e;
+}
+.loisir {
+  background-color: #BC0B27;
+}
+.sciences {
+  background-color: #009BC4;
+}
+.sexualite {
+  background-color: #FF5E5E;
+}
+.finance {
+  background-color: #941066;
+}
+.see-more {
+  width: 100%;
+  border: solid 1px black;
+  border-top: 0px;
+  border-radius: 0px 0px 10px 10px;
+}
+.see-more button {
+  width: 100%;
+  font-size: 19px;
+}
+.see-more button:hover {
+  background-color: #cfcfcf;
 }

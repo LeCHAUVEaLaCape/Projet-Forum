@@ -25,14 +25,25 @@
             <textarea type="text" name="body" required></textarea>
           </div>
         </div>
+        <div class="all-check">
         <div>
-            {{range $key, $value := .categorie}}
-            <input type="checkbox" name="{{$value}}" value="{{$key}}">{{$value}}
-            
+          {{range $key, $value := .categorie}}
+          
+            <div class="checkbox">
+              <div>
+                <input
+                class="check"
+                type="checkbox"
+                name="{{$value}}"
+                value="{{$key}}"
+                onclick='deRequire("check")'
+                required
+                />
+                <p>{{$value}}</p>
+              </div>
+            </div>
             {{end}}
-
-            <!-- <input type="checkbox" name="code"value="1">Code
-            <input type="checkbox" name="info"value="2">Informatique -->
+          </div>
         </div>
         <div class="button">
           <button type="submit">Submit</button>
@@ -42,5 +53,5 @@
     {{template "footer"}}
   </body>
 </html>
-<script>document.getElementById("post").classList.add("active");</script>
+<script src="../assets/js/newPost.js"></script>
 {{end}}

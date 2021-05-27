@@ -1,0 +1,3 @@
+- Supprimer Post / commentaire (seulement la personne qui a posté)
+- Systeme de like
+- régler les cookies

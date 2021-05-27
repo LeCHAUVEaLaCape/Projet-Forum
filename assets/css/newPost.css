@@ -11,7 +11,7 @@ body,
   height: 1000px;
   width: 100vw;
   background-color: #eee;
-  padding-top: 60px;
+  padding-top: 130px;
   font-size: 20px;
 }
 .title {
@@ -54,4 +54,31 @@ body,
   width: 80px;
   font-size: 20px;
   cursor: pointer;
+}
+.all-check {
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.all-check div {
+  margin: 50px 0px 50px 0px;
+  width: 620px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+.checkbox {
+  width: 33% !important;
+  margin: 0px !important;
+}
+.checkbox div {
+  margin: 0px !important;
+}
+.checkbox p {
+  width: 120px;
+  margin-left: 10px;
+  text-align: center;
+  text-transform: capitalize;
 }

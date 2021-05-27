@@ -35,7 +35,7 @@ func AddUser(input_username string, input_email string, input_password string, i
 	if err != nil {
 		fmt.Println(err)
 	}
-	stmt, err := tx.Prepare("INSERT INTO users (username, email, password, fewWords, age, address, photo) VALUES (?, ?, ?, '', '', '', '../assets/images/baptiste.jpg')")
+	stmt, err := tx.Prepare("INSERT INTO users (username, email, password, fewWords, age, address, photo) VALUES (?, ?, ?, '', '', '', '../assets/images/default.png')")
 	if err != nil {
 		fmt.Println(err)
 	}

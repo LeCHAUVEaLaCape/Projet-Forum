@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func AddNewPost(title string, body string, typeOfPost string, dt string, data_newPost map[string]interface{}, category []string) {
+func AddNewPost(title string, body string, dt string, data_newPost map[string]interface{}, category []string) {
 	// Open the database
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
 	defer database.Close()
@@ -17,11 +17,11 @@ func AddNewPost(title string, body string, typeOfPost string, dt string, data_ne
 	if err != nil {
 		fmt.Println(err)
 	}
-	stmt, err := tx.Prepare("INSERT INTO posts (title, body, type, author, date,category) VALUES (?, ?, ?, ?, ?, ?)")
+	stmt, err := tx.Prepare("INSERT INTO posts (title, body, author, date, category, like) VALUES (?, ?, ?, ?, ?, 0)")
 	if err != nil {
 		fmt.Println(err)
 	}
-	_, err = stmt.Exec(title, body, typeOfPost, data_newPost["user"], dt, strings.Join(category, ""))
+	_, err = stmt.Exec(title, body, data_newPost["user"], dt, strings.Join(category, ""))
 	if err != nil {
 		fmt.Println(err)
 	} else {

@@ -38,22 +38,32 @@
               </div>
               <div class="see-more">
                 <form action="/post" method="GET">
+                  <button>
                   <input type="hidden" name="id" value="{{index . 5}}">
-                  <button> Lire la suite... </button>
+                   <p>Lire la suite... </p></button>
                 </form>
                 
               </div>
             </div>
             <div class="author-post">
-              <p class="author">
-                <span>post created by : </span
-                ><a id="user" href="/user?user={{index . 2}}">{{index . 2}}</a>
-                <img src="{{index . 4}}">
-              </p>
-              <span>{{index . 3}}</span>
-              {{range index . 7}}
-              {{.}}
+              <div class="categories">
+              
+                {{range index . 7}}
+              <div class="categorie">
+                <div class="{{.}}">{{.}}</div>
+              </div>  
               {{end}}
+
+              </div>
+              <div class="author-time">
+
+                <p class="author">
+                  <span>post created by : </span
+                  ><a id="user" href="/user?user={{index . 2}}">{{index . 2}}</a>
+                  <img src="{{index . 4}}">
+                </p>
+                <span>{{index . 3}}</span>
+              </div>
             </div>
           </div>
           {{end}}

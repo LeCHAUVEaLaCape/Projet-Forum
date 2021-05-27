@@ -83,3 +83,42 @@ form {
   display: flex;
   justify-content: center;
 }
+
+.author-comment {
+  text-align: end;
+  margin-right: 24.5%;
+}
+.author {
+  height: 28px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+.author img {
+  height: 25px;
+  padding: 0px 0px 0px 10px;
+}
+.author span {
+  height: 100%;
+  display: flex;
+  padding-right: 5px;
+  align-items: flex-end;
+}
+.author-comment span, .author-post span {
+  font-size: 13px;
+}
+#user {
+  text-decoration: underline;
+  color: rgb(0, 54, 201);
+}
+.log {
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 140px;
+}
+.log a {
+  text-decoration: underline;
+  color: rgb(0, 54, 201);
+}

@@ -19,7 +19,7 @@ import (
 var id, like int
 var username, password, email, age, fewWords, address, photo, state, title, body, author, date, content string
 var create_cookie, userFound = false, false
-var categories = []string{"gaming", "code", "informatique"}
+var categories = []string{"gaming", "informatique", "sport", "culture", "politique", "loisir", "sciences", "sexualite", "finance"}
 var data = make(map[string]interface{})
 
 func main() {
@@ -37,7 +37,7 @@ func main() {
 	defer database_post.Close()
 
 	// Create post table in the database_post
-	statement_post, _ := database_post.Prepare("CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY, title TEXT, body TEXT, like INTEGER, type TEXT, idMainPost INTEGER, author TEXT, date TEXT, category TEXT)")
+	statement_post, _ := database_post.Prepare("CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY, title TEXT, body TEXT, like INTEGER, author TEXT, date TEXT, category TEXT)")
 	statement_post.Exec()
 	//
 	database_comment, _ := sql.Open("sqlite3", "./db-sqlite.db")
@@ -370,21 +370,17 @@ func newPost(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/logIn", http.StatusSeeOther)
 	}
 
-	// type main = post / "comment" = commentaire
-	typeOfPost := "Main"
 	// Input de la page
 	title := r.FormValue("title")
 	body := r.FormValue("body")
-	gaming := r.FormValue("gaming")
-	code := r.FormValue("code")
-	informatique := r.FormValue("informatique")
-	category := []string{gaming, code, informatique}
+
+	category := []string{r.FormValue("gaming"), r.FormValue("informatique"), r.FormValue("sport"), r.FormValue("culture"), r.FormValue("politique"), r.FormValue("loisir"), r.FormValue("sciences"), r.FormValue("sexualite"), r.FormValue("finance")}
 
 	if title != "" && body != "" {
 		// Capture la date de submit
 		dt := time.Now()
 		// appel de la fonction pour créer le post
-		AddNewPost(title, body, typeOfPost, dt.Format("02-01-2006 15:04:05"), data_newPost, category)
+		AddNewPost(title, body, dt.Format("02-01-2006 15:04:05"), data_newPost, category)
 	}
 	data_newPost["categorie"] = categories
 
@@ -392,6 +388,7 @@ func newPost(w http.ResponseWriter, r *http.Request) {
 	t = template.Must(t.ParseFiles("./html/newPost.html", "./html/header&footer.html"))
 	t.ExecuteTemplate(w, "newPost", data_newPost)
 }
+
 func post(w http.ResponseWriter, r *http.Request) {
 	post_id := r.FormValue("id")
 	add_comment := r.FormValue("add_comment")
