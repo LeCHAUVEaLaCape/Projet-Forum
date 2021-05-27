@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func Adding_comment(add_comment string, post *[6]string, user string) {
+func Adding_comment(add_comment string, post *[7]string, user string) {
 	database_comment, _ := sql.Open("sqlite3", "./db-sqlite.db")
 	defer database_comment.Close()
 	dt := time.Now()

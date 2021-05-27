@@ -35,6 +35,7 @@ body,
   padding: 10px;
   font-size: 15px;
   background: #fff;
+  position: relative;
 }
 .author-post {
   text-align: end;
@@ -121,4 +122,14 @@ form {
 .log a {
   text-decoration: underline;
   color: rgb(0, 54, 201);
+}
+.message form {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+.message button {
+  border: solid 1px black;
+  padding: 5px;
+  cursor: pointer;
 }

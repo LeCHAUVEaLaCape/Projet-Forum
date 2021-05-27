@@ -10,23 +10,44 @@
 </head>
 <body>
     {{template "header" .}}
+
+    <!-- Post principal -->
     <div class="page">
         <div class="title-post">{{index .main_post 1}}</div>
         <div class="body-post">
-            <div class="message">
-              <p>{{index .main_post 2}}</p>
-            </div>
+          <div class="message">
+            <p>{{index .main_post 2}}</p>
+            {{$user := index .main_post 3}}
+            {{if eq .user $user}}
+            <form action="/delPost" method="POST">
+              <input type="hidden" name="delPost" value="{{index .main_post 0}}">
+              <button class="del-post">X</button>
+            </form>
+            {{end}}
           </div>
-          <div class="author-post">
-            <p class="author">
-              <span>post created by : </span
+        </div>
+        <div class="author-post">
+          <p class="author">
+            <span>post created by : </span
               ><a id="user" href="/user?user={{index .main_post 3}}">{{index .main_post 3}}</a>
               <img src="{{index .main_post 5}}">
             </p>
             <span>{{index .main_post 4}}</span>
+            <div class="like-container">
+              <div class="like">
+                {{if and .cookieExist .already_liked}}
+                <form action="/post?id={{index .main_post 0}}" method="POST">
+                  <input type="hidden" name="addLike" value="1">
+                  <button style="cursor: pointer;">+1</button>
+                </form>
+                {{end}}
+                <span class="nb-like">{{index .main_post 6}}</span> Likes</div>
+            </div>
           </div>
-        {{if .cookieExist}}
-        <div>
+          
+          <!-- Ajouter un commentaire -->
+          {{if .cookieExist}}
+          <div>
             <form action="/post?id={{index .main_post 0}}" method="POST" >
                 <input type="text" name="add_comment">
                 <button type="submit">Submit</button>
@@ -36,8 +57,9 @@
         <div class="log">
           <p>Veuillez <a href="/logIn">vous connecter</a> pour poster un commentaire</p>
         </div>
-
         {{end}}
+
+        <!-- Commentaire -->
         {{range .comments}}
         <div class="full-comment">
           <div class="comment-container">

@@ -4,10 +4,11 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"net/http"
 	"strings"
 )
 
-func AddNewPost(title string, body string, dt string, data_newPost map[string]interface{}, category []string) {
+func AddNewPost(w http.ResponseWriter, r *http.Request, title string, body string, dt string, data_newPost map[string]interface{}, category []string) {
 	// Open the database
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
 	defer database.Close()
@@ -17,7 +18,7 @@ func AddNewPost(title string, body string, dt string, data_newPost map[string]in
 	if err != nil {
 		fmt.Println(err)
 	}
-	stmt, err := tx.Prepare("INSERT INTO posts (title, body, author, date, category, like) VALUES (?, ?, ?, ?, ?, 0)")
+	stmt, err := tx.Prepare("INSERT INTO posts (title, body, author, date, category, like, likedBy) VALUES (?, ?, ?, ?, ?, 0, '')")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -27,17 +28,18 @@ func AddNewPost(title string, body string, dt string, data_newPost map[string]in
 	} else {
 		tx.Commit()
 	}
+	http.Redirect(w, r, "/index", http.StatusSeeOther)
 }
-func Display_post(post_id string, data_post map[string]interface{}, body string) [6]string {
-	var post [6]string
+func Display_post(post_id string, data_post map[string]interface{}, body string) [7]string {
+	var post [7]string
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
 	defer database.Close()
 	//range over database
-	rows, _ := database.Query("SELECT id, title, body, author, date FROM posts WHERE id = ?", post_id)
+	rows, _ := database.Query("SELECT id, title, body, author, date, like FROM posts WHERE id = ?", post_id)
 	defer rows.Close()
 
 	for rows.Next() {
-		err := rows.Scan(&post[0], &post[1], &body, &post[3], &post[4])
+		err := rows.Scan(&post[0], &post[1], &body, &post[3], &post[4], &post[6])
 		if err != nil {
 			log.Fatal(err)
 		}

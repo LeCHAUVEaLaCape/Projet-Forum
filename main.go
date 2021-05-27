@@ -37,7 +37,7 @@ func main() {
 	defer database_post.Close()
 
 	// Create post table in the database_post
-	statement_post, _ := database_post.Prepare("CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY, title TEXT, body TEXT, like INTEGER, author TEXT, date TEXT, category TEXT)")
+	statement_post, _ := database_post.Prepare("CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY, title TEXT, body TEXT, like INTEGER, author TEXT, date TEXT, category TEXT, likedBy TEXT)")
 	statement_post.Exec()
 	//
 	database_comment, _ := sql.Open("sqlite3", "./db-sqlite.db")
@@ -58,6 +58,7 @@ func main() {
 	http.HandleFunc("/user", user)
 	http.HandleFunc("/newPost", newPost)
 	http.HandleFunc("/post", post)
+	http.HandleFunc("/delPost", delPost)
 
 	err := http.ListenAndServe(":8000", nil) // Set listen port
 	if err != nil {
@@ -380,7 +381,7 @@ func newPost(w http.ResponseWriter, r *http.Request) {
 		// Capture la date de submit
 		dt := time.Now()
 		// appel de la fonction pour créer le post
-		AddNewPost(title, body, dt.Format("02-01-2006 15:04:05"), data_newPost, category)
+		AddNewPost(w, r, title, body, dt.Format("02-01-2006 15:04:05"), data_newPost, category)
 	}
 	data_newPost["categorie"] = categories
 
@@ -391,7 +392,6 @@ func newPost(w http.ResponseWriter, r *http.Request) {
 
 func post(w http.ResponseWriter, r *http.Request) {
 	post_id := r.FormValue("id")
-	add_comment := r.FormValue("add_comment")
 
 	// initiate the data that will be send to html
 	data_post := make(map[string]interface{})
@@ -399,18 +399,151 @@ func post(w http.ResponseWriter, r *http.Request) {
 		data_post[k] = v
 	}
 	data_post["cookieExist"] = false
+	data_post["already_liked"] = false
 	GetCookie(data_post, r)
 
 	var post = Display_post(post_id, data_post, body)
 
 	Display_comments(data_post, post_id)
 
+	add_comment := r.FormValue("add_comment")
 	if add_comment != "" {
 		Adding_comment(add_comment, &post, data_post["user"].(string))
 		http.Redirect(w, r, "/post?id="+post_id, http.StatusSeeOther)
 	}
 
+	if data_post["user"] != nil {
+		data_post["already_liked"] = checkIfLikedByUser(post_id, data_post)
+	}
+
+	add_like := r.FormValue("addLike")
+	if add_like != "" {
+		addLike(w, r, post_id, data_post)
+	}
+
+	if data_post["user"] == nil {
+		data_post["user"] = ""
+	}
+
+	fmt.Println(data_post["already_liked"])
 	t := template.New("post-template")
 	t = template.Must(t.ParseFiles("./html/post.html", "./html/header&footer.html"))
 	t.ExecuteTemplate(w, "post", data_post)
+}
+
+func delPost(w http.ResponseWriter, r *http.Request) {
+	delete_post := r.FormValue("delPost")
+
+	// Open the database
+	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	defer database.Close()
+
+	// DELETE the comments of the main post
+	tx, err := database.Begin()
+	if err != nil {
+		fmt.Println(err)
+	}
+	stmt, err := tx.Prepare("DELETE FROM comments WHERE idMainPost = ?")
+	if err != nil {
+		fmt.Println(err)
+	}
+	_, err = stmt.Exec(delete_post)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	// DELETE the main POST
+	if err != nil {
+		fmt.Println(err)
+	}
+	stmt, err = tx.Prepare("DELETE FROM posts WHERE id = ?")
+	if err != nil {
+		fmt.Println(err)
+	}
+	_, err = stmt.Exec(delete_post)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		tx.Commit()
+	}
+
+	http.Redirect(w, r, "/index", http.StatusSeeOther)
+}
+
+func checkIfLikedByUser(post_id string, data_post map[string]interface{}) bool {
+	user := data_post["user"].(string)
+
+	// Open the database
+	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	defer database.Close()
+
+	// créer un string des personnes qui ont liké
+	var likedBy string
+	rows, _ := database.Query("SELECT likedBy FROM posts WHERE id = ?", post_id)
+	for rows.Next() {
+		err := rows.Scan(&likedBy)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+
+	if likedBy == "" {
+		likedBy = user
+	} else {
+		// Split le string en array
+		all_likedBy := strings.Split(likedBy, " ")
+		// parcour l'array de ceux qui ont liké pour éviter les doublons
+		for i := 0; i < len(all_likedBy); i++ {
+			if all_likedBy[i] == user {
+				return false
+			}
+		}
+		likedBy += " " + user
+	}
+
+	tx, err := database.Begin()
+	// Update the users who liked
+	query := "UPDATE posts SET likedBy = ? WHERE id = " + post_id
+	stmt, err := tx.Prepare(query)
+	if err != nil {
+		fmt.Println(err)
+	}
+	_, err = stmt.Exec(likedBy)
+	if err != nil {
+		fmt.Println(err)
+	}
+	tx.Commit()
+
+	return true
+}
+
+func addLike(w http.ResponseWriter, r *http.Request, post_id string, data_post map[string]interface{}) {
+
+	// Open the database
+	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	defer database.Close()
+
+	tx, err := database.Begin()
+	// Ajoute +1 like des POSTS
+	rows, _ := database.Query("SELECT like FROM posts WHERE id = ?", post_id)
+	for rows.Next() {
+		err := rows.Scan(&like)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+	like += 1
+
+	// Update the nb of like
+	query := "UPDATE posts SET like = " + strconv.Itoa(like) + " WHERE id = " + post_id
+	stmt, err := tx.Prepare(query)
+	if err != nil {
+		fmt.Println(err)
+	}
+	_, err = stmt.Exec()
+	if err != nil {
+		fmt.Println(err)
+	}
+	tx.Commit()
+	http.Redirect(w, r, "/post?id="+post_id, http.StatusSeeOther)
 }
