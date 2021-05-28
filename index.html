@@ -8,6 +8,7 @@
     <title>Faux Rhum</title>
     <link rel="shortcut icon" href="./assets/images/logo.png" />
     <link rel="stylesheet" href="./assets/css/index.css" />
+    <link rel="stylesheet" href="./assets/css/mainPostStyle.css" />
   </head>
 
   <body>
@@ -35,19 +36,36 @@
       <div class="display-post">
         <div class="display-post-container">
           <div class="display-title">
-            <p>Changer l'ordre des posts</p>
+            <h4>Changer l'ordre des posts</h4>
           </div>
-          <div class="chane-order-posts">
-            <div id="newest">Newest</div>
-            <div id="latest">Latest</div>
+          <div class="change-order-posts">
+            <div id="newest">Anciens posts</div>
+            <div id="latest">Nouveaux posts</div>
           </div>
           <div class="display-title">
-            <p>Changer le format d'affichage</p>
+            <h4>Changer le format d'affichage</h4>
           </div>
-          <div class="chane-order-posts">
-            <div id="grand">Grand</div>
-            <div id="moyen">Moyen</div>
+          <div class="change-order-posts">
+            <div id="grand" class="grand">
+              <div>Grand</div>
+              <img src="./assets/images/rectangles-couple.png" alt="grand">
+            </div>
+            <div id="moyen" class="moyen">
+              <div>Moyen</div>
+              <img src="./assets/images/two.png" alt="moyen">
+            </div>
+            <div id="compact" class="compact">
+              <div>Compact</div>
+              <img src="./assets/images/justify.png" alt="">
+            </div>
           </div>
+          {{if .cookieExist}}
+          <div class="my-post-container">
+            <h4>Show only</h4>
+            <a href="/myPosts">My posts</a><br>
+            <a href="/myLikedPosts">The posts I liked</a>
+          </div>
+          {{end}}
         </div>
       </div>
 
@@ -100,7 +118,7 @@
               <div class="categories">
                 {{range index . 7}}
               <div class="categorie">
-                <div class="{{.}}">{{.}}</div>
+                <div class="color {{.}}"><p class="each-cat">{{.}}</p></div>
               </div>  
               {{end}}
               </div>
@@ -111,7 +129,7 @@
                   ><a id="user" href="/user?user={{index . 2}}">{{index . 2}}</a>
                   <img src="{{index . 4}}">
                 </p>
-                <span>{{index . 3}}</span>
+                <span id="time-posted">{{index . 3}}</span>
               </div>
             </div>
 

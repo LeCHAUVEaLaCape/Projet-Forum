@@ -18,7 +18,7 @@ import (
 )
 
 var id, like int
-var username, password, email, age, fewWords, address, photo, state, title, body, author, date, content string
+var username, password, email, age, fewWords, address, photo, state, title, body, author, date, content, likedBy string
 var create_cookie, userFound = false, false
 var categories = []string{"gaming", "informatique", "sport", "culture", "politique", "loisir", "sciences", "sexualite", "finance"}
 var data = make(map[string]interface{})
@@ -41,6 +41,8 @@ func main() {
 	http.HandleFunc("/post", post)
 	http.HandleFunc("/delPost", delPost)
 	http.HandleFunc("/delComment", delComment)
+	http.HandleFunc("/myPosts", myPosts)
+	http.HandleFunc("/myLikedPosts", myLikedPosts)
 
 	err := http.ListenAndServe(":8000", nil) // Set listen port
 	if err != nil {
@@ -59,6 +61,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 	}
 	data_index["cookieExist"] = false
 	GetCookie(data_index, r)
+
 	// filtre de categorie
 	selected_categories := ""
 	for i := range categories {
@@ -498,4 +501,153 @@ func delComment(w http.ResponseWriter, r *http.Request) {
 	}
 	tx.Commit()
 	http.Redirect(w, r, "/index", http.StatusSeeOther)
+}
+
+func myPosts(w http.ResponseWriter, r *http.Request) {
+	var all_myPosts [][]interface{}
+
+	// initiate the data that will be send to html
+	data_myPosts := make(map[string]interface{})
+	for k, v := range data {
+		data_myPosts[k] = v
+	}
+	data_myPosts["cookieExist"] = false
+	GetCookie(data_myPosts, r)
+
+	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	defer database.Close()
+	//range over database
+	rows, _ := database.Query("SELECT title, body, author, date, id, category FROM posts WHERE author = ?", data["user"].(string))
+	defer rows.Close()
+
+	for rows.Next() {
+		myPosts := []interface{}{"", "", "", "", "", "", ""}
+		rows.Scan(&myPosts[0], &myPosts[1], &myPosts[2], &myPosts[3], &id, &myPosts[6])
+		// si le RegExp correspond à la DB
+		// Remplace les \n par des <br> pour sauter des lignes en html
+		myPosts[1] = strings.Replace(myPosts[1].(string), string('\r'), "", -1)
+		myPosts[1] = strings.Replace(myPosts[1].(string), string('\n'), "<br>", -1)
+		myPosts[5] = strconv.Itoa(id)
+		if myPosts[6] != nil {
+			temp := []interface{}{} // string
+			for _, e := range myPosts[6].(string) {
+				j, _ := strconv.Atoi(string(e))
+				temp = append(temp, categories[j])
+			}
+			myPosts = append(myPosts, temp)
+		} else {
+			myPosts[6] = []string{}
+			myPosts = append(myPosts, []string{})
+		}
+		all_myPosts = append(all_myPosts, myPosts)
+	}
+
+	// Ajoute le chemin de la photo qui a été choisit par l'utilisateur
+	for i := 0; i < len(all_myPosts); i++ {
+		rows, err := database.Query("SELECT photo FROM users WHERE username = ?", all_myPosts[i][2])
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer rows.Close()
+		for rows.Next() {
+			err := rows.Scan(&photo)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+		err = rows.Err()
+		if err != nil {
+			log.Fatal(err)
+		}
+		all_myPosts[i][4] = photo
+	}
+
+	data_myPosts["all_myPosts"] = all_myPosts
+
+	t := template.New("myPosts-template")
+	t = template.Must(t.ParseFiles("./html/myPosts.html", "./html/header&footer.html"))
+	t.ExecuteTemplate(w, "myPosts", data_myPosts)
+}
+
+func myLikedPosts(w http.ResponseWriter, r *http.Request) {
+	var all_myLikedPosts [][]interface{}
+	var post_liked bool
+
+	// initiate the data that will be send to html
+	data_myLikedPosts := make(map[string]interface{})
+	for k, v := range data {
+		data_myLikedPosts[k] = v
+	}
+	data_myLikedPosts["cookieExist"] = false
+	GetCookie(data_myLikedPosts, r)
+
+	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	defer database.Close()
+
+	//range over database
+	rows, _ := database.Query("SELECT title, body, author, date, id, category, likedBy FROM posts")
+	defer rows.Close()
+
+	for rows.Next() {
+		myLikedPosts := []interface{}{"", "", "", "", "", "", ""}
+		rows.Scan(&myLikedPosts[0], &myLikedPosts[1], &myLikedPosts[2], &myLikedPosts[3], &id, &myLikedPosts[6], &likedBy)
+
+		// find all the posts which the user liked
+		like_splitted := strings.Split(likedBy, " ")
+		for i := 0; i < len(like_splitted); i++ {
+			if like_splitted[i] == data["user"].(string) {
+				post_liked = true
+				break
+			} else {
+				post_liked = false
+			}
+		}
+
+		if post_liked {
+			// Remplace les \n par des <br> pour sauter des lignes en html
+			myLikedPosts[1] = strings.Replace(myLikedPosts[1].(string), string('\r'), "", -1)
+			myLikedPosts[1] = strings.Replace(myLikedPosts[1].(string), string('\n'), "<br>", -1)
+			myLikedPosts[5] = strconv.Itoa(id)
+			if myLikedPosts[6] != nil {
+				temp := []interface{}{} // string
+				for _, e := range myLikedPosts[6].(string) {
+					j, _ := strconv.Atoi(string(e))
+					temp = append(temp, categories[j])
+				}
+				myLikedPosts = append(myLikedPosts, temp)
+			} else {
+				myLikedPosts[6] = []string{}
+				myLikedPosts = append(myLikedPosts, []string{})
+			}
+			all_myLikedPosts = append(all_myLikedPosts, myLikedPosts)
+		}
+	}
+
+	if post_liked {
+		// Ajoute le chemin de la photo qui a été choisit par l'utilisateur
+		for i := 0; i < len(all_myLikedPosts); i++ {
+			rows, err := database.Query("SELECT photo FROM users WHERE username = ?", all_myLikedPosts[i][2])
+			if err != nil {
+				log.Fatal(err)
+			}
+			defer rows.Close()
+			for rows.Next() {
+				err := rows.Scan(&photo)
+				if err != nil {
+					log.Fatal(err)
+				}
+			}
+			err = rows.Err()
+			if err != nil {
+				log.Fatal(err)
+			}
+			all_myLikedPosts[i][4] = photo
+		}
+	}
+
+	data_myLikedPosts["all_myLikedPosts"] = all_myLikedPosts
+
+	t := template.New("myLikedPosts-template")
+	t = template.Must(t.ParseFiles("./html/myLikedPosts.html", "./html/header&footer.html"))
+	t.ExecuteTemplate(w, "myLikedPosts", data_myLikedPosts)
 }

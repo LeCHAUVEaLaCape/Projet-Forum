@@ -20,9 +20,13 @@
             {{$user := index .main_post 3}}
             {{$userconnect := .user}}
             {{if eq $userconnect $user}}
-            <form action="/delPost" method="POST">
+            <form class="form-del" action="/delPost" method="POST">
               <input type="hidden" name="delPost" value="{{index .main_post 0}}">
               <button class="del-post">X</button>
+            </form>
+            <form class="form-modif" action="/modifPost" method="get">
+              <input type="hidden" name="modifPost" value="{{index .main_post 0}}">
+              <button class="modif-post">O</button>
             </form>
             {{end}}
           </div>

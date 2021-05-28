@@ -123,10 +123,15 @@ form {
   text-decoration: underline;
   color: rgb(0, 54, 201);
 }
-.message form {
+.form-del {
   position: absolute;
   top: 0;
   right: 0;
+}
+.form-modif {
+  position: absolute;
+  top: 0;
+  right: 20px;
 }
 .message button {
   border: solid 1px black;

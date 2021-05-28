@@ -1,0 +1,74 @@
+{{define "myPosts"}}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Faux Rhum - My Posts</title>
+    <link rel="shortcut icon" href="../assets/images/logo.png" />
+    <link rel="stylesheet" href="../assets/css/myPosts.css" />
+    <link rel="stylesheet" href="../assets/css/mainPostStyle.css" />
+  </head>
+
+  <body>
+    {{template "header" .}}
+    <div class="page">
+
+      <!-- ajoute les POSTS -->
+      <div class="post-container">
+        <div class="all-posts">
+          {{range .all_myPosts}}
+          <div class="singlePost-container">
+            <!-- ajoute le titre du poste -->
+            <div class="title-post">{{index . 0}}</div>
+            <!-- ajoute le corps du poste -->
+            <div class="body-post">
+              <div class="message">
+                <p>{{index . 1}}</p>
+              </div>
+              <div class="see-more">
+                <form action="/post" method="GET">
+                  <button>
+                  <input type="hidden" name="id" value="{{index . 5}}">
+                   <p>Lire la suite... </p></button>
+                </form>
+                
+              </div>
+            </div>
+
+            <!-- Block des POSTS -->
+            <div class="author-post">
+              <!-- ajoute les catégorie de trie -->
+              <div class="categories">
+                {{range index . 7}}
+              <div class="categorie">
+                <div class="color {{.}}"><p class="each-cat">{{.}}</p></div>
+              </div>  
+              {{end}}
+              </div>
+              <!-- Ajoute l'auteur du post et le time -->
+              <div class="author-time">
+                <p class="author">
+                  <span>post crée par : </span
+                  ><a id="user" href="/user?user={{index . 2}}">{{index . 2}}</a>
+                  <img src="{{index . 4}}">
+                </p>
+                <span id="time-posted">{{index . 3}}</span>
+              </div>
+            </div>
+
+          </div>
+          {{end}}
+        </div>
+      </div>
+
+
+
+
+    </div>
+    {{template "footer"}}
+  </body>
+
+  {{end}}
+</html>

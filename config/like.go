@@ -9,7 +9,10 @@ import (
 
 // verifie Si l'utilisateur connecter à déjà liker le post
 func CheckIfLikedByUser(post_id string, data_post map[string]interface{}) (bool, string) {
-	user := data_post["user"].(string)
+	var user string
+	if data_post["user"] != nil {
+		user = data_post["user"].(string)
+	}
 
 	// Open the database
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
