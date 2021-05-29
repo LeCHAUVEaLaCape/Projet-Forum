@@ -13,23 +13,21 @@ latest.addEventListener("click", () => {
   change_text_post.innerHTML = "Nouveaux Posts";
 });
 
-var grand = document.getElementById("grand");
-var moyen = document.getElementById("moyen");
-var compact = document.getElementById("compact");
-
+// initialisation des éléments qui doivent être changé 
 var message = document.getElementsByClassName("message");
 var posts_container = document.getElementsByClassName("singlePost-container");
 var categories = document.getElementsByClassName("categories");
 var each_cat = document.getElementsByClassName("each-cat");
-
 var body_post = document.getElementsByClassName("body-post");
 var see_more = document.getElementsByClassName("see-more")
-
 var time = document.getElementsByClassName("time-posted")
 var author = document.getElementsByClassName("author-time")
 var color = document.getElementsByClassName("color")
+var like_comment = document.getElementsByClassName("nb-like")
+var created_by = document.getElementsByClassName("created-by")
 
-grand.addEventListener("click", () => {
+// Quand l'affichage = grand
+document.getElementById("grand").addEventListener("click", () => {
   for (let i = 0; i < posts_container.length; i++) {
     posts_container[i].style.width = "70%";
     posts_container[i].style.margin = "10px 0px 25px 0px";
@@ -37,6 +35,8 @@ grand.addEventListener("click", () => {
     message[i].style.borderRadius = "10px 10px 0px 0px";
     see_more[i].style.borderRadius = "0px 0px 10px 10px";
     author[i].style.display = "initial"
+    like_comment[i].style.width = "unset"
+    created_by[i].style.display = "flex"
   }
   for (let i = 0; i < categories.length; i++) {
     categories[i].style.flexWrap = "wrap";
@@ -49,7 +49,8 @@ grand.addEventListener("click", () => {
   }
 });
 
-moyen.addEventListener("click", () => {
+// Quand l'affichage = moyen
+document.getElementById("moyen").addEventListener("click", () => {
   for (i = 0; i < posts_container.length; i++) {
     posts_container[i].style.width = "38%";
     posts_container[i].style.margin = "10px 20px 25px 20px";
@@ -57,6 +58,8 @@ moyen.addEventListener("click", () => {
     message[i].style.borderRadius = "10px 10px 0px 0px";
     see_more[i].style.borderRadius = "0px 0px 10px 10px";
     author[i].style.display = "initial"
+    like_comment[i].style.width = "215px"
+    created_by[i].style.display = "none"
   }
   for (let i = 0; i < categories.length; i++) {
     categories[i].style.flexWrap = "wrap";
@@ -64,12 +67,13 @@ moyen.addEventListener("click", () => {
     see_more[i].style.width = "100%"
   }
   for (let i = 0; i < each_cat.length; i++) {
-    color[i].style.height = "27px";
-    each_cat[i].style.display = "initial";
+    color[i].style.height = "16px";
+    each_cat[i].style.display = "none";
   }
 });
 
-compact.addEventListener("click", () => {
+// Quand l'affichage = compact
+document.getElementById("compact").addEventListener("click", () => {
   for (i = 0; i < posts_container.length; i++) {
     posts_container[i].style.width = "70%";
     posts_container[i].style.margin = "0px";
@@ -77,6 +81,8 @@ compact.addEventListener("click", () => {
     message[i].style.borderRadius = "0px";
     see_more[i].style.borderRadius = "0px";
     author[i].style.display = "flex"
+    like_comment[i].style.width = "unset"
+    created_by[i].style.display = "flex"
   }
   for (let i = 0; i < categories.length; i++) {
     categories[i].style.flexWrap = "initial";

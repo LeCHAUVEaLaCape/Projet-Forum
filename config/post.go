@@ -2,9 +2,9 @@ package config
 
 import (
 	"database/sql"
-	"fmt"
-	"log"
 	"strings"
+
+	. "./err"
 )
 
 func AddNewPost(title string, body string, dt string, data_newPost map[string]interface{}, category []string) {
@@ -14,19 +14,13 @@ func AddNewPost(title string, body string, dt string, data_newPost map[string]in
 
 	// add the inputs to the database
 	tx, err := database.Begin()
-	if err != nil {
-		fmt.Println(err)
-	}
-	stmt, err := tx.Prepare("INSERT INTO posts (title, body, author, date, category, like, likedBy) VALUES (?, ?, ?, ?, ?, 0, '')")
-	if err != nil {
-		fmt.Println(err)
-	}
+	CheckError(err)
+	stmt, err := tx.Prepare("INSERT INTO posts (title, body, author, date, category, like, likedBy, nbComments) VALUES (?, ?, ?, ?, ?, 0, '', 0)")
+	CheckError(err)
 	_, err = stmt.Exec(title, body, data_newPost["user"], dt, strings.Join(category, ""))
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		tx.Commit()
-	}
+	CheckError(err)
+
+	tx.Commit()
 }
 func Display_post(post_id string, data_post map[string]interface{}, body string) [7]string {
 	var post [7]string
@@ -38,9 +32,7 @@ func Display_post(post_id string, data_post map[string]interface{}, body string)
 
 	for rows.Next() {
 		err := rows.Scan(&post[0], &post[1], &body, &post[3], &post[4], &post[6])
-		if err != nil {
-			log.Fatal(err)
-		}
+		CheckError(err)
 	}
 	// Remplace les \n par des <br> pour sauter des lignes en html
 	post[2] = strings.Replace(body, string('\r'), "", -1)
@@ -48,20 +40,14 @@ func Display_post(post_id string, data_post map[string]interface{}, body string)
 
 	// Ajoute le chemin de la photo qui a été choisit par l'utilisateur
 	rows, err := database.Query("SELECT photo FROM users WHERE username = ?", post[3])
-	if err != nil {
-		log.Fatal(err)
-	}
+	CheckError(err)
 	defer rows.Close()
 	for rows.Next() {
 		err := rows.Scan(&post[5])
-		if err != nil {
-			log.Fatal(err)
-		}
+		CheckError(err)
 	}
 	err = rows.Err()
-	if err != nil {
-		log.Fatal(err)
-	}
+	CheckError(err)
 	data_post["main_post"] = post
 	return post
 }

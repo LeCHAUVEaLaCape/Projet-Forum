@@ -56,14 +56,14 @@
             </div>
             <div id="compact" class="compact">
               <div>Compact</div>
-              <img src="./assets/images/justify.png" alt="">
+              <img src="./assets/images/justify.png" alt="compact">
             </div>
           </div>
           {{if .cookieExist}}
           <div class="my-post-container">
-            <h4>Show only</h4>
-            <a href="/myPosts">My posts</a><br>
-            <a href="/myLikedPosts">The posts I liked</a>
+            <h4>Afficher Seuleument :</h4>
+            <a href="/myPosts">Mes posts</a><br>
+            <a href="/myLikedPosts">Les posts que j'ai liké</a>
           </div>
           {{end}}
         </div>
@@ -77,11 +77,11 @@
         </div>
       </div>
 
-      <!-- Ajoute le bouton pour ajouter un commentaire -->
+      <!-- Ajoute le bouton pour ajouter un post -->
       {{if .cookieExist}}
       <div class="newpost-container">
         <a href="/newPost" class="newpost-redirect">
-          <div>Ajouter un nouveau poste</div>
+          <div>Ajouter un nouveau post</div>
         </a>
       </div>
       {{else}}
@@ -122,11 +122,15 @@
               </div>  
               {{end}}
               </div>
+              <!-- Ajoute le nombre de like -->
+              <div class="nb-like">
+                <p class="nb-like-comment">{{index . 8}} Like(s)<br>{{index . 9}} Commentaire(s)</p>
+              </div>
               <!-- Ajoute l'auteur du post et le time -->
               <div class="author-time">
                 <p class="author">
-                  <span>post crée par : </span
-                  ><a id="user" href="/user?user={{index . 2}}">{{index . 2}}</a>
+                  <span class="created-by">post crée par : </span
+                  ><a class="user" href="/user?user={{index . 2}}">{{index . 2}}</a>
                   <img src="{{index . 4}}">
                 </p>
                 <span id="time-posted">{{index . 3}}</span>

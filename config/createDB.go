@@ -1,28 +1,29 @@
 package config
 
-import "database/sql"
+import (
+	"database/sql"
+
+	. "./err"
+)
 
 func CreateDB() {
 	// Open the database and create it if needed
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	database, err := sql.Open("sqlite3", "./db-sqlite.db")
+	CheckError(err)
 	defer database.Close()
 
 	// Create users table in the database
-	statement, _ := database.Prepare("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username TEXT, email TEXT, password TEXT, fewWords TEXT, age TEXT, address TEXT, photo TEXT)")
+	statement, err := database.Prepare("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username TEXT, email TEXT, password TEXT, fewWords TEXT, age TEXT, address TEXT, photo TEXT)")
+	CheckError(err)
 	statement.Exec()
-	//
-	// Open the database_post and create it if needed
-	database_post, _ := sql.Open("sqlite3", "./db-sqlite.db")
-	defer database_post.Close()
 
 	// Create post table in the database_post
-	statement_post, _ := database_post.Prepare("CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY, title TEXT, body TEXT, like INTEGER, author TEXT, date TEXT, category TEXT, likedBy TEXT)")
-	statement_post.Exec()
-	//
-	database_comment, _ := sql.Open("sqlite3", "./db-sqlite.db")
-	defer database_comment.Close()
+	statement, err = database.Prepare("CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY, title TEXT, body TEXT, like INTEGER, author TEXT, date TEXT, category TEXT, likedBy TEXT, nbComments INTEGER)")
+	CheckError(err)
+	statement.Exec()
 
 	// Create users table in the database
-	statement_comment, _ := database_comment.Prepare("CREATE TABLE IF NOT EXISTS comments (id INTEGER PRIMARY KEY, idMainPost TEXT, content TEXT, like INTEGER, author TEXT, date TEXT)")
-	statement_comment.Exec()
+	statement, err = database.Prepare("CREATE TABLE IF NOT EXISTS comments (id INTEGER PRIMARY KEY, idMainPost TEXT, content TEXT, like INTEGER, author TEXT, date TEXT)")
+	CheckError(err)
+	statement.Exec()
 }

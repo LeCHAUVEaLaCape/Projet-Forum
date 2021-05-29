@@ -82,3 +82,6 @@ body,
   text-align: center;
   text-transform: capitalize;
 }
+.checkbox input {
+  cursor: pointer;
+}

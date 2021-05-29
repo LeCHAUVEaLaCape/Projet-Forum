@@ -2,10 +2,28 @@ package config
 
 import (
 	"database/sql"
-	"fmt"
+	"net/http"
 	"strconv"
 	"strings"
+
+	. "./err"
 )
+
+func Like(change_nmb_like string, data_post map[string]interface{}, post_id string, w http.ResponseWriter, r *http.Request) string {
+	// Verifie si l'utilisateur a liké
+	var likedBy string
+	data_post["already_liked"], likedBy = CheckIfLikedByUser(post_id, data_post)
+
+	if change_nmb_like == "1" {
+		likedBy = AddLike(post_id, data_post, likedBy)
+		http.Redirect(w, r, "/post?id="+post_id, http.StatusSeeOther)
+	} else if change_nmb_like == "0" {
+		likedBy = RemoveLike(post_id, data_post, likedBy)
+		http.Redirect(w, r, "/post?id="+post_id, http.StatusSeeOther)
+	}
+
+	return likedBy
+}
 
 // verifie Si l'utilisateur connecter à déjà liker le post
 func CheckIfLikedByUser(post_id string, data_post map[string]interface{}) (bool, string) {
@@ -23,9 +41,7 @@ func CheckIfLikedByUser(post_id string, data_post map[string]interface{}) (bool,
 	rows, _ := database.Query("SELECT likedBy FROM posts WHERE id = ?", post_id)
 	for rows.Next() {
 		err := rows.Scan(&likedBy)
-		if err != nil {
-			fmt.Println(err)
-		}
+		CheckError(err)
 	}
 
 	if likedBy != "" {
@@ -56,40 +72,29 @@ func AddLike(post_id string, data_post map[string]interface{}, likedBy string) s
 	rows, _ := database.Query("SELECT like FROM posts WHERE id = ?", post_id)
 	for rows.Next() {
 		err := rows.Scan(&like)
-		if err != nil {
-			fmt.Println(err)
-		}
+		CheckError(err)
 	}
 	like += 1
 
 	// Update the nb of like
 	query := "UPDATE posts SET like = " + strconv.Itoa(like) + " WHERE id = " + post_id
 	stmt, err := tx.Prepare(query)
-	if err != nil {
-		fmt.Println(err)
-	}
+	CheckError(err)
 	_, err = stmt.Exec()
-	if err != nil {
-		fmt.Println(err)
-	}
+	CheckError(err)
 
 	if likedBy == "" {
 		likedBy = user
 	} else {
-
 		likedBy += " " + user
 	}
 
 	// Update the users who liked
 	query = "UPDATE posts SET likedBy = ? WHERE id = " + post_id
 	stmt, err = tx.Prepare(query)
-	if err != nil {
-		fmt.Println(err)
-	}
+	CheckError(err)
 	_, err = stmt.Exec(likedBy)
-	if err != nil {
-		fmt.Println(err)
-	}
+	CheckError(err)
 	tx.Commit()
 
 	return likedBy
@@ -109,22 +114,16 @@ func RemoveLike(post_id string, data_post map[string]interface{}, likedBy string
 	rows, _ := database.Query("SELECT like FROM posts WHERE id = ?", post_id)
 	for rows.Next() {
 		err := rows.Scan(&like)
-		if err != nil {
-			fmt.Println(err)
-		}
+		CheckError(err)
 	}
 	like -= 1
 
 	// Update the nb of like
 	query := "UPDATE posts SET like = " + strconv.Itoa(like) + " WHERE id = " + post_id
 	stmt, err := tx.Prepare(query)
-	if err != nil {
-		fmt.Println(err)
-	}
+	CheckError(err)
 	_, err = stmt.Exec()
-	if err != nil {
-		fmt.Println(err)
-	}
+	CheckError(err)
 
 	all_likedBy := strings.Split(likedBy, " ")
 
@@ -139,13 +138,9 @@ func RemoveLike(post_id string, data_post map[string]interface{}, likedBy string
 	// Update the users who liked
 	query = "UPDATE posts SET likedBy = ? WHERE id = " + post_id
 	stmt, err = tx.Prepare(query)
-	if err != nil {
-		fmt.Println(err)
-	}
+	CheckError(err)
 	_, err = stmt.Exec(likedBy)
-	if err != nil {
-		fmt.Println(err)
-	}
+	CheckError(err)
 	tx.Commit()
 
 	return likedBy

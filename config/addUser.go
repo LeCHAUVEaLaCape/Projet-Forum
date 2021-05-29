@@ -3,6 +3,8 @@ package config
 import (
 	"database/sql"
 	"fmt"
+
+	. "./err"
 )
 
 var username, email string
@@ -32,18 +34,12 @@ func AddUser(input_username string, input_email string, input_password string, i
 
 	// add the inputs to the database
 	tx, err := database.Begin()
-	if err != nil {
-		fmt.Println(err)
-	}
+	CheckError(err)
 	stmt, err := tx.Prepare("INSERT INTO users (username, email, password, fewWords, age, address, photo) VALUES (?, ?, ?, '', '', '', '../assets/images/default.png')")
-	if err != nil {
-		fmt.Println(err)
-	}
+	CheckError(err)
 	_, err = stmt.Exec(input_username, input_email, input_password)
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		tx.Commit()
-		info["accountCreated"] = true
-	}
+	CheckError(err)
+	tx.Commit()
+	info["accountCreated"] = true
+
 }

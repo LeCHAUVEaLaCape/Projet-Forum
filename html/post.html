@@ -1,114 +1,177 @@
 {{define "post"}}
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Faux Rhum - {{index .main_post 1}}</title>
     <link rel="stylesheet" href="./assets/css/post.css" />
-</head>
-<body>
+  </head>
+  <body>
     {{template "header" .}}
+    {{$idMainPost := index .main_post 0}}
+    {{$userconnect := .user}}
 
-    <!-- Post principal -->
+    <!----------------------
+    POST PRINCIPAL
+   ---------------------->
     <div class="page">
-        <div class="title-post">{{index .main_post 1}}</div>
-        <div class="body-post">
-          <div class="message">
-            <p>{{index .main_post 2}}</p>
-            {{$user := index .main_post 3}}
-            {{$userconnect := .user}}
-            {{if eq $userconnect $user}}
-            <form class="form-del" action="/delPost" method="POST">
-              <input type="hidden" name="delPost" value="{{index .main_post 0}}">
-              <button class="del-post">X</button>
+      <div class="title-post">{{index .main_post 1}}</div>
+      <div class="body-post">
+        <div class="message">
+          <p>{{index .main_post 2}}</p>
+        </div>
+        {{$user := index .main_post 3}}
+        {{if eq $userconnect $user}}
+        <!-- Bouton pour supprimer le post -->
+        <form class="form-del" action="/delPost" method="POST">
+          <input type="hidden" name="delPost" value="{{index .main_post 0}}" />
+          <button class="del-post">
+            <img src="../assets/images/trash.png" />
+          </button>
+        </form>
+        <!-- Bouton pour modifier le post -->
+        <div id="display-modif">
+          <img src="../assets/images/edit-button.png" />
+        </div>
+        <form
+          class="form-modif"
+          action="/post?id={{index .main_post 0}}"
+          method="post"
+        >
+          <textarea
+            type="text"
+            name="modifPost"
+            id="modif"
+            cols="30"
+            rows="10"
+            required
+          >
+{{index .main_post 2}}</textarea
+          >
+          <input
+            type="hidden"
+            name="id-mainPost"
+            id="confirm"
+            value="{{index .main_post 0}}"
+          />
+          <button class="modif-post" required>Submit changes</button>
+        </form>
+        {{end}}
+      </div>
+      <!-- Auteur et time -->
+      <div class="author-post">
+        <p class="author">
+          <span>post created by : </span
+          ><a id="user" href="/user?user={{index .main_post 3}}"
+            >{{index .main_post 3}}</a
+          >
+          <img src="{{index .main_post 5}}" />
+        </p>
+        <span>{{index .main_post 4}}</span>
+
+        <!-- LIKES -->
+        <div class="like-container">
+          <div class="like">
+            <!-- LIKE lorsque l'utilisateur est connecté et qu'il n'a pas encore liké le post -->
+            {{if and .cookieExist .already_liked}}
+            <form
+              class="like-button"
+              action="/post?id={{index .main_post 0}}"
+              method="POST"
+            >
+              <input type="hidden" name="Like" value="1" />
+              <button style="cursor: pointer">+1</button>
             </form>
-            <form class="form-modif" action="/modifPost" method="get">
-              <input type="hidden" name="modifPost" value="{{index .main_post 0}}">
-              <button class="modif-post">O</button>
+            <!-- Enlever le LIKE lorsque l'utilisateur est connecté et qu'il a déjà liké le post -->
+            {{else if .cookieExist}}
+            <form
+              class="like-button"
+              action="/post?id={{index .main_post 0}}"
+              method="POST"
+            >
+              <input type="hidden" name="Like" value="0" />
+              <button style="cursor: pointer">-1</button>
             </form>
             {{end}}
+            <span class="nb-like">
+              {{index .main_post 6}} Like(s)
+              <div class="invisible-likers">{{.mainPost_likedBy}}</div>
+            </span>
           </div>
         </div>
-        <div class="author-post">
-          <p class="author">
-            <span>post created by : </span
-              ><a id="user" href="/user?user={{index .main_post 3}}">{{index .main_post 3}}</a>
-              <img src="{{index .main_post 5}}">
+      </div>
+
+      <!----------------------
+    Ajouter un commentaire
+   ---------------------->
+      {{if .cookieExist}}
+      <div class="text-add-comment">
+        <h3>Répondez à ce post</h3>
+      </div>
+      <div>
+        <form action="/post?id={{index .main_post 0}}" method="POST" id="form-add-comment">
+          <textarea type="text" name="add_comment" class="add_comment" cols="80" rows="5"></textarea>
+
+          <button type="submit">Commenter</button>
+        </form>
+      </div>
+      {{else}}
+      <div class="log">
+        <p>
+          Veuillez <a href="/logIn">vous connecter</a> pour poster un
+          commentaire
+        </p>
+      </div>
+      {{end}}
+
+      <!----------------------
+            TOUS LES COMMENTAIRES
+           ---------------------->
+           <div class="all-comments">
+             <h3>Tous les commentaires (<span id="nb-comment">0</span>)</h3>
+           </div>
+      {{range .comments}}
+      {{$author := index . 1}} 
+      <div class="full-comment">
+        <div class="comment-container">
+          <div class="comment">
+            <p class="text">{{index . 0}}</p>
+          </div>
+          {{if eq $author $userconnect}}
+          <div class="display-modif-comment">
+            <img src="../assets/images/edit-button.png" />
+          </div>
+          <!-- bouton pour supprimer commentaire -->
+          <form action="/delComment" method="POST">
+            <input type="hidden" name="delComment" value="{{index . 5}}" />
+            <input type="hidden" name="id-mainPost" value="{{$idMainPost}}" />
+            <button class="del-comment"><img src="../assets/images/trash.png"></button>
+          </form>
+          <!-- Bouton pour modifier le commentaire -->
+          <form class="form-modif-comment" action="/post?id={{$idMainPost}}" method="post">
+            <textarea type="text" name="modifComment" class="modifComment" cols="30" rows="10" required>{{index . 0}}</textarea>
+            <input type="hidden" name="id-comment" class="confirm" value="{{index . 5}}"/>
+            <button class="modif-comment" required>Submit changes</button>
+          </form>
+          {{end}} 
+        </div>
+        <div class="author-comment">
+          <div class="author-time">
+            <p class="author">
+              <span>post created by : </span
+              ><a id="user" href="/user?user={{index . 1}}">{{index . 1}}</a>
+              <img src="{{index . 4}}" />
             </p>
-            <span>{{index .main_post 4}}</span>
-
-            <!-- LIKES -->
-            <div class="like-container">
-              <div class="like">
-                <!-- LIKE lorsque l'utilisateur est connecté et qu'il n'a pas encore liké le post -->
-                {{if and .cookieExist .already_liked}}
-                <form class="like-button" action="/post?id={{index .main_post 0}}" method="POST">
-                  <input type="hidden" name="Like" value="1">
-                  <button style="cursor: pointer;">+1</button>
-                </form>
-                <!-- Enlever le LIKE lorsque l'utilisateur est connecté et qu'il a déjà liké le post -->
-                {{else if .cookieExist}}
-                <form class="like-button" action="/post?id={{index .main_post 0}}" method="POST">
-                  <input type="hidden" name="Like" value="0">
-                  <button style="cursor: pointer;">-1</button>
-                </form>
-                {{end}}
-                <span class="nb-like">
-                  {{index .main_post 6}}  Like(s)
-                  <div class="invisible-likers">
-                    {{.mainPost_likedBy}}
-                  </div>
-                </span>
-              </div>
-            </div>
+            <span>{{index . 2}}</span>
           </div>
-          
-          <!-- Ajouter un commentaire -->
-          {{if .cookieExist}}
-          <div>
-            <form action="/post?id={{index .main_post 0}}" method="POST" >
-              <input type="text" name="add_comment">
-              <button type="submit">Submit</button>
-            </form>
-          </div>
-          {{else}}
-        <div class="log">
-          <p>Veuillez <a href="/logIn">vous connecter</a> pour poster un commentaire</p>
         </div>
-        {{end}}
-
-        <!-- Commentaire -->
-        {{range .comments}}
-        <div class="full-comment">
-          <div class="comment-container">
-            <div class="comment">
-              {{$author := index . 1}}
-              {{if eq $author $userconnect}}
-              <form action="/delComment" method="POST">
-                <input type="hidden" name="delComment" value="{{index . 0}}">
-                <button class="del-comment">X</button>
-              </form>
-              {{end}}
-              {{index . 0}}
-            </div>
-          </div>
-          <div class="author-comment">
-            <div class="author-time">
-              <p class="author">
-                <span>post created by : </span
-                ><a id="user" href="/user?user={{index . 1}}">{{index . 1}}</a>
-                <img src="{{index . 4}}">
-              </p>
-              <span>{{index . 2}}</span>
-            </div>
-          </div>
-          </div>
-          {{end}}
-        </div>
+      </div>
+      {{end}}
     </div>
     {{template "footer"}}
-</body>
+  </body>
+  <script src="../assets/js/post.js"></script>
 </html>
 {{end}}

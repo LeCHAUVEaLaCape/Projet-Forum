@@ -1,0 +1,1 @@
+document.getElementById("nb-posts").innerHTML = document.getElementsByClassName("all-posts")[0].childElementCount

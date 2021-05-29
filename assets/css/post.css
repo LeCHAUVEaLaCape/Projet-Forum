@@ -12,7 +12,6 @@ body,
   width: 100vw;
   background-color: #eee;
   padding-top: 140px;
-  padding-bottom: 60px;
   font-size: 20px;
 }
 .title-post {
@@ -25,6 +24,7 @@ body,
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
 }
 .message {
   width: 55%;
@@ -35,7 +35,6 @@ body,
   padding: 10px;
   font-size: 15px;
   background: #fff;
-  position: relative;
 }
 .author-post {
   text-align: end;
@@ -60,8 +59,7 @@ body,
 .comment-container {
   display: flex;
   justify-content: center;
-  align-items: flex-end;
-  min-height: 180px;
+  min-height: 150px;
 }
 .comment {
   border: solid 1px black;
@@ -126,12 +124,7 @@ form {
 .form-del {
   position: absolute;
   top: 0;
-  right: 0;
-}
-.form-modif {
-  position: absolute;
-  top: 0;
-  right: 20px;
+  right: 22.5vw;
 }
 .message button {
   border: solid 1px black;
@@ -148,15 +141,17 @@ form {
 .nb-like {
   margin-left: 9px;
 }
-.comment {
+.comment, .comment-container {
   position: relative;
+}
+.full-comment {
+  margin-bottom: 75px;
 }
 .del-comment {
   position: absolute;
   top: 0;
-  right: 0;
+  right: 25vw;
   border: solid 1px black;
-  padding: 5px;
   cursor: pointer;
 }
 .invisible-likers{
@@ -172,4 +167,94 @@ form {
   font-size: 15px;
   border: solid 1px black;
   border-radius: 10px;
+}
+.form-modif,
+.form-modif-comment {
+  width: 55%;
+    min-height: 150px;
+    max-height: 90%;
+    border: black 1px solid;
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 15px;
+    background: #fff;
+    display: none;
+}
+.form-modif textarea {
+  background-color: #f5f5f5;
+  resize: none;
+}
+.add_comment {
+  min-height: 100px;
+  min-width: 250px;
+  max-height: 300px;
+  max-width: 980px;
+  border-radius: 10px 10px 0px 0px;
+  padding: 10px;
+}
+#form-add-comment {
+  display: grid;
+}
+#form-add-comment button {    
+  border-radius: 0px 0px 10px 10px;
+  border: solid 1px black;
+  cursor: pointer;
+}
+#modif {
+  height: 100%;
+  width: 100%;
+  border: none;
+}
+#display-modif {
+  position: absolute;
+  top: 0;
+  right: 24.5vw;
+  cursor: pointer;
+}
+.display-modif-comment img {
+  position: absolute;
+  top: 2px;
+  right: 27vw;
+  cursor: pointer;
+}
+.hide-message {
+  display: none;
+}
+.see-modif {
+  display: initial;
+}
+.del-post {
+  cursor: pointer;
+}
+#display-modif img, 
+.display-modif-comment img, 
+.del-post img,
+.del-comment img {
+  height: 20px;
+}
+.modif-post {
+  cursor: pointer;
+}
+.modifComment {
+  background-color: #f5f5f5;
+  resize: vertical;
+  max-height: 300px;
+  height: 80%;
+  width: 100%;
+  border: none;
+}
+.resize-box {
+  width: 50%;
+}
+.text-add-comment {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+}
+.all-comments {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 175px;
 }

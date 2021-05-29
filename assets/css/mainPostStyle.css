@@ -46,9 +46,10 @@
   span {
     font-size: 12px;
   }
-  #user {
+ .user {
     text-decoration: underline;
     color: rgb(0, 54, 201);
+    max-width: 156px;
   }
   .newpost-container {
     margin-bottom: 66px;
@@ -112,12 +113,14 @@
     justify-content: space-between;
   }
   .author-time {
+    justify-content: flex-end;
     text-align: end;
+    width: 310px;
   }
   .categories {
     font-size: 15px;
     display: flex;
-    width: 280px;
+    width: 310px;
     flex-wrap: wrap;
   }
   .categorie {
@@ -176,4 +179,10 @@
   }
   .see-more button:hover {
     background-color: #cfcfcf;
+  }
+  .nb-like {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 15px;
   }

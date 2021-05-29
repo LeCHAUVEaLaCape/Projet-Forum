@@ -15,3 +15,17 @@ body,
     padding-bottom: 60px;
     font-size: 20px;
   }
+.title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+#nb-post {
+  display: flex;
+  font-size: 35px;
+}
+#nb-like {
+  display: flex;
+  font-size: 35px;
+}

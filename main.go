@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -18,7 +17,7 @@ import (
 )
 
 var id, like int
-var username, password, email, age, fewWords, address, photo, state, title, body, author, date, content, likedBy string
+var username, password, email, age, fewWords, address, photo, state, title, body, author, date, content, likedBy, nbComments string
 var create_cookie, userFound = false, false
 var categories = []string{"gaming", "informatique", "sport", "culture", "politique", "loisir", "sciences", "sexualite", "finance"}
 var data = make(map[string]interface{})
@@ -45,9 +44,7 @@ func main() {
 	http.HandleFunc("/myLikedPosts", myLikedPosts)
 
 	err := http.ListenAndServe(":8000", nil) // Set listen port
-	if err != nil {
-		log.Fatal("ListenAndServe: ", err)
-	}
+	checkError(err)
 }
 
 // Generate the main page when first loading the site
@@ -76,12 +73,12 @@ func index(w http.ResponseWriter, r *http.Request) {
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
 	defer database.Close()
 	//range over database
-	rows, _ := database.Query("SELECT title, body, author, date, id, category FROM posts")
+	rows, _ := database.Query("SELECT title, body, author, date, id, category, like, nbComments FROM posts")
 	defer rows.Close()
 
 	for rows.Next() {
 		aPost := []interface{}{"", "", "", "", "", "", ""}
-		rows.Scan(&aPost[0], &aPost[1], &aPost[2], &aPost[3], &id, &aPost[6])
+		rows.Scan(&aPost[0], &aPost[1], &aPost[2], &aPost[3], &id, &aPost[6], &like, &nbComments)
 		// si le RegExp correspond à la DB
 		if filter.MatchString(aPost[6].(string)) {
 			// Remplace les \n par des <br> pour sauter des lignes en html
@@ -99,6 +96,8 @@ func index(w http.ResponseWriter, r *http.Request) {
 				aPost[6] = []string{}
 				aPost = append(aPost, []string{})
 			}
+			aPost = append(aPost, like)
+			aPost = append(aPost, nbComments)
 			post = append(post, aPost)
 		}
 
@@ -106,26 +105,20 @@ func index(w http.ResponseWriter, r *http.Request) {
 	// Ajoute le chemin de la photo qui a été choisit par l'utilisateur
 	for i := 0; i < len(post); i++ {
 		rows, err := database.Query("SELECT photo FROM users WHERE username = ?", post[i][2])
-		if err != nil {
-			log.Fatal(err)
-		}
+		checkError(err)
 		defer rows.Close()
 		for rows.Next() {
 			err := rows.Scan(&photo)
-			if err != nil {
-				log.Fatal(err)
-			}
+			checkError(err)
 		}
 		err = rows.Err()
-		if err != nil {
-			log.Fatal(err)
-		}
+		checkError(err)
 		post[i][4] = photo
 	}
 
 	data_index["allposts"] = post
-	// B
 	data_index["categories"] = categories
+
 	t := template.New("index-template")
 	t = template.Must(t.ParseFiles("index.html", "./html/header&footer.html"))
 	t.ExecuteTemplate(w, "index", data_index)
@@ -403,8 +396,8 @@ func post(w http.ResponseWriter, r *http.Request) {
 	data_post["already_liked"] = false
 	GetCookie(data_post, r)
 
+	// Affiche les posts et commentaires
 	var post = Display_post(post_id, data_post, body)
-
 	Display_comments(data_post, post_id)
 
 	// Ajoute un commentaire
@@ -414,23 +407,25 @@ func post(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/post?id="+post_id, http.StatusSeeOther)
 	}
 
+	// Système de Like
 	change_nmb_like := r.FormValue("Like")
-	// Verifie si l'utilisateur a liké
-	var likedBy string
-	data_post["already_liked"], likedBy = CheckIfLikedByUser(post_id, data_post)
-
-	if change_nmb_like == "1" {
-		likedBy = AddLike(post_id, data_post, likedBy)
-		http.Redirect(w, r, "/post?id="+post_id, http.StatusSeeOther)
-	} else if change_nmb_like == "0" {
-		likedBy = RemoveLike(post_id, data_post, likedBy)
-		http.Redirect(w, r, "/post?id="+post_id, http.StatusSeeOther)
-	}
+	likedBy = Like(change_nmb_like, data_post, post_id, w, r)
 
 	if data_post["user"] == nil {
 		data_post["user"] = ""
 	}
 
+	// Modification de post
+	modif_post := r.FormValue("modifPost")
+	id_mainPost := r.FormValue("id-mainPost")
+	modif_comment := r.FormValue("modifComment")
+	id_comment := r.FormValue("id-comment")
+	if modif_post != "" && id_mainPost != "" || modif_comment != "" && id_comment != "" {
+		ModifPostAndComment(modif_post, id_mainPost, modif_comment, id_comment)
+		http.Redirect(w, r, "/post?id="+post_id, http.StatusSeeOther)
+	}
+
+	// ajoute les personnes qui ont liké le post principal
 	likedBy = strings.ReplaceAll(likedBy, " ", "<br>")
 	data_post["mainPost_likedBy"] = likedBy
 
@@ -449,32 +444,18 @@ func delPost(w http.ResponseWriter, r *http.Request) {
 
 	// DELETE the comments of the main post
 	tx, err := database.Begin()
-	if err != nil {
-		fmt.Println(err)
-	}
+	checkError(err)
 	stmt, err := tx.Prepare("DELETE FROM comments WHERE idMainPost = ?")
-	if err != nil {
-		fmt.Println(err)
-	}
+	checkError(err)
 	_, err = stmt.Exec(delete_post)
-	if err != nil {
-		fmt.Println(err)
-	}
+	checkError(err)
 
 	// DELETE the main POST
-	if err != nil {
-		fmt.Println(err)
-	}
 	stmt, err = tx.Prepare("DELETE FROM posts WHERE id = ?")
-	if err != nil {
-		fmt.Println(err)
-	}
+	checkError(err)
 	_, err = stmt.Exec(delete_post)
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		tx.Commit()
-	}
+	checkError(err)
+	tx.Commit()
 
 	http.Redirect(w, r, "/index", http.StatusSeeOther)
 }
@@ -482,27 +463,24 @@ func delPost(w http.ResponseWriter, r *http.Request) {
 // supprime un commentaire
 func delComment(w http.ResponseWriter, r *http.Request) {
 	delete_comment := r.FormValue("delComment")
+	idMainPost := r.FormValue("id-mainPost")
+	fmt.Println(delete_comment)
 	// Open the database
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
 	defer database.Close()
 
 	// DELETE the comments of the main post
 	tx, err := database.Begin()
-	if err != nil {
-		fmt.Println(err)
-	}
-	stmt, err := tx.Prepare("DELETE FROM comments WHERE content = ?")
-	if err != nil {
-		fmt.Println(err)
-	}
+	checkError(err)
+	stmt, err := tx.Prepare("DELETE FROM comments WHERE id = ?")
+	checkError(err)
 	_, err = stmt.Exec(delete_comment)
-	if err != nil {
-		fmt.Println(err)
-	}
+	checkError(err)
 	tx.Commit()
-	http.Redirect(w, r, "/index", http.StatusSeeOther)
+	http.Redirect(w, r, "/post?id="+idMainPost, http.StatusSeeOther)
 }
 
+// Page qui affiche les posts créé par l'utilisateur connecté
 func myPosts(w http.ResponseWriter, r *http.Request) {
 	var all_myPosts [][]interface{}
 
@@ -545,20 +523,14 @@ func myPosts(w http.ResponseWriter, r *http.Request) {
 	// Ajoute le chemin de la photo qui a été choisit par l'utilisateur
 	for i := 0; i < len(all_myPosts); i++ {
 		rows, err := database.Query("SELECT photo FROM users WHERE username = ?", all_myPosts[i][2])
-		if err != nil {
-			log.Fatal(err)
-		}
+		checkError(err)
 		defer rows.Close()
 		for rows.Next() {
 			err := rows.Scan(&photo)
-			if err != nil {
-				log.Fatal(err)
-			}
+			checkError(err)
 		}
 		err = rows.Err()
-		if err != nil {
-			log.Fatal(err)
-		}
+		checkError(err)
 		all_myPosts[i][4] = photo
 	}
 
@@ -569,6 +541,7 @@ func myPosts(w http.ResponseWriter, r *http.Request) {
 	t.ExecuteTemplate(w, "myPosts", data_myPosts)
 }
 
+// Page qui affiche les posts liké par l'utilisateur connecté
 func myLikedPosts(w http.ResponseWriter, r *http.Request) {
 	var all_myLikedPosts [][]interface{}
 	var post_liked bool
@@ -627,20 +600,14 @@ func myLikedPosts(w http.ResponseWriter, r *http.Request) {
 		// Ajoute le chemin de la photo qui a été choisit par l'utilisateur
 		for i := 0; i < len(all_myLikedPosts); i++ {
 			rows, err := database.Query("SELECT photo FROM users WHERE username = ?", all_myLikedPosts[i][2])
-			if err != nil {
-				log.Fatal(err)
-			}
+			checkError(err)
 			defer rows.Close()
 			for rows.Next() {
 				err := rows.Scan(&photo)
-				if err != nil {
-					log.Fatal(err)
-				}
+				checkError(err)
 			}
 			err = rows.Err()
-			if err != nil {
-				log.Fatal(err)
-			}
+			checkError(err)
 			all_myLikedPosts[i][4] = photo
 		}
 	}
@@ -650,4 +617,10 @@ func myLikedPosts(w http.ResponseWriter, r *http.Request) {
 	t := template.New("myLikedPosts-template")
 	t = template.Must(t.ParseFiles("./html/myLikedPosts.html", "./html/header&footer.html"))
 	t.ExecuteTemplate(w, "myLikedPosts", data_myLikedPosts)
+}
+
+func checkError(err error) {
+	if err != nil {
+		fmt.Println(err)
+	}
 }

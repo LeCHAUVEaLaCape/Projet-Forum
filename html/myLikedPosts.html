@@ -15,6 +15,11 @@
     {{template "header" .}}
     <div class="page">
 
+<div class="title">
+  <h1>Les posts que j'ai liké&nbsp;</h1>
+  <span id="nb-like">(<p id="nb-likes"></p>)</span>
+</div>
+
       <!-- ajoute les POSTS -->
       <div class="post-container">
         <div class="all-posts">
@@ -69,6 +74,6 @@
     </div>
     {{template "footer"}}
   </body>
-
+<script src="../assets/js/myLikedPosts.js"></script>
+  </html>
   {{end}}
-</html>
