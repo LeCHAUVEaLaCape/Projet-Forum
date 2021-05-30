@@ -204,14 +204,18 @@ func logIn(w http.ResponseWriter, r *http.Request) {
 				data["user"] = username
 				data["cookieExist"] = true
 				break
+			} else {
+				data_logIn["wrongPassword"] = true
 			}
+		} else if user_login != "" {
+			data_logIn["wrongUsername"] = true
 		}
 	}
 
 	if create_cookie {
 		// Créé un cookie si user bien authentifié
 		CreateCookie(w, r)
-		data["cookieExist"] = true
+		data_logIn["wrongPassword"] = false
 		http.Redirect(w, r, "/index", http.StatusSeeOther)
 	}
 

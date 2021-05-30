@@ -23,16 +23,29 @@
                     <label for="user-login">Username</label>
                     <input type="text" name="user-login">
                 </div>
+                {{if .wrongUsername}}
+                    {{if not .wrongPassword}}
+                    <div class="wrong-username">
+                        <p>Unknown username</p>
+                        <a href="/signUp">Create an account</a>
+                    </div>
+                    {{end}}
+                {{end}}
                 <div class="enter-password">
                     <label for="password-login">Password</label>
                     <input type="password" name="password-login">
                 </div>
+                {{if .wrongPassword}}
+                    <div class="wrong-password">
+                        <p>Wrong password</p>
+                    <a href="#">Forgot your password?</a>
+                </div>
+                {{end}}
                 <div class="submit">
                     <button type="submit">Log In</button>
                 </div>
             </form>
         </div>
-
         <div class="create-account">
             <div>
                 <p>New to the Forum ? <br><a href="/SignUp">Create an account</a>.</p>

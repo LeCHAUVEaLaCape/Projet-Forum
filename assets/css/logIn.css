@@ -78,3 +78,11 @@ body,
       color: rgb(0, 81, 255);
       text-decoration: underline;
 }
+.wrong-username, .wrong-password {
+  font-size: 12px;
+  padding: 0px 12px;
+}
+.wrong-username a, .wrong-password a {
+  color: blue;
+  text-decoration: underline;
+}
