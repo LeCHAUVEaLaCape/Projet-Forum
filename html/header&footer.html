@@ -20,22 +20,40 @@
         <div class="auth">
           {{if .cookieExist}}
           <div>
-            <p>Connecté en tant que :</p>
             <a class="account" href="/user?user={{.user}}">{{.user}}</a>
+          </div>
+          <div class="notif-bell">
+            <img id="notif-btn" src="../assets/images/notification-inactive.png" alt="no-notif">
           </div>
           <button class="logout-btn" onclick='window.location.href="./logOut"'><a href="/logOut">Logout</a></button>
           {{else}}
           <button  class="login-btn" onclick='window.location.href="./logIn"'><a href="/logIn">Login</a></button>
           <a href="/SignUp" class="btn">Register</a>
           {{end}}
-
         </div>
       </div>
     </div>
   </div>
 </div>
-<script type="text/javascript" src="../js/script.js"></script>
-{{end}} {{define "footer"}}
+
+{{if .cookieExist}}
+<div class="notif-container">
+  <div id="notif">
+    <span>Vos notifications :</span>
+    {{$lenNotif := len .notif}}
+    <div id="all-notif">
+      {{range .notif}}
+      <p class="notif">{{index . 1}} a {{index . 2}} votre&nbsp;<a href="/post?id={{index . 0}}">post</a></p>
+      {{end}}
+    </div>
+  </div>
+</div>
+<script src="../assets/js/header.js"></script>
+{{end}} 
+{{end}} 
+
+<!-- footer -->
+{{define "footer"}}
 <link rel="stylesheet" href="../assets/css/footer.css" />
 <div class="footer"></div>
 {{end}}

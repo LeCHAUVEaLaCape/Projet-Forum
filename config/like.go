@@ -2,6 +2,7 @@ package config
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -9,13 +10,26 @@ import (
 	. "./err"
 )
 
+type Notif struct {
+	idPost          string
+	liker           string
+	action          string
+	userToSendNotif string
+}
+
 func Like(change_nmb_like string, data_post map[string]interface{}, post_id string, w http.ResponseWriter, r *http.Request) string {
 	// Verifie si l'utilisateur a liké
 	var likedBy string
 	data_post["already_liked"], likedBy = CheckIfLikedByUser(post_id, data_post)
 
+	var notif Notif
+	notif.idPost = r.FormValue("id-post")
+	notif.liker = r.FormValue("liker")
+	notif.action = r.FormValue("action")
+	notif.userToSendNotif = r.FormValue("userToSendNotif")
+
 	if change_nmb_like == "1" {
-		likedBy = AddLike(post_id, data_post, likedBy)
+		likedBy = AddLike(post_id, data_post, likedBy, notif)
 		http.Redirect(w, r, "/post?id="+post_id, http.StatusSeeOther)
 	} else if change_nmb_like == "0" {
 		likedBy = RemoveLike(post_id, data_post, likedBy)
@@ -59,15 +73,15 @@ func CheckIfLikedByUser(post_id string, data_post map[string]interface{}) (bool,
 }
 
 // ajoute un like au post quand l'utilisateur clique sur le bouton
-func AddLike(post_id string, data_post map[string]interface{}, likedBy string) string {
+func AddLike(post_id string, data_post map[string]interface{}, likedBy string, notif Notif) string {
 	var like int
 	user := data_post["user"].(string)
 
 	// Open the database
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
-	defer database.Close()
 
 	tx, err := database.Begin()
+	CheckError(err)
 	// Ajoute +1 like des POSTS
 	rows, _ := database.Query("SELECT like FROM posts WHERE id = ?", post_id)
 	for rows.Next() {
@@ -90,13 +104,15 @@ func AddLike(post_id string, data_post map[string]interface{}, likedBy string) s
 	}
 
 	// Update the users who liked
-	query = "UPDATE posts SET likedBy = ? WHERE id = " + post_id
+	query = "UPDATE posts SET likedBy =  ? WHERE id = " + post_id
 	stmt, err = tx.Prepare(query)
 	CheckError(err)
 	_, err = stmt.Exec(likedBy)
 	CheckError(err)
 	tx.Commit()
+	database.Close()
 
+	updateNotif(notif)
 	return likedBy
 }
 
@@ -144,4 +160,34 @@ func RemoveLike(post_id string, data_post map[string]interface{}, likedBy string
 	tx.Commit()
 
 	return likedBy
+}
+
+func updateNotif(notif Notif) {
+	// Open the database
+	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	defer database.Close()
+
+	var notification string
+	// Get the notification from the user to add the new notif
+	rows, err := database.Query("SELECT notification FROM users WHERE username = ?", notif.userToSendNotif)
+	CheckError(err)
+	defer rows.Close()
+	for rows.Next() {
+		err := rows.Scan(&notification)
+		CheckError(err)
+		fmt.Println("notif", notification)
+	}
+
+	tx, err := database.Begin()
+	CheckError(err)
+	// Update the notif section
+	if notif.liker != notif.userToSendNotif {
+		query := "UPDATE users SET notification = ? WHERE username = ?"
+		stmt, err := tx.Prepare(query)
+		CheckError(err)
+		_, err = stmt.Exec(notification+notif.idPost+" "+notif.liker+" "+notif.action+",", notif.userToSendNotif)
+		CheckError(err)
+	}
+
+	tx.Commit()
 }

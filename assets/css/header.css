@@ -263,3 +263,52 @@
   color: white;
   background-color: black;
 }
+.notif-container {
+  display: none;
+  position: fixed;
+  top: 100px;
+  right: 15.5vw;
+  height: 200px;
+  width: 280px;
+  background-color: #fff;
+  z-index: 1;
+  border-radius: 12px;
+  border: solid 4px black;
+}
+.notif-bell img {
+  height: 20px;
+  cursor: pointer;
+  padding: 5px;
+  border: solid 1px black;
+  border-radius: 10px;
+  margin: 0px 20px;
+}
+.notif-active {
+  display: initial;
+}
+#notif span {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 30px;
+  font-size: 21px;
+  background: transparent;
+  margin-bottom: 17px;
+}
+.notif {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-top: solid 1px black;
+    border-bottom: solid 1px black;
+    padding: 9px;
+    width:100%;
+}
+.notif a{
+  color: blue;
+  text-decoration: underline;
+}
+#all-notif {
+  display: flex;
+  flex-wrap: wrap-reverse;
+}

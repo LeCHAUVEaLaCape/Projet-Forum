@@ -13,7 +13,7 @@ func CreateDB() {
 	defer database.Close()
 
 	// Create users table in the database
-	statement, err := database.Prepare("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username TEXT, email TEXT, password TEXT, fewWords TEXT, age TEXT, address TEXT, photo TEXT)")
+	statement, err := database.Prepare("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username TEXT, email TEXT, password TEXT, fewWords TEXT, age TEXT, address TEXT, photo TEXT, notification TEXT)")
 	CheckError(err)
 	statement.Exec()
 

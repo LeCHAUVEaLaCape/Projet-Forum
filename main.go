@@ -59,6 +59,10 @@ func index(w http.ResponseWriter, r *http.Request) {
 	data_index["cookieExist"] = false
 	GetCookie(data_index, r)
 
+	if data["user"] != nil {
+		checkNotif(data_index)
+	}
+
 	// filtre de categorie
 	selected_categories := ""
 	for i := range categories {
@@ -225,6 +229,9 @@ func welcome(w http.ResponseWriter, r *http.Request) {
 	}
 
 	GetCookie(data_welcome, r)
+	if data["user"] != nil {
+		checkNotif(data_welcome)
+	}
 
 	t := template.New("welcome-template")
 	t = template.Must(t.ParseFiles("./html/welcome.html", "./html/header&footer.html"))
@@ -241,6 +248,9 @@ func user(w http.ResponseWriter, r *http.Request) {
 	data_user["cookieExist"] = false
 	data_user["username"] = ""
 	GetCookie(data_user, r)
+	if data["user"] != nil {
+		checkNotif(data_user)
+	}
 
 	user := r.FormValue("user")
 
@@ -317,6 +327,9 @@ func allUsers(w http.ResponseWriter, r *http.Request) {
 		data_allUsers[k] = v
 	}
 	GetCookie(data_allUsers, r)
+	if data["user"] != nil {
+		checkNotif(data_allUsers)
+	}
 
 	// Open the database
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
@@ -362,6 +375,9 @@ func newPost(w http.ResponseWriter, r *http.Request) {
 	if data_newPost["cookieExist"] == false {
 		http.Redirect(w, r, "/logIn", http.StatusSeeOther)
 	}
+	if data["user"] != nil {
+		checkNotif(data_newPost)
+	}
 
 	// Input de la page
 	title := r.FormValue("title")
@@ -395,6 +411,9 @@ func post(w http.ResponseWriter, r *http.Request) {
 	data_post["cookieExist"] = false
 	data_post["already_liked"] = false
 	GetCookie(data_post, r)
+	if data["user"] != nil {
+		checkNotif(data_post)
+	}
 
 	// Affiche les posts et commentaires
 	var post = Display_post(post_id, data_post, body)
@@ -491,6 +510,9 @@ func myPosts(w http.ResponseWriter, r *http.Request) {
 	}
 	data_myPosts["cookieExist"] = false
 	GetCookie(data_myPosts, r)
+	if data["user"] != nil {
+		checkNotif(data_myPosts)
+	}
 
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
 	defer database.Close()
@@ -553,6 +575,9 @@ func myLikedPosts(w http.ResponseWriter, r *http.Request) {
 	}
 	data_myLikedPosts["cookieExist"] = false
 	GetCookie(data_myLikedPosts, r)
+	if data["user"] != nil {
+		checkNotif(data_myLikedPosts)
+	}
 
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
 	defer database.Close()
@@ -623,4 +648,37 @@ func checkError(err error) {
 	if err != nil {
 		fmt.Println(err)
 	}
+}
+
+func checkNotif(data_notif map[string]interface{}) {
+	// Open the database
+	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	defer database.Close()
+
+	var notification string
+	var arrNotification []string
+	var test []string
+	var arr_notif [][]string
+	rows, err := database.Query("SELECT notification FROM users WHERE username = ?", data_notif["user"])
+	checkError(err)
+	defer rows.Close()
+	for rows.Next() {
+		err := rows.Scan(&notification)
+		checkError(err)
+		// get the section splited with the ","
+		arrNotification = strings.Split(notification, ",")
+		// remove the last part of the section which is empty
+		if len(arrNotification[len(arrNotification)-1]) < 1 {
+			arrNotification = arrNotification[0 : len(arrNotification)-1]
+		}
+		// Now split with white spaces and add them to the final array
+		for i := 0; i < len(arrNotification); i++ {
+			test = strings.Split(arrNotification[i], " ")
+			arr_notif = append(arr_notif, test)
+		}
+	}
+	err = rows.Err()
+	checkError(err)
+
+	data_notif["notif"] = arr_notif
 }
