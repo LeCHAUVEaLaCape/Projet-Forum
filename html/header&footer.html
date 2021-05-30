@@ -39,11 +39,18 @@
 {{if .cookieExist}}
 <div class="notif-container">
   <div id="notif">
-    <span>Vos notifications :</span>
+    <h3>Vos notifications :</h3>
     {{$lenNotif := len .notif}}
     <div id="all-notif">
+      {{if gt $lenNotif 0}}
+      <form class="del-notif" action="" method="POST">
+        <input type="hidden" name="del-notif" value="1">
+        <input type="hidden" name="user" value="{{.user}}">
+        <button><img id="del-notif" src="../assets/images/trash.png"></button>
+      </form>
       {{range .notif}}
-      <p class="notif">{{index . 1}} a {{index . 2}} votre&nbsp;<a href="/post?id={{index . 0}}">post</a></p>
+      <p class="notif">{{index . 1}} a&nbsp;<span class="action">{{index . 2}}</span>&nbsp;votre&nbsp;<a href="/post?id={{index . 0}}">post</a></p>
+      {{end}}
       {{end}}
     </div>
   </div>

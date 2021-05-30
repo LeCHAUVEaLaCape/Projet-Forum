@@ -112,7 +112,7 @@ func AddLike(post_id string, data_post map[string]interface{}, likedBy string, n
 	tx.Commit()
 	database.Close()
 
-	updateNotif(notif)
+	UpdateNotif(notif)
 	return likedBy
 }
 
@@ -162,7 +162,7 @@ func RemoveLike(post_id string, data_post map[string]interface{}, likedBy string
 	return likedBy
 }
 
-func updateNotif(notif Notif) {
+func UpdateNotif(notif Notif) {
 	// Open the database
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
 	defer database.Close()

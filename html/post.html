@@ -122,6 +122,10 @@
             cols="80"
             rows="5"
           ></textarea>
+          <input type="hidden" name="id-post" value="{{index .main_post 0}}" />
+          <input type="hidden" name="liker" value="{{$userconnect}}" />
+          <input type="hidden" name="action" value="comment" />
+          <input type="hidden" name="userToSendNotif" value="{{index .main_post 3}}" />
 
           <button type="submit">Commenter</button>
         </form>

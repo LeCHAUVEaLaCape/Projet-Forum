@@ -3,15 +3,22 @@ package config
 import (
 	"database/sql"
 	"log"
+	"net/http"
 	"strings"
 	"time"
 
 	. "./err"
 )
 
-func Adding_comment(add_comment string, post *[7]string, user string) {
+func Adding_comment(w http.ResponseWriter, r *http.Request, add_comment string, post *[7]string, user string) {
+	var notif Notif
+	notif.idPost = r.FormValue("id-post")
+	notif.liker = r.FormValue("liker") // liker = user commenting the post
+	notif.action = r.FormValue("action")
+	notif.userToSendNotif = r.FormValue("userToSendNotif")
+
 	database_comment, _ := sql.Open("sqlite3", "./db-sqlite.db")
-	defer database_comment.Close()
+
 	dt := time.Now()
 	// commentaire à ajouter
 	tx, err := database_comment.Begin()
@@ -27,8 +34,10 @@ func Adding_comment(add_comment string, post *[7]string, user string) {
 	CheckError(err)
 	_, err = stmt.Exec()
 	CheckError(err)
-
 	tx.Commit()
+	database_comment.Close()
+
+	UpdateNotif(notif) // config/like.go
 
 }
 func Display_comments(data_post map[string]interface{}, post_id string) {

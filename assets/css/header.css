@@ -286,7 +286,7 @@
 .notif-active {
   display: initial;
 }
-#notif span {
+#notif h3 {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -311,4 +311,26 @@
 #all-notif {
   display: flex;
   flex-wrap: wrap-reverse;
+}
+.action {
+  font-size: 16px;
+}
+.del-notif {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 50px;
+}
+.del-notif button {
+  background-color: transparent;
+  border-radius: 10px;
+  border: none;
+}
+#del-notif {
+  height: 20px;
+  padding: 10px;
+  border: solid 1px black;
+  border-radius: 10px;
+  cursor: pointer;
 }

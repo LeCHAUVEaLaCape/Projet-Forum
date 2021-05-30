@@ -60,7 +60,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 	GetCookie(data_index, r)
 
 	if data["user"] != nil {
-		checkNotif(data_index)
+		checkNotif(w, r, data_index)
 	}
 
 	// filtre de categorie
@@ -230,7 +230,7 @@ func welcome(w http.ResponseWriter, r *http.Request) {
 
 	GetCookie(data_welcome, r)
 	if data["user"] != nil {
-		checkNotif(data_welcome)
+		checkNotif(w, r, data_welcome)
 	}
 
 	t := template.New("welcome-template")
@@ -249,7 +249,7 @@ func user(w http.ResponseWriter, r *http.Request) {
 	data_user["username"] = ""
 	GetCookie(data_user, r)
 	if data["user"] != nil {
-		checkNotif(data_user)
+		checkNotif(w, r, data_user)
 	}
 
 	user := r.FormValue("user")
@@ -328,7 +328,7 @@ func allUsers(w http.ResponseWriter, r *http.Request) {
 	}
 	GetCookie(data_allUsers, r)
 	if data["user"] != nil {
-		checkNotif(data_allUsers)
+		checkNotif(w, r, data_allUsers)
 	}
 
 	// Open the database
@@ -376,7 +376,7 @@ func newPost(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/logIn", http.StatusSeeOther)
 	}
 	if data["user"] != nil {
-		checkNotif(data_newPost)
+		checkNotif(w, r, data_newPost)
 	}
 
 	// Input de la page
@@ -412,7 +412,7 @@ func post(w http.ResponseWriter, r *http.Request) {
 	data_post["already_liked"] = false
 	GetCookie(data_post, r)
 	if data["user"] != nil {
-		checkNotif(data_post)
+		checkNotif(w, r, data_post)
 	}
 
 	// Affiche les posts et commentaires
@@ -422,7 +422,7 @@ func post(w http.ResponseWriter, r *http.Request) {
 	// Ajoute un commentaire
 	add_comment := r.FormValue("add_comment")
 	if add_comment != "" {
-		Adding_comment(add_comment, &post, data_post["user"].(string))
+		Adding_comment(w, r, add_comment, &post, data_post["user"].(string))
 		http.Redirect(w, r, "/post?id="+post_id, http.StatusSeeOther)
 	}
 
@@ -511,7 +511,7 @@ func myPosts(w http.ResponseWriter, r *http.Request) {
 	data_myPosts["cookieExist"] = false
 	GetCookie(data_myPosts, r)
 	if data["user"] != nil {
-		checkNotif(data_myPosts)
+		checkNotif(w, r, data_myPosts)
 	}
 
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
@@ -576,7 +576,7 @@ func myLikedPosts(w http.ResponseWriter, r *http.Request) {
 	data_myLikedPosts["cookieExist"] = false
 	GetCookie(data_myLikedPosts, r)
 	if data["user"] != nil {
-		checkNotif(data_myLikedPosts)
+		checkNotif(w, r, data_myLikedPosts)
 	}
 
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
@@ -650,7 +650,7 @@ func checkError(err error) {
 	}
 }
 
-func checkNotif(data_notif map[string]interface{}) {
+func checkNotif(w http.ResponseWriter, r *http.Request, data_notif map[string]interface{}) {
 	// Open the database
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
 	defer database.Close()
@@ -661,7 +661,6 @@ func checkNotif(data_notif map[string]interface{}) {
 	var arr_notif [][]string
 	rows, err := database.Query("SELECT notification FROM users WHERE username = ?", data_notif["user"])
 	checkError(err)
-	defer rows.Close()
 	for rows.Next() {
 		err := rows.Scan(&notification)
 		checkError(err)
@@ -677,8 +676,24 @@ func checkNotif(data_notif map[string]interface{}) {
 			arr_notif = append(arr_notif, test)
 		}
 	}
+	rows.Close()
 	err = rows.Err()
 	checkError(err)
 
 	data_notif["notif"] = arr_notif
+
+	// Delete notif
+	del_notif := r.FormValue("del-notif")
+	userToDel := r.FormValue("user")
+	if del_notif == "1" {
+		tx, err := database.Begin()
+		checkError(err)
+		fmt.Println(del_notif, userToDel)
+		stmt, err := tx.Prepare("UPDATE users SET notification = ? WHERE username = ?")
+		checkError(err)
+		_, err = stmt.Exec("", userToDel)
+		checkError(err)
+		tx.Commit()
+		http.Redirect(w, r, r.Header.Get("Referer"), 302)
+	}
 }

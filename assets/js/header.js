@@ -19,3 +19,11 @@ notif_btn.addEventListener("click", () => {
     localStorage.setItem("notif_seen", all_notif.childElementCount)
 })
 
+var action = document.getElementsByClassName("action")
+for (let i = 0 ; i < action.length ; i++) {
+    if (action[i].innerHTML == "like") {
+        action[i].innerHTML = "aimé"
+    } else if (action[i].innerHTML == "comment"){
+        action[i].innerHTML = "commenté"
+    }
+}
