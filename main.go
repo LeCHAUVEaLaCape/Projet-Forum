@@ -256,31 +256,8 @@ func user(w http.ResponseWriter, r *http.Request) {
 		checkNotif(w, r, data_user)
 	}
 
-	user := r.FormValue("user")
-
-	// Open the database
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
-	defer database.Close()
-
-	// tx, _ := database.Begin()
-	// Parcourir la BDD
-	rows, _ := database.Query("SELECT id, username, email, fewWords, address, age, photo FROM users")
-	defer rows.Close()
-	for rows.Next() {
-		rows.Scan(&id, &username, &email, &fewWords, &address, &age, &photo)
-		// Si l'input username est trouvé
-		if user == username {
-			userFound = true
-			data_user["username"] = username
-			data_user["email"] = email
-			data_user["fewWords"] = fewWords
-			data_user["address"] = address
-			data_user["age"] = age
-			data_user["photo"] = photo
-			break
-		}
-	}
-	rows.Close()
+	// Récupère les infos de l'utilisateur
+	GetInfoUser(w, r, data_user)
 
 	// Check if the user logged is on his personnal page
 	if data_user["username"] == data_user["user"] && data_user["cookieExist"] != false {
@@ -289,32 +266,8 @@ func user(w http.ResponseWriter, r *http.Request) {
 		data_user["sameUser"] = false
 	}
 
-	// get input age/address/FewWords of the user
-	add_few_words := r.FormValue("addFewWords")
-	add_age := r.FormValue("age")
-	add_address := r.FormValue("address")
-	change_photo := r.FormValue("photo")
-	// add the input to his data in the DB
-	if add_few_words != "" {
-		state = "fewWords"
-		UpdateInfoUser(database, add_few_words, state, id)
-		http.Redirect(w, r, "/user?user="+username, http.StatusSeeOther)
-	}
-	if add_address != "" {
-		state = "address"
-		UpdateInfoUser(database, add_address, state, id)
-		http.Redirect(w, r, "/user?user="+username, http.StatusSeeOther)
-	}
-	if add_age != "" {
-		state = "age"
-		UpdateInfoUser(database, add_age, state, id)
-		http.Redirect(w, r, "/user?user="+username, http.StatusSeeOther)
-	}
-	if change_photo != "" {
-		state = "photo"
-		UpdateInfoUser(database, change_photo, state, id)
-		http.Redirect(w, r, "/user?user="+username, http.StatusSeeOther)
-	}
+	// Change the photo / info of users
+	UpdateInfoUsers(w, r, id) // ./config/modifDB.go
 
 	t := template.New("user-template")
 	t = template.Must(t.ParseFiles("./html/user.html", "./html/header&footer.html"))
