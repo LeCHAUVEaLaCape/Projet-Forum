@@ -1,0 +1,87 @@
+{{define "pendingPosts"}}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Faux Rhum - Pending Posts</title>
+    <link rel="stylesheet" href="../assets/css/pendingPosts.css" />
+    <link rel="stylesheet" href="../assets/css/mainPostStyle.css" />
+  </head>
+  <body>
+    {{template "header" .}}
+
+    <div class="page">
+        <h1 class="title">Pending posts</h1>
+        <h2 class="title">Accept a post to publish it</h2>
+
+      <!-- ajoute les POSTS -->
+      <div class="post-container">
+        <div class="all-posts">
+          {{range .allposts}}
+          <div class="singlePost-container">
+            <!-- ajoute le titre du poste -->
+            <div class="title-post">{{index . 0}}</div>
+            <!-- ajoute le corps du poste -->
+            <div class="body-post">
+              <div class="message">
+                <p>{{index . 1}}</p>
+              </div>
+            </div>
+
+            <!------------------
+              Block des POSTS 
+            ------------------->
+            <div class="author-post">
+              <!-- ajoute les catégorie de trie -->
+              <div class="categories">
+                {{range index . 7}}
+                <div class="categorie">
+                  <div class="color {{.}}"><p class="each-cat">{{.}}</p></div>
+                </div>
+                {{end}}
+              </div>
+              <!-- Ajoute le nombre de like -->
+              <div class="nb-like">
+                <p class="nb-like-comment">
+                  {{index . 8}} Like(s)<br />{{index . 9}} Commentaire(s)
+                </p>
+              </div>
+              <!-- Ajoute l'auteur du post et le time -->
+              <div class="author-time">
+                <p class="author">
+                  <span class="created-by">post crée par : </span
+                  ><a class="user" href="/user?user={{index . 2}}"
+                    >{{index . 2}}</a
+                  >
+                  <img src="{{index . 4}}" />
+                </p>
+                <span id="time-posted">{{index . 3}}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="accept-reject-container">
+              <div class="accept-reject">
+                  <form action="" method="POST">
+                      <input type="hidden" name="post-accepted" value="true">
+                      <input type="hidden" name="id-pendingPost" value="{{index . 5}}">
+                      <button id="accept">Accepter</button>
+                    </form>
+                    <form action="" method="POST">
+                        <input type="hidden" name="post-accepted" value="false">
+                      <input type="hidden" name="id-pendingPost" value="{{index . 5}}">
+                      <button id="reject">Rejeter</button>
+                  </form>
+              </div>
+          </div>
+          {{end}}
+        </div>
+      </div>
+    </div>
+    {{template "footer"}}
+  </body>
+</html>
+
+{{end}}

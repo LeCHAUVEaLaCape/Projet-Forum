@@ -13,7 +13,7 @@ func CreateDB() {
 	defer database.Close()
 
 	// Create users table in the database
-	statement, err := database.Prepare("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username TEXT, email TEXT, password TEXT, fewWords TEXT, age TEXT, address TEXT, photo TEXT, notification TEXT)")
+	statement, err := database.Prepare("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username TEXT, email TEXT, password TEXT, fewWords TEXT, age TEXT, address TEXT, photo TEXT, notification TEXT, role TEXT)")
 	CheckError(err)
 	statement.Exec()
 
@@ -22,8 +22,13 @@ func CreateDB() {
 	CheckError(err)
 	statement.Exec()
 
-	// Create users table in the database
+	// Create comments table in the database
 	statement, err = database.Prepare("CREATE TABLE IF NOT EXISTS comments (id INTEGER PRIMARY KEY, idMainPost TEXT, content TEXT, like INTEGER, author TEXT, date TEXT)")
+	CheckError(err)
+	statement.Exec()
+
+	// Create pendingPosts table in the database
+	statement, err = database.Prepare("CREATE TABLE IF NOT EXISTS pendingPosts (id INTEGER PRIMARY KEY, title TEXT, body TEXT, like INTEGER, author TEXT, date TEXT, category TEXT, likedBy TEXT, nbComments INTEGER)")
 	CheckError(err)
 	statement.Exec()
 }

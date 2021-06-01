@@ -1,46 +1,88 @@
 {{define "allUsers"}}
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="../assets/css/allUsers.css" />
-    <link rel="shortcut icon" href="../assets/images/icone.png" />
-    <title>Faux Rhum - All Users</title>
-  </head>
-  <body>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="../assets/css/allUsers.css" />
+  <link rel="shortcut icon" href="../assets/images/logoforum.png" />
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300&display=swap" rel="stylesheet">
+  <title>Faux Rhum - All Users</title>
+</head>
+
+<body>
+  <section>
     {{template "header" .}}
-    <div class="page">
-        <form action="/user" method="get">
-          <label for="user">Search a User</label>
-          <input type="text" name="user" id="user">
-          <button type="submit">submit</button>
-        </form>
-      <div class="users-container">
+    <div  id="top" class="page">
+      <form style="overflow: hidden;" action="/user" method="get">
+        <div class="search">
+          <label data-aos="fade-down" data-aos-duration="3000" for="user"><img src="https://discord.com/assets/31abf4145cf7c27ea0e1a2e4328283fd.svg" alt="bas"><strong>S</strong>earch an <strong>U</strong>ser <img src="https://discord.com/assets/31abf4145cf7c27ea0e1a2e4328283fd.svg" alt="bas"></label>
+          <div>
+            <input data-aos="fade-right" data-aos-duration="3000"type="text" name="user" id="user">
+            <button data-aos="fade-left" data-aos-duration="3000" type="submit" class="submitbtn">Submit</button>
+          </div>
+        </div>
+      </form>
+      <div data-aos="fade-up" data-aos-duration="3000"class="users-container">
+        <div class="all-admin">
+          <h3>Tous les Admins</h3>
+          <div class="container">
+            {{$length := len .allAdmin}} 
+            {{if gt $length 0}} 
+            {{template "aUser" .allAdmin}}
+            {{else}}
+            <p>Aucun admin enregistré</p>
+            {{end}}
+          </div>
+        </div>
+        <div class="all-moderator">
+          <h3>Tous les modérateurs</h3>
+          <div class="container">
+            {{$length := len .allModerator}} 
+            {{if gt $length 0}} 
+            {{template "aUser" .allModerator}}
+            {{else}}
+            <p>Aucun modérateur enregistré</p>
+            {{end}}
+          </div>
+        </div>
         <div class="all-users">
-          {{$length := len .}} {{if gt $length 0}} {{template "aUser" .}}
+          <h3>Tous les utilisateurs</h3>
+          <div class="container">
+          {{$length := len .allUsers}} 
+          {{if gt $length 0}} 
+          {{template "aUser" .allUsers}}
           {{else}}
           <p>Aucun utilisateur enregistré</p>
           {{end}}
         </div>
       </div>
+      </div>
+      <a class="top" href="#top">Top of the Page</a>
     </div>
     {{template "footer"}}
-  </body>
+  </section>
+</body>
+
 </html>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init();
+</script>
 <script>
   document.getElementById("all-users").classList.add("active");
 </script>
-{{end}} 
+{{end}}
 
 <!-- template for each user -->
-{{define "aUser"}} 
-  {{range .allUsers}}
-    <div class="user-card">
-    {{index . 0}}
-    {{index . 1}}
-    {{index . 2}}
-  </div>
-  {{end}} 
+{{define "aUser"}}
+{{range .}}
+<div class="user-card">
+  <a href="/user?user={{index . 0}}"> {{index . 0}} : </a>
+  {{index . 1}}
+</div>
+{{end}}
 {{end}}

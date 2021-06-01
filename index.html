@@ -16,7 +16,9 @@
 
     <div class="full-page">
       
-    <!-- Filtre par catégories -->
+    <!----------------
+          CATEGORIES
+     ---------------->
       <div class="filter">
         <div class="filter-title">
           <p>Trier les posts par catégories</p>
@@ -32,7 +34,9 @@
         <a class="cat all" href="/index" ><p>All</p></a>
       </div>
 
-      <!-- Modifier l'affichage des posts -->
+      <!----------------------- 
+              Ordre des posts / Format d'affichage / Mes posts...
+       ----------------------->
       <div class="display-post">
         <div class="display-post-container">
           <div class="display-title">
@@ -112,7 +116,9 @@
               </div>
             </div>
 
-            <!-- Block des POSTS -->
+            <!------------------
+              Block des POSTS 
+            ------------------->
             <div class="author-post">
               <!-- ajoute les catégorie de trie -->
               <div class="categories">
@@ -129,9 +135,14 @@
               <!-- Ajoute l'auteur du post et le time -->
               <div class="author-time">
                 <p class="author">
-                  <span class="created-by">post crée par : </span
-                  ><a class="user" href="/user?user={{index . 2}}">{{index . 2}}</a>
+                  <span class="created-by">post crée par : </span>
+                  {{$author := index . 2}}
+                  {{if ne $author "user deleted"}}
+                  <a class="user" href="/user?user={{$author}}">{{$author}}</a>
                   <img src="{{index . 4}}">
+                  {{else}}
+                  <a class="user" style="color: black; text-decoration: none;">{{$author}}</a>
+                  {{end}}
                 </p>
                 <span id="time-posted">{{index . 3}}</span>
               </div>

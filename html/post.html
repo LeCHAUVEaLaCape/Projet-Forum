@@ -12,6 +12,7 @@
     {{template "header" .}} {{$idMainPost := index .main_post 0}}
     <!-- prettier-ignore -->
     {{$userconnect := .user}}
+    {{$role := .role}}
 
     <!----------------------
     POST PRINCIPAL
@@ -22,7 +23,7 @@
         <div class="message">
           <p>{{index .main_post 2}}</p>
         </div>
-        {{$user := index .main_post 3}} {{if eq $userconnect $user}}
+        {{$user := index .main_post 3}} {{if or (eq $userconnect $user) (eq $role "admin") (eq $role "moderator")}}
         <!-- Bouton pour supprimer le post -->
         <form class="form-del" action="/delPost" method="POST">
           <input type="hidden" name="delPost" value="{{index .main_post 0}}" />
@@ -60,13 +61,18 @@
         {{end}}
       </div>
       <!-- Auteur et time -->
+      {{$author := index .main_post 3}}
       <div class="author-post">
         <p class="author">
-          <span>post created by : </span
-          ><a id="user" href="/user?user={{index .main_post 3}}"
-            >{{index .main_post 3}}</a
-          >
+          <span>post created by : </span>
+          {{if ne $author "user deleted"}}
+          <a id="user" href="/user?user={{$author}}">
+            {{index .main_post 3}}
+          </a>
           <img src="{{index .main_post 5}}" />
+          {{else}}
+          <a class="user" style="color: black; text-decoration: none;">{{$author}}</a>
+          {{end}}
         </p>
         <span>{{index .main_post 4}}</span>
 
@@ -151,7 +157,7 @@
           <div class="comment">
             <p class="text">{{index . 0}}</p>
           </div>
-          {{if eq $author $userconnect}}
+          {{if or (eq $author $userconnect) (eq $role "admin") (eq $role "moderator")}}
           <div class="display-modif-comment">
             <img src="../assets/images/edit-button.png" />
           </div>

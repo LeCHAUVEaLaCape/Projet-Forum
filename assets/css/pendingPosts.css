@@ -1,0 +1,55 @@
+body,
+* {
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: black;
+  text-decoration: none;
+  overflow-x: hidden;
+}
+.page {
+  min-height: 1000px;
+  width: 100vw;
+  background-color: #eee;
+  font-size: 30px;
+  padding-top: 100px;
+  display: flex;
+  flex-wrap: wrap;
+}
+.author {
+  overflow: hidden;
+}
+.message {
+  min-height: 175px !important;
+  border-radius: 10px !important;
+}
+.title {
+  width: 100%;
+  text-align: center;
+}
+.accept-reject-container {
+  display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    height: 35%;
+}
+.accept-reject button {
+  width: 88%;
+  border: solid 1px black;
+  padding: 13px;
+  margin: 10px;
+  border-radius: 10px;
+}
+#accept {
+  background-color: #85ec85;
+}
+#accept:hover {
+  background-color: #6ccf6c;
+}
+#reject {
+  background-color: #d47575;
+}
+#reject:hover {
+  background-color: #bb5959;
+}

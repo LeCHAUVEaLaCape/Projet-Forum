@@ -35,3 +35,16 @@ modify_fewWords.addEventListener("click", () => {
     fewWords_info.classList.toggle("fewWords-hidden")
     fewWords_modifier.classList.toggle("fewWords-modifier-visible")
 })
+
+
+// Affichage des boutons pour supprimer le compte
+var show_delete = document.getElementById("show-delete-account")
+var hide_delete = document.getElementById("hide-delete-account")
+var delete_account_container = document.getElementsByClassName("del-account-container")[0]
+
+show_delete.addEventListener("click", () => {
+    delete_account_container.classList.add("del-active")
+})
+hide_delete.addEventListener("click", () => {
+    delete_account_container.classList.remove("del-active")
+})

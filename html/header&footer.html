@@ -15,12 +15,19 @@
           <a href="/welcome" id="welcome">Welcome</a>
           <a href="/allUsers" id="all-users">All Users</a>
           <a href="/newPost" id="post">Post</a>
-          <div class="lien4">POST 1</div>
+          {{if or (eq .role "admin") (eq .role "moderator")}}
+          <a href="/pendingPosts">Pending Posts</a>
+          {{end}}
         </div>
         <div class="auth">
           {{if .cookieExist}}
           <div>
             <a class="account" href="/user?user={{.user}}">{{.user}}</a>
+            {{if eq .role "admin"}}
+            <div>Admin</div>
+            {{else if eq .role "moderator"}}
+            <div>Moderator</div>
+            {{end}}
           </div>
           <div class="notif-bell">
             <img id="notif-btn" src="../assets/images/notification-inactive.png" alt="no-notif">
@@ -62,5 +69,29 @@
 <!-- footer -->
 {{define "footer"}}
 <link rel="stylesheet" href="../assets/css/footer.css" />
-<div class="footer"></div>
+<div class="footer">
+  <div class="left">
+    <p><img class="okok" src="../assets/images/florian.png" alt="flo"> Florian : <a
+        href="https://www.linkedin.com/in/florian-moracchini/">Linkedin</a></p>
+    <p><img class="okok" src="../assets/images/sven.png" alt="sven"> Sven : <a
+        href="https://www.linkedin.com/in/sven-dockx/">Linkedin</a></p>
+  </div>
+  <div class="troll">
+    <div class="troll1">
+      <p><strong>Faux</strong></p>
+      <img src="../assets/images/logoforum.png" alt="logotroll">
+      <p><strong>Rhum</strong></p>
+    </div>
+    <div class="troll2">
+      <p>00 00 00 00 00</p>
+      <p>ForRome@FauxRhum.forum</p>
+    </div>
+  </div>
+  <div class="right">
+    <p><img class="okok" src="../assets/images/baptiste.png" alt="baptiste"> Baptiste : <a
+        href="https://www.linkedin.com/in/baptiste-bouquier/">Linkedin</a></p>
+    <p><img class="okok" src="../assets/images/brian.png" alt="brian"> Brian : <a
+        href="https://www.linkedin.com/in/brian-peyre/">Linkedin</a></p>
+  </div>
+</div>
 {{end}}

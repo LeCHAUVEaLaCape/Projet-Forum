@@ -1,4 +1,125 @@
+/*------------------------------------------------------------- 
+|
+|font-face
+|
+ ------------------------------------------------------------- */
+ @font-face {
+    font-family: 'Modusa';
+    src: url('../font/Modusa.ttf');
+}
+
+
 .footer {
     height: 150px;
-    background-color: rgb(44,44,44);
+    width: 100vw;
+    background-color: rgb(0, 0, 0, 0.9);
+    border-top-style: solid;
+    border-width: 4px;
+    border-image: linear-gradient(45deg, #DFA003, brown, yellow, brown, #DFA003) 1;
+    display: flex;
+    justify-content: space-between;
+    color: white;
+}
+
+.footer .left {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.footer .right {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+    transform: translateX(100px);
+}
+
+.footer p {
+    font-size: 25px;
+    color: white;
+    text-decoration: underline;
+    font-family: "Modusa";
+}
+
+.footer p a {
+    font-size: 25px;
+    color: white;
+    text-decoration: underline;
+    font-family: "Modusa";
+    margin-left: 5px;
+}
+
+.footer p a:hover {
+    background: -webkit-linear-gradient(#DFA003, brown, yellow);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.footer .okok {
+    width: 12%;
+}
+.troll {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    flex-direction: column;
+}
+.troll img{
+    height: 80%;
+}
+.troll p{
+    padding: 0px 30px 0px 30px;
+    font-size: 30px;
+    font-family: 'Modusa';
+}
+.troll strong {
+    font-family: 'Modusa';
+    font-size: 40px;
+    font-weight: bold;
+    border-bottom-style: solid;
+    border-width: 1px;
+    border-image: linear-gradient(45deg, #DFA003, brown, yellow) 1;
+}
+
+.troll .troll1{
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    height: 50%;
+    background: -webkit-linear-gradient(45deg, #DFA003, brown, yellow);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: bold;
+}
+.troll .troll2{
+    height: 50%;
+
+}
+.troll .troll2 p{
+    margin-top: 5px;
+    font-size: 18px;
+    color: white;
+    text-decoration: underline;
+}
+.troll .troll2 p:hover{
+    cursor:not-allowed;
+    opacity: 0;
+}
+/*
++----------------------------------------------------------------------+
+| Pour les sÃ©lections
++----------------------------------------------------------------------+
+*/
+::-moz-selection {
+    color: white;
+    background-color: black;
+}
+
+::selection {
+    color: white;
+    background-color: black;
 }

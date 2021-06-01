@@ -6,53 +6,59 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Log in to Forum - Forum</title>
+    <title>Faux Rhum - Log in</title>
     <link rel="stylesheet" href="../assets/css/logIn.css" />
-    <link rel="shortcut icon" href="../assets/images/icone.png" />
+    <link rel="shortcut icon" href="../assets/images/logoforum.png" />
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 </head>
 
 <body>
-    {{template "header" .}}
-    <div class="page">
+    <section>
+        {{template "header" .}}
+        <div class="page">
 
-        <h1>Log in to Forum</h1>
+            <h1 data-aos="fade-down" data-aos-duration="1000"><strong>L</strong>og in to <strong>F</strong>orum</h1>
 
-        <div class="formulaire">
-            <form method="POST" action="?">
-                <div class="enter-username">
-                    <label for="user-login">Username</label>
-                    <input type="text" name="user-login">
-                </div>
-                {{if .wrongUsername}}
+            <div class="formulaire"  data-aos="zoom-in" data-aos-duration="1000">
+                <form method="POST" action="?">
+                    <div class="enter-username">
+                        <label for="user-login"> <img src="https://discord.com/assets/97af278eacce256fb63c30689f80ee86.svg" alt="masque"> Username <span>*</span> </label>
+                        <input type="text" name="user-login">
+                    </div>
+                    {{if .wrongUsername}}
                     {{if not .wrongPassword}}
                     <div class="wrong-username">
                         <p>Unknown username</p>
-                        <a href="/signUp">Create an account</a>
+                        <a href="/SignUp">Create an account ?</a>
                     </div>
                     {{end}}
-                {{end}}
-                <div class="enter-password">
-                    <label for="password-login">Password</label>
-                    <input type="password" name="password-login">
-                </div>
-                {{if .wrongPassword}}
+                    {{end}}
+                    <div class="enter-password">
+                        <label for="password-login"> <img src="https://discord.com/assets/8b7eb8b25468313916d2e5ec3727cd2d.svg" alt="unlock"> Password <span>*</span></label>
+                        <input type="password" name="password-login">
+                    </div>
+                    {{if .wrongPassword}}
                     <div class="wrong-password">
                         <p>Wrong password</p>
-                    <a href="#">Forgot your password?</a>
+                    </div>
+                    {{end}}
+                    <div class="submit">
+                        <button type="submit">Log In</button>
+                    </div>
+                </form>
+            </div>
+            <div class="create-account"  data-aos="fade-up" data-aos-duration="1000">
+                <div>
+                    <p>New to the Forum ? <br><a href="/SignUp">Create an account !</a></p>
                 </div>
-                {{end}}
-                <div class="submit">
-                    <button type="submit">Log In</button>
-                </div>
-            </form>
-        </div>
-        <div class="create-account">
-            <div>
-                <p>New to the Forum ? <br><a href="/SignUp">Create an account</a>.</p>
             </div>
         </div>
-    </div>
+    </section>
 </body>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init();
+</script>
 
 </html>
 {{end}}

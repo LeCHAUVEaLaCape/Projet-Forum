@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
-	"regexp"
 	"strconv"
 	"strings"
 	"text/template"
@@ -42,6 +41,7 @@ func main() {
 	http.HandleFunc("/delComment", delComment)
 	http.HandleFunc("/myPosts", myPosts)
 	http.HandleFunc("/myLikedPosts", myLikedPosts)
+	http.HandleFunc("/pendingPosts", pendingPosts)
 
 	err := http.ListenAndServe(":8000", nil) // Set listen port
 	checkError(err)
@@ -49,79 +49,23 @@ func main() {
 
 // Generate the main page when first loading the site
 func index(w http.ResponseWriter, r *http.Request) {
-	var post [][]interface{}
-
 	// initiate the data that will be send to html
 	data_index := make(map[string]interface{})
 	for k, v := range data {
 		data_index[k] = v
 	}
 	data_index["cookieExist"] = false
-	GetCookie(data_index, r)
+	GetCookie(data_index, r) // ./cookies/getCookies.go
 
 	if data["user"] != nil {
 		checkNotif(w, r, data_index)
+		GetRole(data_index, false, "")
+	} else {
+		data_index["cookieExist"] = false
 	}
 
-	// filtre de categorie
-	selected_categories := ""
-	for i := range categories {
-		tmp := r.FormValue(categories[i])
-		if tmp != "" {
-			selected_categories += strconv.Itoa(i)
-		}
-	}
-	// RegExp
-	var filter = regexp.MustCompile(selected_categories)
-
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
-	defer database.Close()
-	//range over database
-	rows, _ := database.Query("SELECT title, body, author, date, id, category, like, nbComments FROM posts")
-	defer rows.Close()
-
-	for rows.Next() {
-		aPost := []interface{}{"", "", "", "", "", "", ""}
-		rows.Scan(&aPost[0], &aPost[1], &aPost[2], &aPost[3], &id, &aPost[6], &like, &nbComments)
-		// si le RegExp correspond à la DB
-		if filter.MatchString(aPost[6].(string)) {
-			// Remplace les \n par des <br> pour sauter des lignes en html
-			aPost[1] = strings.Replace(aPost[1].(string), string('\r'), "", -1)
-			aPost[1] = strings.Replace(aPost[1].(string), string('\n'), "<br>", -1)
-			aPost[5] = strconv.Itoa(id)
-			if aPost[6] != nil {
-				temp := []interface{}{} // string
-				for _, e := range aPost[6].(string) {
-					j, _ := strconv.Atoi(string(e))
-					temp = append(temp, categories[j])
-				}
-				aPost = append(aPost, temp)
-			} else {
-				aPost[6] = []string{}
-				aPost = append(aPost, []string{})
-			}
-			aPost = append(aPost, like)
-			aPost = append(aPost, nbComments)
-			post = append(post, aPost)
-		}
-
-	}
-	// Ajoute le chemin de la photo qui a été choisit par l'utilisateur
-	for i := 0; i < len(post); i++ {
-		rows, err := database.Query("SELECT photo FROM users WHERE username = ?", post[i][2])
-		checkError(err)
-		defer rows.Close()
-		for rows.Next() {
-			err := rows.Scan(&photo)
-			checkError(err)
-		}
-		err = rows.Err()
-		checkError(err)
-		post[i][4] = photo
-	}
-
-	data_index["allposts"] = post
-	data_index["categories"] = categories
+	state = "index"
+	DisplayPosts(r, data_index, state) // ./config/post.go
 
 	t := template.New("index-template")
 	t = template.Must(t.ParseFiles("index.html", "./html/header&footer.html"))
@@ -235,6 +179,7 @@ func welcome(w http.ResponseWriter, r *http.Request) {
 	GetCookie(data_welcome, r)
 	if data["user"] != nil {
 		checkNotif(w, r, data_welcome)
+		GetRole(data_welcome, false, "")
 	}
 
 	t := template.New("welcome-template")
@@ -254,10 +199,15 @@ func user(w http.ResponseWriter, r *http.Request) {
 	GetCookie(data_user, r)
 	if data["user"] != nil {
 		checkNotif(w, r, data_user)
+		on_user_page := true // Lorsque la page actuelle est le profil d'un utilisateur
+		user_page := r.FormValue("user")
+		GetRole(data_user, on_user_page, user_page)
+		// Change un role lorsqu'un Admin submit le formulaire
+		ChangeRole(w, r) // ./config/modifDB.go
 	}
 
 	// Récupère les infos de l'utilisateur
-	GetInfoUser(w, r, data_user)
+	GetInfoUser(w, r, data_user) // ./config/modifDB.go
 
 	// Check if the user logged is on his personnal page
 	if data_user["username"] == data_user["user"] && data_user["cookieExist"] != false {
@@ -269,6 +219,14 @@ func user(w http.ResponseWriter, r *http.Request) {
 	// Change the photo / info of users
 	UpdateInfoUsers(w, r, id) // ./config/modifDB.go
 
+	delete_account := r.FormValue("del-account")
+	if delete_account != "" {
+		DelAccount(delete_account) // ./config/modifDB.GO
+		http.Redirect(w, r, "/index", http.StatusSeeOther)
+	}
+
+	fmt.Println(data_user)
+
 	t := template.New("user-template")
 	t = template.Must(t.ParseFiles("./html/user.html", "./html/header&footer.html"))
 	t.ExecuteTemplate(w, "user", data_user)
@@ -277,8 +235,10 @@ func user(w http.ResponseWriter, r *http.Request) {
 // Generate allUsers page
 func allUsers(w http.ResponseWriter, r *http.Request) {
 	// initiate the data that will be send to html
-	var aUser [3]string
-	var all_users [][3]string
+	var aUser [2]string
+	var all_users [][2]string
+	var all_moderator [][2]string
+	var all_admin [][2]string
 	data_allUsers := make(map[string]interface{})
 	for k, v := range data {
 		data_allUsers[k] = v
@@ -286,20 +246,44 @@ func allUsers(w http.ResponseWriter, r *http.Request) {
 	GetCookie(data_allUsers, r)
 	if data["user"] != nil {
 		checkNotif(w, r, data_allUsers)
+		GetRole(data_allUsers, false, "")
 	}
 
 	// Open the database
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
 	defer database.Close()
 
-	// Parcourir la BDD
-	rows, _ := database.Query("SELECT username, email, age FROM users")
-	defer rows.Close()
+	var role string
+	// Ajouter tous les admins
+	rows, err := database.Query("SELECT username, email, photo, role FROM users WHERE role = ?", "admin")
+	checkError(err)
 	for rows.Next() {
-		rows.Scan(&username, &email, &age)
+		rows.Scan(&username, &email, &photo, &role)
 		aUser[0] = username
 		aUser[1] = email
-		aUser[2] = age
+		all_admin = append(all_admin, aUser)
+	}
+	rows.Close()
+	data_allUsers["allAdmin"] = all_admin
+	// Ajouter tous les moderateur
+	rows, err = database.Query("SELECT username, email, photo, role FROM users WHERE role = ?", "moderator")
+	checkError(err)
+	for rows.Next() {
+		rows.Scan(&username, &email, &photo, &role)
+		aUser[0] = username
+		aUser[1] = email
+		all_moderator = append(all_moderator, aUser)
+	}
+	rows.Close()
+	data_allUsers["allModerator"] = all_moderator
+	// Ajouter tous les users
+	rows, err = database.Query("SELECT username, email, photo, role FROM users WHERE role = ?", "user")
+	checkError(err)
+	defer rows.Close()
+	for rows.Next() {
+		rows.Scan(&username, &email, &photo, &role)
+		aUser[0] = username
+		aUser[1] = email
 		all_users = append(all_users, aUser)
 	}
 	data_allUsers["allUsers"] = all_users
@@ -334,6 +318,7 @@ func newPost(w http.ResponseWriter, r *http.Request) {
 	}
 	if data["user"] != nil {
 		checkNotif(w, r, data_newPost)
+		GetRole(data_newPost, false, "")
 	}
 
 	// Input de la page
@@ -370,10 +355,11 @@ func post(w http.ResponseWriter, r *http.Request) {
 	GetCookie(data_post, r)
 	if data["user"] != nil {
 		checkNotif(w, r, data_post)
+		GetRole(data_post, false, "")
 	}
 
 	// Affiche les posts et commentaires
-	var post = Display_post(post_id, data_post, body)
+	var post = Display_post_comment(post_id, data_post, body)
 	Display_comments(data_post, post_id)
 
 	// Ajoute un commentaire
@@ -440,7 +426,6 @@ func delPost(w http.ResponseWriter, r *http.Request) {
 func delComment(w http.ResponseWriter, r *http.Request) {
 	delete_comment := r.FormValue("delComment")
 	idMainPost := r.FormValue("id-mainPost")
-	fmt.Println(delete_comment)
 	// Open the database
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
 	defer database.Close()
@@ -469,6 +454,7 @@ func myPosts(w http.ResponseWriter, r *http.Request) {
 	GetCookie(data_myPosts, r)
 	if data["user"] != nil {
 		checkNotif(w, r, data_myPosts)
+		GetRole(data_myPosts, false, "")
 	}
 
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
@@ -534,6 +520,7 @@ func myLikedPosts(w http.ResponseWriter, r *http.Request) {
 	GetCookie(data_myLikedPosts, r)
 	if data["user"] != nil {
 		checkNotif(w, r, data_myLikedPosts)
+		GetRole(data_myLikedPosts, false, "")
 	}
 
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
@@ -601,12 +588,14 @@ func myLikedPosts(w http.ResponseWriter, r *http.Request) {
 	t.ExecuteTemplate(w, "myLikedPosts", data_myLikedPosts)
 }
 
+// verifie les erreurs
 func checkError(err error) {
 	if err != nil {
 		fmt.Println(err)
 	}
 }
 
+// Affiche les notifications de l'utilisateur s'il y en a
 func checkNotif(w http.ResponseWriter, r *http.Request, data_notif map[string]interface{}) {
 	// Open the database
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
@@ -645,7 +634,6 @@ func checkNotif(w http.ResponseWriter, r *http.Request, data_notif map[string]in
 	if del_notif == "1" {
 		tx, err := database.Begin()
 		checkError(err)
-		fmt.Println(del_notif, userToDel)
 		stmt, err := tx.Prepare("UPDATE users SET notification = ? WHERE username = ?")
 		checkError(err)
 		_, err = stmt.Exec("", userToDel)
@@ -653,4 +641,38 @@ func checkNotif(w http.ResponseWriter, r *http.Request, data_notif map[string]in
 		tx.Commit()
 		http.Redirect(w, r, r.Header.Get("Referer"), 302)
 	}
+}
+
+// page des posts en attente, un admin ou moderateur doit les accepter pour les mettres sur la page principal
+func pendingPosts(w http.ResponseWriter, r *http.Request) {
+	// initiate the data that will be send to html
+	data_pendingPosts := make(map[string]interface{})
+	for k, v := range data {
+		data_pendingPosts[k] = v
+	}
+
+	GetCookie(data_pendingPosts, r)
+	// Redirection pour ceux qui ne sont pas connecté
+	if data["user"] != nil {
+		checkNotif(w, r, data_pendingPosts)
+		GetRole(data_pendingPosts, false, "")
+	}
+	if data_pendingPosts["cookieExist"] == false || data_pendingPosts["role"] == "user" {
+		http.Redirect(w, r, "/logIn", http.StatusSeeOther)
+	}
+
+	post_accepted := r.FormValue("post-accepted")
+	id_pendingPost := r.FormValue("id-pendingPost")
+	// supprime ou déplace le post s'il est accepté ou non
+	if post_accepted != "" && id_pendingPost != "" {
+		PostAcceptedOrNot(post_accepted, id_pendingPost) // ./config/modifDB.go
+	}
+
+	// affiche le post
+	state = "pendingPosts"
+	DisplayPosts(r, data_pendingPosts, state) // ./config/post.go
+
+	t := template.New("pendingPosts-template")
+	t = template.Must(t.ParseFiles("./html/pendingPosts.html", "./html/header&footer.html"))
+	t.ExecuteTemplate(w, "pendingPosts", data_pendingPosts)
 }

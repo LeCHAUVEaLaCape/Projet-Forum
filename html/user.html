@@ -13,82 +13,123 @@
     {{template "header" .}}
 
     <div class="page">
-      <br /><br />
+      <!----------------- 
+            PROFIL
+       ----------------->
+      <div class="left-page">
+        <h1 class="profil">Profil</h1>
       <div class="user-info">
         <div class="username">
-          <p class="title">Username :</p>
+          <h3 class="title">Username :</h3>
           <p>{{.username}}</p>
         </div>
 
         <div class="email">
-          <p class="title">Email :</p>
+          <h3 class="title">Email :</h3>
           <p>{{.email}}</p>
         </div>
+
+        <div class="role">
+          <h3 class="title">Role :</h3>
+          <p>{{.roleUserPage}}</p>
+        </div>
       </div>
+
+      <input type="hidden" name="user" value="{{.user}}" />
 
       <!-- block PHOTO -->
       <div class="photo">
         <div class="photo-defini">
           <img src="{{.photo}}" />
-          {{if .sameUser}}
-          <div class="modify"><img src="../assets/images/edit-button.png" alt="edit"></div>
+          {{if or (.sameUser) (eq .role "admin")}}
+          <div class="modify">
+            <img src="../assets/images/edit-button.png" alt="edit" />
+          </div>
           {{end}}
         </div>
-        {{if .sameUser}}
+        {{if or (.sameUser) (eq .role "admin")}}
         <div class="photo-container">
-          <form action="/user?user={{.user}}" method="post" class="input-photo">
+          <form action="/user?user={{.username}}" method="post" class="input-photo">
             <div>
               <button>
-                <img src="../assets/images/default.png">
-                <input type="hidden" name="photo" value="../assets/images/default.png"/>
+                <img src="../assets/images/default.png" />
+                <input
+                  type="hidden"
+                  name="photo"
+                  value="../assets/images/default.png"
+                />
               </button>
             </div>
           </form>
-          <form action="/user?user={{.user}}" method="post" class="input-photo">
+          <form action="/user?user={{.username}}" method="post" class="input-photo">
             <div>
               <button>
-                <img src="../assets/images/sven.png">
-                <input type="hidden" name="photo" value="../assets/images/sven.png"/>
+                <img src="../assets/images/sven.png" />
+                <input
+                  type="hidden"
+                  name="photo"
+                  value="../assets/images/sven.png"
+                />
               </button>
             </div>
           </form>
-          <form action="/user?user={{.user}}" method="post" class="input-photo">
+          <form action="/user?user={{.username}}" method="post" class="input-photo">
             <div>
               <button>
-                <img src="../assets/images/baptiste.png">
-                <input type="hidden" name="photo" value="../assets/images/baptiste.png"/>
+                <img src="../assets/images/baptiste.png" />
+                <input
+                  type="hidden"
+                  name="photo"
+                  value="../assets/images/baptiste.png"
+                />
               </button>
             </div>
           </form>
-          <form action="/user?user={{.user}}" method="post" class="input-photo">
+          <form action="/user?user={{.username}}" method="post" class="input-photo">
             <div>
               <button>
-                <img src="../assets/images/brian.png">
-                <input type="hidden" name="photo" value="../assets/images/brian.png"/>
+                <img src="../assets/images/brian.png" />
+                <input
+                  type="hidden"
+                  name="photo"
+                  value="../assets/images/brian.png"
+                />
               </button>
             </div>
           </form>
-          <form action="/user?user={{.user}}" method="post" class="input-photo">
+          <form action="/user?user={{.username}}" method="post" class="input-photo">
             <div>
               <button>
-                <img src="../assets/images/florian.png">
-                <input type="hidden" name="photo" value="../assets/images/florian.png"/>
+                <img src="../assets/images/florian.png" />
+                <input
+                  type="hidden"
+                  name="photo"
+                  value="../assets/images/florian.png"
+                />
               </button>
             </div>
           </form>
-          <form action="/user?user={{.user}}" method="post" class="input-photo">
+          <form action="/user?user={{.username}}" method="post" class="input-photo">
             <div>
               <button>
-                <img src="../assets/images/feminin.png">
-                <input type="hidden" name="photo" value="../assets/images/feminin.png"/>
+                <img src="../assets/images/feminin.png" />
+                <input
+                  type="hidden"
+                  name="photo"
+                  value="../assets/images/feminin.png"
+                />
               </button>
             </div>
           </form>
-          <form action="/user?user={{.user}}" method="post" class="input-photo">
+          <form action="/user?user={{.username}}" method="post" class="input-photo">
             <div>
               <button>
-                <img src="../assets/images/feminin2.png">
-                <input type="hidden" name="photo" value="../assets/images/feminin2.png"/>
+                <img src="../assets/images/feminin2.png" />
+                <input
+                  type="hidden"
+                  name="photo"
+                  value="../assets/images/feminin2.png"
+                />
               </button>
             </div>
           </form>
@@ -96,6 +137,7 @@
         {{end}}
       </div>
 
+      <!-- block INFO age/address/fewWords -->
       <div class="info">
         <!-- block AGE -->
         <div class="age">
@@ -103,14 +145,16 @@
             <p class="title">Age :</p>
             <p>{{.age}}</p>
           </div>
-          {{if .sameUser}}
-          <form action="/user?user={{.user}}" method="post" class="input-age">
+          {{if or (.sameUser) (eq .role "admin")}}
+          <form action="/user?user={{.username}}" method="post" class="input-age">
             <div>
-              <input type="text" name="age" value="{{.age}}"/>
+              <input type="text" name="age" value="{{.age}}" />
             </div>
             <button type="submit">Submit</button>
           </form>
-          <div class="modify"><img src="../assets/images/edit-button.png" alt="edit"></div>
+          <div class="modify">
+            <img src="../assets/images/edit-button.png" alt="edit" />
+          </div>
           {{end}}
         </div>
 
@@ -120,14 +164,20 @@
             <p class="title">Address :</p>
             <p>{{.address}}</p>
           </div>
-          {{if .sameUser}}
-          <form action="/user?user={{.user}}" method="post" class="input-address">
+          {{if or (.sameUser) (eq .role "admin")}}
+          <form
+            action="/user?user={{.username}}"
+            method="post"
+            class="input-address"
+          >
             <div>
               <input type="text" name="address" value="{{.address}}" />
             </div>
             <button type="submit">Submit</button>
           </form>
-          <div class="modify"><img src="../assets/images/edit-button.png" alt="edit"></div>
+          <div class="modify">
+            <img src="../assets/images/edit-button.png" alt="edit" />
+          </div>
           {{end}}
         </div>
 
@@ -137,21 +187,94 @@
             <p class="title">Few Words :</p>
             <p>{{.fewWords}}</p>
           </div>
-          {{if .sameUser}}
-          <form action="/user?user={{.user}}" method="post" class="input-fewWords">
+          {{if or (.sameUser) (eq .role "admin")}}
+          <form
+            action="/user?user={{.username}}"
+            method="post"
+            class="input-fewWords"
+          >
             <div>
               <input type="text" name="addFewWords" value="{{.fewWords}}" />
             </div>
             <button type="submit">Submit</button>
           </form>
-          <div class="modify"><img src="../assets/images/edit-button.png" alt="edit"></div>
+          <div class="modify">
+            <img src="../assets/images/edit-button.png" alt="edit" />
+          </div>
           {{end}}
         </div>
       </div>
+    </div>
+    
+    <!---------------- 
+            FEED
+     ---------------->
+    <div class="middle-page">
+      <h2 class="feed">Feed</h2>
+      <div class="mid-page-container"></div>
+    </div>
 
+    <!------------------
+          PARAMETRES
+     ------------------>
+    <div class="right-page">
+      <h2 class="parameters">Paramètres</h2>
+      <!-----------
+        Changement de role (visible que par les Admin, autre que leur propre page)
+       ----------->
+       {{if and (eq .role "admin") (ne .username .user)}} 
+       <div class="modif-role">
+         <h4 class="title">Change role of {{.username}}</h4>
+         <form action="/user?user={{.username}}" method="post">
+           <input type="hidden" name="username" value="{{.username}}"/>
+           <select name="change-role" id="chg-role">
+             <option value="user">Utilisateur</option>
+             <option value="moderator">Moderateur</option>
+             <option value="admin">Administrateur</option>
+           </select>
+           <button type="submit">Submit changes</button>
+         </form>
+       </div>
+      {{end}}
+      <!--------------- 
+        DEMANDE pour etre moderateur (visible que par les users sur leur propre page)
+       --------------->
+      {{if and (.sameUser) (eq .role "user")}}
+        <div class="ask-moderator">
+          <label class="title">Ask to be moderator</label>
+          <button>Submit</button>
+        </div>
+      {{end}}
+      <!------------
+          Supprimer son compte (visible par tous sauf pour les Admin sur leur propre page)
+       ------------->
+        {{if or (eq .username .user) (eq .role "admin")}}
+        <div class="access-delete-account">
+          <p>Delete account</p>
+          <button id="show-delete-account">Delete</button>
+        </div>
+          <div class="del-account-container">
+            <div class="del-account">
+              <form action="/user?user={{.username}}" method="POST">
+                {{if eq .username .user}}
+                <label>You are about to <span>delete your account</span><br>Are you sure ?</label>
+                {{else}}
+                <label>You are about to <span>delete the account</span><br>Are you sure ?</label>
+                {{end}}
+                <input type="hidden" name="del-account" value="{{.username}}">
+                <div class="buttons">
+                  <button>Confirm</button>
+                  <button type="reset" id="hide-delete-account">Cancel</button>
+                </div>
+              </form>
+            </div>
+          </div>
+       {{end}}
 
     </div>
-{{template "footer"}}
+  </div>
+
+    {{template "footer"}}
   </body>
 </html>
 <script src="../assets/js/user.js"></script>

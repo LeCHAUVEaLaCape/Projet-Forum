@@ -1,4 +1,3 @@
-
 body,
 * {
   margin: 0;
@@ -6,11 +5,11 @@ body,
   color: black;
   text-decoration: none;
   overflow-x: hidden;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 section{
   width: 100vw;
   height: 100vh;
+  overflow: hidden;
 }
 /*------------------------------------------------------------- 
 |
@@ -26,32 +25,38 @@ section{
 |autentification
 |
  ------------------------------------------------------------- */
-.page2{
-  height: 85%;
-  overflow: hidden;
-  margin: auto 35%;
-  margin-top: 5%;
-  border-radius: 20%;
-  border: black solid 3px;
-  box-shadow: 5px 10px 20px aqua inset ,0px 0px 10px  black;
-}
 .page {
   height: 100%;
-  width: 100%;
+  width: 80%;
+  margin-left: 10%;
+  margin-top: 58px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: "Modusa";
   background-color: #eee;
-  font-size: 60px;
-  overflow: hidden;
+  border-style: solid;
+  border-width: 4px;
+  border-image: linear-gradient(to bottom, #DFA003, brown, yellow, brown, #DFA003) 1 100%;
 }
 .title {
-  display: grid;
+  display: flex;
   justify-content: center;
 }
 .title div {
   text-align: center;
-  font-size: 32px;
+  overflow: hidden;
 }
 .join {
-  font-size: 16px !important;
+  font-size: 80px ;
+  letter-spacing: 5px;
+}
+/* font-family: 'Merriweather', serif; */
+.join strong{
+  background-color: black;
+  color: white;
+  padding: 2px;
 }
 .formulaire {
   display: flex;
@@ -65,315 +70,185 @@ section{
   display: grid;
   font-size: 18px;
   padding: 11px;
+  position: relative;
+}
+.username img{
+  width: 20px;
+  height: 20px;
+}
+.email label img{
+  width: 20px;
+  height: 20px;
+
+}
+.passwd label img {
+  width: 20px;
+  height: 20px;
 }
 .username label,
 .email label,
 .passwd label {
-  padding: 0px 0px 7px 0px;
+  padding: 0px 0px 2px 0px;
+  margin-bottom: 5px;
+  border-bottom-style: solid;
+  border-width: 1px;
+  border-image: linear-gradient(45deg, #DFA003, brown, yellow) 1;
+  font-size: 20px;
+  color: black;
 }
 input {
-  padding: 5px 9px 5px 9px;
+  display: flex;
+  justify-content: center;
+  margin-right: 5px;
+  height: 30px;
   width: 400px;
-  border-radius: 6px;
-  border: 1px solid;
+  font-family: 'Merriweather', serif;
+  border-style: solid;
+  border-width: 4px;
+  border-image: linear-gradient(45deg, #DFA003, brown, yellow, brown , #DFA003)1;
+  background-color: black;
+  color: white;
+  transition: all 0.5s;
+
 }
+
+input:hover{
+  cursor: pointer;
+  box-shadow: 0px 0px 8px #000000 ,2px 2px 10px #DFA003 ;
+  background-color: black;
+  transform:skewY(-0.5deg);
+}
+input:focus{
+  cursor: pointer;
+  box-shadow: 0px 0px 8px #000000 ,2px 2px 10px #DFA003 ;
+  background-color: black;
+  outline: none;
+  transform:skewY(-0.5deg);
+}
+
 .username p,
 .passwd p {
-  font-size: 12px;
-  padding: 3px 0px 0px 0px;
+  font-size: 14px;
+  padding: 6px 0px 0px 0px;
+  font-family: 'Merriweather', serif;
+  font-style: italic;
 }
 .passwd p {
   width: 380px;
 }
 .sub {
   display: flex;
+  align-items: center;
   justify-content: center;
-  align-items: flex-end;
-  height: 130px;
+  height: 100px;
 }
-form button {
-  padding: 0.75em 1.5em;
+.sub button {
+  height: 50%;
+  padding: 10px 10px;
   font-size: 17px;
   line-height: 1.5;
-  border-radius: 0.5em;
+  border-radius: 15px;
   cursor: pointer;
-  background-color: rgb(148, 211, 162);
+  font-family: "Modusa";
+  background-color: white;
+  transition: all 0.3s;
+  position: relative;
 }
-form button:hover {
-  background-color: rgb(115, 185, 131);
+.sub button:hover::before{
+  left: 100%;
+}
+.sub button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%; 
+  background: linear-gradient(120deg ,transparent, rgb(0, 0, 0 , 0.5) ,transparent);
+  transition: all 0.3s;
+}
+.sub button:hover {
+  box-shadow: 0px 0px 8px #000000 ,5px 5px 10px #DFA003 ;
+  color: black;
+  background: linear-gradient(45deg, #DFA003, brown, yellow, brown , #DFA003);
+  outline: none;
 }
 .logIn {
-  font-size: 12px;
-  padding: 12px;
+  font-size: 14px;
+  padding: 20px;
+  margin-bottom: 20px;
 }
 .logIn a {
-  color: blue;
+  color: #DFA003;
   cursor: pointer;
   text-decoration: underline;
 }
 .logIn a:hover {
-  color: aqua;
+  background: -webkit-linear-gradient(#DFA003, brown, yellow);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   cursor: pointer;
   text-decoration: underline;
-}
-span {
-  color: red;
-}
-
-.account-created {
-  width: 100%;
-}
-.account-created div {
-  font-size: 21px;
-  padding: 10px 0px 0px 12px;
-  color: green;
-  text-decoration: underline;
-}
-.input-taken {
-  color: #c10000;
-  text-decoration: underline;
-      font-size: 12px;
-    padding: 3px 0px 0px 0px;
-}
-
-body,
-* {
-  margin: 0;
-  padding: 0;
-  color: black;
-  text-decoration: none;
-  overflow-x: hidden;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-}
-section{
-  width: 100vw;
-  height: 100vh;
-}
-/*------------------------------------------------------------- 
-|
-|font-face
-|
- ------------------------------------------------------------- */
-@font-face {
-  font-family: 'Modusa';
-  src: url('../font/Modusa.ttf');
-}
-/*------------------------------------------------------------- 
-|
-|autentification
-|
- ------------------------------------------------------------- */
-.page2{
-  height: 85%;
-  overflow: hidden;
-  margin: auto 35%;
-  margin-top: 5%;
-  border-radius: 20%;
-  border: black solid 3px;
-  box-shadow: 5px 10px 20px aqua inset ,0px 0px 10px  black;
-}
-.page {
-  height: 100%;
-  width: 100%;
-  background-color: #eee;
-  font-size: 60px;
-  overflow: hidden;
-}
-.title {
-  display: grid;
-  justify-content: center;
-}
-.title div {
-  text-align: center;
-  font-size: 32px;
-}
-.join {
-  font-size: 16px !important;
-}
-.formulaire {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 600px;
-}
-.username,
-.email,
-.passwd {
-  display: grid;
   font-size: 18px;
-  padding: 11px;
-}
-.username label,
-.email label,
-.passwd label {
-  padding: 0px 0px 7px 0px;
-}
-input {
-  padding: 5px 9px 5px 9px;
-  width: 400px;
-  border-radius: 6px;
-  border: 1px solid;
-}
-.username p,
-.passwd p {
-  font-size: 12px;
-  padding: 3px 0px 0px 0px;
-}
-.passwd p {
-  width: 380px;
-}
-.sub {
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  height: 130px;
-}
-form button {
-  padding: 0.75em 1.5em;
-  font-size: 17px;
-  line-height: 1.5;
-  border-radius: 0.5em;
-  cursor: pointer;
-  background-color: rgb(148, 211, 162);
-}
-form button:hover {
-  background-color: rgb(115, 185, 131);
-}
-.logIn {
-  font-size: 12px;
-  padding: 12px;
-}
-.logIn a {
-  color: blue;
-  cursor: pointer;
-  text-decoration: underline;
-}
-.logIn a:hover {
-  color: aqua;
-  cursor: pointer;
-  text-decoration: underline;
 }
 span {
-  color: red;
+  background: -webkit-linear-gradient(#DFA003, brown, yellow );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .account-created {
   width: 100%;
 }
-.account-created div {
-  font-size: 21px;
-  padding: 10px 0px 0px 12px;
-  color: green;
+.account-created div p{
+  font-size: 15px;
+  color: #DFA003;
   text-decoration: underline;
+  font-family: 'Merriweather', serif;
 }
 .input-taken {
-  color: #c10000;
+  color: #DFA003;
   text-decoration: underline;
-      font-size: 12px;
-    padding: 3px 0px 0px 0px;
-}
-
-body,
-* {
-  margin: 0;
-  padding: 0;
-  color: black;
-  text-decoration: none;
-  overflow-x: hidden;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-}
-.page {
-  height: 85vh;
-  width: 100vw;
-  background-color: #eee;
-  padding-top: 15vh;
-  font-size: 60px;
-}
-.title {
-  display: grid;
-  justify-content: center;
-}
-.title div {
-  text-align: center;
-  font-size: 32px;
-}
-.join {
-  font-size: 16px !important;
-}
-.formulaire {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 600px;
-}
-.username,
-.email,
-.passwd {
-  display: grid;
-  font-size: 18px;
-  padding: 11px;
-}
-.username label,
-.email label,
-.passwd label {
-  padding: 0px 0px 7px 0px;
-}
-input {
-  padding: 5px 9px 5px 9px;
-  width: 400px;
-  border-radius: 6px;
-  border: 1px solid;
-}
-.username p,
-.passwd p {
   font-size: 12px;
+  font-weight: bold;
   padding: 3px 0px 0px 0px;
-}
-.passwd p {
-  width: 380px;
-}
-.sub {
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  height: 130px;
-}
-form button {
-  padding: 0.75em 1.5em;
-  font-size: 17px;
-  line-height: 1.5;
-  border-radius: 0.5em;
-  cursor: pointer;
-  background-color: rgb(148, 211, 162);
-}
-form button:hover {
-  background-color: rgb(115, 185, 131);
-}
-.logIn {
-  font-size: 12px;
-  padding: 12px;
-}
-.logIn a {
-  color: blue;
-  cursor: pointer;
-  text-decoration: underline;
-}
-span {
-  color: red;
+  font-family: 'Merriweather', serif;
+  font-style: italic;
 }
 
-.account-created {
-  width: 100%;
+/* 
++----------------------------------------------------------------------+
+| Scroll Bar
++----------------------------------------------------------------------+
+*/
+::-webkit-scrollbar {
+  width: 10px;
+  background-color: white;
 }
-.account-created div {
-  font-size: 21px;
-  padding: 10px 0px 0px 12px;
-  color: green;
-  text-decoration: underline;
+
+::-webkit-scrollbar-thumb {
+  background-color: rgb(0, 0, 0);
 }
-.input-taken {
-  color: #c10000;
-  text-decoration: underline;
-      font-size: 12px;
-    padding: 3px 0px 0px 0px;
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #DFA003;
+}
+
+::-webkit-scrollbar-button {
+  height: 8px;
+  background-color: black;
+}
+/* 
++----------------------------------------------------------------------+
+| Pour les sÃ©lections
++----------------------------------------------------------------------+
+*/
+::-moz-selection {
+  color: white;
+  background-color: black;
+}
+
+::selection {
+  color: white;
+  background-color: black;
 }
