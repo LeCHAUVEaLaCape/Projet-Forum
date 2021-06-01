@@ -10,7 +10,7 @@ import (
 	. "./err"
 )
 
-func Adding_comment(w http.ResponseWriter, r *http.Request, add_comment string, post *[7]string, user string) {
+func Adding_comment(w http.ResponseWriter, r *http.Request, add_comment string, post *[8]string, user string) {
 	var notif Notif
 	notif.idPost = r.FormValue("id-post")
 	notif.liker = r.FormValue("liker") // liker = user commenting the post
