@@ -343,6 +343,8 @@ func newPost(w http.ResponseWriter, r *http.Request) {
 
 // Generate page des posts avec ses commentaires
 func post(w http.ResponseWriter, r *http.Request) {
+	// var dislike int
+	var dislikedBy string
 	post_id := r.FormValue("id")
 
 	// initiate the data that will be send to html
@@ -352,6 +354,7 @@ func post(w http.ResponseWriter, r *http.Request) {
 	}
 	data_post["cookieExist"] = false
 	data_post["already_liked"] = false
+	data_post["already_disliked"] = false
 	GetCookie(data_post, r)
 	if data["user"] != nil {
 		checkNotif(w, r, data_post)
@@ -376,6 +379,13 @@ func post(w http.ResponseWriter, r *http.Request) {
 	if data_post["user"] == nil {
 		data_post["user"] = ""
 	}
+	// Système de disLike
+	change_nmb_dislike := r.FormValue("DisLike")
+	likedBy = DisLike(change_nmb_dislike, data_post, post_id, w, r)
+
+	if data_post["user"] == nil {
+		data_post["user"] = ""
+	}
 
 	// Modification de post
 	modif_post := r.FormValue("modifPost")
@@ -390,6 +400,10 @@ func post(w http.ResponseWriter, r *http.Request) {
 	// ajoute les personnes qui ont liké le post principal
 	likedBy = strings.ReplaceAll(likedBy, " ", "<br>")
 	data_post["mainPost_likedBy"] = likedBy
+
+	// ajoute les personnes qui ont disliké le post principal
+	dislikedBy = strings.ReplaceAll(dislikedBy, " ", "<br>")
+	data_post["mainPost_dislikedBy"] = dislikedBy
 
 	t := template.New("post-template")
 	t = template.Must(t.ParseFiles("./html/post.html", "./html/header&footer.html"))

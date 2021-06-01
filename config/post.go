@@ -11,21 +11,20 @@ import (
 )
 
 func AddNewPost(title string, body string, dt string, data_newPost map[string]interface{}, category []string) {
-	// Open the database
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
-	defer database.Close()
+    // Open the database
+    database, _:= sql.Open("sqlite3", "./db-sqlite.db")
+    defer database.Close()
 
-	// add the inputs to the database
-	tx, err := database.Begin()
-	CheckError(err)
-	stmt, err := tx.Prepare("INSERT INTO pendingPosts (title, body, author, date, category, like, likedBy, nbComments) VALUES (?, ?, ?, ?, ?, 0, '', 0)")
-	CheckError(err)
-	_, err = stmt.Exec(title, body, data_newPost["user"], dt, strings.Join(category, ""))
-	CheckError(err)
+    // add the inputs to the database
+    tx, err := database.Begin()
+    CheckError(err)
+    stmt, err := tx.Prepare("INSERT INTO posts (title, body, author, date, category, like, likedBy, nbComments ,dislike , dislikedBy) VALUES (?, ?, ?, ?, ?, 0, '', 0 ,0,'')")
+    CheckError(err)
+    _, err = stmt.Exec(title, body, data_newPost["user"], dt, strings.Join(category, ""))
+    CheckError(err)
 
-	tx.Commit()
+    tx.Commit()
 }
-
 // Affiche les posts pour la page INDEX et pendingPosts
 func DisplayPosts(r *http.Request, data_info map[string]interface{}, state string) {
 	var categories = []string{"gaming", "informatique", "sport", "culture", "politique", "loisir", "sciences", "sexualite", "finance"}
@@ -101,16 +100,16 @@ func DisplayPosts(r *http.Request, data_info map[string]interface{}, state strin
 }
 
 // Affiche les posts et les commentaires pour la page POST
-func Display_post_comment(post_id string, data_post map[string]interface{}, body string) [7]string {
-	var post [7]string
+func Display_post_comment(post_id string, data_post map[string]interface{}, body string) [8]string {
+	var post [8]string
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
 	defer database.Close()
 	//range over database
-	rows, _ := database.Query("SELECT id, title, body, author, date, like FROM posts WHERE id = ?", post_id)
+	rows, _ := database.Query("SELECT id, title, body, author, date, like , dislike FROM posts WHERE id = ?", post_id)
 	defer rows.Close()
 
 	for rows.Next() {
-		err := rows.Scan(&post[0], &post[1], &body, &post[3], &post[4], &post[6])
+		err := rows.Scan(&post[0], &post[1], &body, &post[3], &post[4], &post[6], &post[7])
 		CheckError(err)
 	}
 	// Remplace les \n par des <br> pour sauter des lignes en html
