@@ -12,7 +12,7 @@
   <body>
     {{template "header" .}}
     <div class="page">
-      <form action="?" method="POST" autocomplete="off">
+      <form enctype="multipart/form-data" action="?" method="POST" autocomplete="off">
         <div class="title">
           <div>
             <label for="title">Title of the post</label>
@@ -25,6 +25,11 @@
             <textarea type="text" name="body" required></textarea>
           </div>
         </div>
+        <div class=uploadimg>
+          <title>Image Upload</title>
+    
+            <input class="input file-input" type="file" name="file" multiple />
+          </div>
         <div class="all-check">
         <div>
           {{range $key, $value := .categorie}}
@@ -50,6 +55,7 @@
         </div>
       </form>
     </div>
+
     {{template "footer"}}
   </body>
 </html>

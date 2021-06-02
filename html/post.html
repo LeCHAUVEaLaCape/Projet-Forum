@@ -24,7 +24,15 @@
     <div class="body-post">
       <div class="message">
         <p>{{index .main_post 2}}</p>
+        <div class= "imgposts">
+        {{range index .imagepost 0}}
+          <img class="each-images" src="{{.}}">
+        {{end}}
       </div>
+      <div id="img-fullscreen-container">
+          <img id="img" src="">
+      </div>
+    </div>
       {{$user := index .main_post 3}} {{if or (eq $userconnect $user) (eq $role "admin") (eq $role "moderator")}}
       <!-- Bouton pour supprimer le post -->
       <form class="form-del" action="/delPost" method="POST">

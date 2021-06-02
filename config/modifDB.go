@@ -142,16 +142,16 @@ func PostAcceptedOrNot(post_accepted string, id_pendingPost string) {
 	tx, err := database.Begin()
 	// Accepter le post et le transferer jusqu'a la BDD posts
 	if post_accepted == "true" {
-		var transfer_post [8]string
-		rows, _ := database.Query("SELECT title, body, like, author, date, category, likedBy, nbComments FROM pendingPosts WHERE id = " + id_pendingPost)
+		var transfer_post [10]string
+		rows, _ := database.Query("SELECT title, body, like, author, date, category, likedBy, nbComments, dislikedBy, image FROM pendingPosts WHERE id = " + id_pendingPost)
 		for rows.Next() {
-			rows.Scan(&transfer_post[0], &transfer_post[1], &transfer_post[2], &transfer_post[3], &transfer_post[4], &transfer_post[5], &transfer_post[6], &transfer_post[7])
+			rows.Scan(&transfer_post[0], &transfer_post[1], &transfer_post[2], &transfer_post[3], &transfer_post[4], &transfer_post[5], &transfer_post[6], &transfer_post[7], &transfer_post[8], &transfer_post[9])
 		}
 		rows.Close()
 		// add the inputs to the database
-		stmt, err := tx.Prepare("INSERT INTO posts (title, body, like, author, date, category, likedBy, nbComments) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
+		stmt, err := tx.Prepare("INSERT INTO posts (title, body, like, author, date, category, likedBy, nbComments, dislikedBy, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
 		CheckError(err)
-		_, err = stmt.Exec(transfer_post[0], transfer_post[1], transfer_post[2], transfer_post[3], transfer_post[4], transfer_post[5], transfer_post[6], transfer_post[7])
+		_, err = stmt.Exec(transfer_post[0], transfer_post[1], transfer_post[2], transfer_post[3], transfer_post[4], transfer_post[5], transfer_post[6], transfer_post[7], &transfer_post[8], &transfer_post[9])
 		CheckError(err)
 	}
 	// DELETE the comments of the main post

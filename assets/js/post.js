@@ -29,10 +29,8 @@ var comment_container = document.getElementsByClassName("comment-container")
             
 
 // change the number of posts
-console.log(comment_container.length)
 document.getElementById("nb-comment").innerHTML = comment_container.length
 
-console.log(display_modif_comment[0].parentNode.children[0])
 for (let i = 0 ; i < display_modif_comment.length ; i++) {
     display_modif_comment[i].addEventListener("click", () => {
         display_modif_comment[i].parentNode.children[0].classList.toggle("hide-message")
@@ -43,3 +41,21 @@ for (let i = 0 ; i < display_modif_comment.length ; i++) {
     new_text = textarea_modif_comment[i].innerHTML.replace(/&lt;br&gt;/g, '').replace(/<br>/g, '')
     textarea_modif_comment[i].innerHTML = new_text
 }
+
+var each_images = document.getElementsByClassName("each-images")
+var img = document.getElementById("img")
+var img_fullscreen_container = document.getElementById("img-fullscreen-container")
+
+console.log(each_images)
+
+for (let i = 0 ; i < each_images.length ; i++) {
+    each_images[i].addEventListener("click", () => {
+        var src = each_images[i].src
+        img.src = src
+        img_fullscreen_container.classList.add("img-active")
+    })
+}
+
+img_fullscreen_container.addEventListener("click", () => {
+    img_fullscreen_container.classList.remove("img-active")
+})

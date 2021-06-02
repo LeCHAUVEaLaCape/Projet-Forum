@@ -3,7 +3,10 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"io"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"text/template"
@@ -13,6 +16,7 @@ import (
 	. "./cookies"
 
 	_ "github.com/mattn/go-sqlite3"
+	uuid "github.com/satori/go.uuid"
 )
 
 var id, like int
@@ -20,6 +24,12 @@ var username, password, email, age, fewWords, address, photo, state, title, body
 var create_cookie, userFound = false, false
 var categories = []string{"gaming", "informatique", "sport", "culture", "politique", "loisir", "sciences", "sexualite", "finance"}
 var data = make(map[string]interface{})
+
+const MAX_UPLOAD_SIZE = 1024 * 1024 // 1MB
+type Progress struct {
+	TotalSize int64
+	BytesRead int64
+}
 
 func main() {
 	data["user"] = ""
@@ -330,7 +340,7 @@ func newPost(w http.ResponseWriter, r *http.Request) {
 		dt := time.Now()
 		// appel de la fonction pour créer le post
 		AddNewPost(title, body, dt.Format("02-01-2006 15:04:05"), data_newPost, category)
-		http.Redirect(w, r, "/index", http.StatusSeeOther)
+		uploadHandler(w, r)
 	}
 	data_newPost["categorie"] = categories
 
@@ -408,14 +418,28 @@ func post(w http.ResponseWriter, r *http.Request) {
 	t.ExecuteTemplate(w, "post", data_post)
 }
 
-// supprime un post et ses commentaires
 func delPost(w http.ResponseWriter, r *http.Request) {
 	delete_post := r.FormValue("delPost")
-
+	var image string
 	// Open the database
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
 	defer database.Close()
 
+	rows, err := database.Query("SELECT image FROM posts WHERE id = ?", delete_post)
+	checkError(err)
+	defer rows.Close()
+	for rows.Next() {
+		err := rows.Scan(&image)
+		checkError(err)
+
+	}
+	image = strings.Replace(image, ".", "", 1)
+	fmt.Println(image)
+	err = os.Remove(image)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 	// DELETE the comments of the main post
 	tx, err := database.Begin()
 	checkError(err)
@@ -687,4 +711,103 @@ func pendingPosts(w http.ResponseWriter, r *http.Request) {
 	t := template.New("pendingPosts-template")
 	t = template.Must(t.ParseFiles("./html/pendingPosts.html", "./html/header&footer.html"))
 	t.ExecuteTemplate(w, "pendingPosts", data_pendingPosts)
+}
+
+func (pr *Progress) Write(p []byte) (n int, err error) {
+	n, err = len(p), nil
+	pr.BytesRead += int64(n)
+	return
+}
+func uploadHandler(w http.ResponseWriter, r *http.Request) {
+	// if r.Method != "POST" {
+	// 	http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	// 	return
+	// }
+
+	// 32 MB is the default used by FormFile
+	if err := r.ParseMultipartForm(32 << 20); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// get a reference to the fileHeaders
+	files := r.MultipartForm.File["file"]
+
+	for _, fileHeader := range files {
+		if fileHeader.Size > MAX_UPLOAD_SIZE {
+			http.Error(w, fmt.Sprintf("The uploaded image is too big: %s. Please use an image less than 1MB in size", fileHeader.Filename), http.StatusBadRequest)
+			return
+		}
+		file, err := fileHeader.Open()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		defer file.Close()
+		buff := make([]byte, 512)
+		_, err = file.Read(buff)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		filetype := http.DetectContentType(buff)
+		if filetype != "image/jpeg" && filetype != "image/png" {
+			http.Error(w, "The provided file format is not allowed. Please upload a JPEG or PNG image", http.StatusBadRequest)
+			return
+		}
+		_, err = file.Seek(0, io.SeekStart)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		err = os.MkdirAll("./assets/uploads", os.ModePerm)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		name, _ := uuid.NewV4()
+		f, err := os.Create(fmt.Sprintf("./assets/uploads/%s%s", name, filepath.Ext(fileHeader.Filename)))
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		defer f.Close()
+		pr := &Progress{
+			TotalSize: fileHeader.Size,
+		}
+		_, err = io.Copy(f, io.TeeReader(file, pr))
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		database, err := sql.Open("sqlite3", "./db-sqlite.db")
+		checkError(err)
+		defer database.Close()
+		rows, err := database.Query("SELECT id FROM pendingPosts ORDER BY id DESC LIMIT 1")
+		checkError(err)
+		defer rows.Close()
+		for rows.Next() {
+			err := rows.Scan(&id)
+			checkError(err)
+		}
+		var image string
+		rows, err = database.Query("SELECT image FROM pendingPosts WHERE id = ?", id)
+		checkError(err)
+		defer rows.Close()
+		for rows.Next() {
+			err := rows.Scan(&image)
+			checkError(err)
+		}
+		image += "," + "../assets/uploads/" + name.String() + filepath.Ext(fileHeader.Filename)
+		fmt.Println(image)
+
+		//range over database
+		tx, err := database.Begin()
+		stmt, err := tx.Prepare("UPDATE pendingPosts SET image = ? WHERE id = ?")
+		checkError(err)
+		_, err = stmt.Exec(image, id)
+		checkError(err)
+		tx.Commit()
+	}
+	http.Redirect(w, r, "/index", http.StatusSeeOther)
 }

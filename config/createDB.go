@@ -18,9 +18,9 @@ func CreateDB() {
 	statement.Exec()
 
 	// Create post table in the database_post
-    statement, err = database.Prepare("CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY, title TEXT, body TEXT, like INTEGER, dislike INTEGER,author TEXT, date TEXT, category TEXT, likedBy TEXT, dislikedBy TEXT,nbComments INTEGER)")
-    CheckError(err)
-    statement.Exec()
+	statement, err = database.Prepare("CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY, title TEXT, body TEXT, like INTEGER, dislike INTEGER,author TEXT, date TEXT, category TEXT, likedBy TEXT, dislikedBy TEXT, nbComments INTEGER, image TEXT)")
+	CheckError(err)
+	statement.Exec()
 
 	// Create comments table in the database
 	statement, err = database.Prepare("CREATE TABLE IF NOT EXISTS comments (id INTEGER PRIMARY KEY, idMainPost TEXT, content TEXT, like INTEGER, author TEXT, date TEXT)")
@@ -28,7 +28,7 @@ func CreateDB() {
 	statement.Exec()
 
 	// Create pendingPosts table in the database
-	statement, err = database.Prepare("CREATE TABLE IF NOT EXISTS pendingPosts (id INTEGER PRIMARY KEY, title TEXT, body TEXT, like INTEGER, author TEXT, date TEXT, category TEXT, likedBy TEXT, nbComments INTEGER)")
+	statement, err = database.Prepare("CREATE TABLE IF NOT EXISTS pendingPosts (id INTEGER PRIMARY KEY, title TEXT, body TEXT, like INTEGER, author TEXT, date TEXT, category TEXT, likedBy TEXT, dislikedBy TEXT, nbComments INTEGER, image TEXT)")
 	CheckError(err)
 	statement.Exec()
 }
