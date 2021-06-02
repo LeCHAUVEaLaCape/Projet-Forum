@@ -153,6 +153,9 @@ func PostAcceptedOrNot(post_accepted string, id_pendingPost string) {
 		CheckError(err)
 		_, err = stmt.Exec(transfer_post[0], transfer_post[1], transfer_post[2], transfer_post[3], transfer_post[4], transfer_post[5], transfer_post[6], transfer_post[7], &transfer_post[8], &transfer_post[9])
 		CheckError(err)
+	} else {
+		state := "pendingPosts"
+		Delete_image(state, id_pendingPost)
 	}
 	// DELETE the comments of the main post
 	CheckError(err)
@@ -161,6 +164,7 @@ func PostAcceptedOrNot(post_accepted string, id_pendingPost string) {
 	_, err = stmt.Exec(id_pendingPost)
 	CheckError(err)
 	tx.Commit()
+
 }
 
 // Modifie le role d'un utilisateur quand un Admin le veut

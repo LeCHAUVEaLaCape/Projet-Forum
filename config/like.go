@@ -2,7 +2,6 @@ package config
 
 import (
 	"database/sql"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -175,7 +174,6 @@ func UpdateNotif(notif Notif) {
 	for rows.Next() {
 		err := rows.Scan(&notification)
 		CheckError(err)
-		fmt.Println("notif", notification)
 	}
 
 	tx, err := database.Begin()
@@ -192,143 +190,146 @@ func UpdateNotif(notif Notif) {
 	tx.Commit()
 }
 func DisLike(change_nmb_dislike string, data_post map[string]interface{}, post_id string, w http.ResponseWriter, r *http.Request) string {
-    // Verifie si l'utilisateur a disliké
-    var dislikedBy string
-    data_post["already_disliked"], dislikedBy = CheckIfdisLikedByUser(post_id, data_post)
+	// Verifie si l'utilisateur a disliké
+	var dislikedBy string
+	data_post["already_disliked"], dislikedBy = CheckIfdisLikedByUser(post_id, data_post)
 
-    var notif Notif
-    notif.idPost = r.FormValue("id-post")
-    notif.liker = r.FormValue("disliker")
-    notif.action = r.FormValue("action")
-    notif.userToSendNotif = r.FormValue("userToSendNotif")
+	var notif Notif
+	notif.idPost = r.FormValue("id-post")
+	notif.liker = r.FormValue("disliker")
+	notif.action = r.FormValue("action")
+	notif.userToSendNotif = r.FormValue("userToSendNotif")
 
-    if change_nmb_dislike == "1" {
-        dislikedBy = AddDisLike(post_id, data_post, dislikedBy, notif)
-        http.Redirect(w, r, "/post?id="+post_id, http.StatusSeeOther)
-    } else if change_nmb_dislike == "0" {
-        dislikedBy = RemoveDisLike(post_id, data_post, dislikedBy)
-        http.Redirect(w, r, "/post?id="+post_id, http.StatusSeeOther)
-    }
+	if change_nmb_dislike == "1" {
+		dislikedBy = AddDisLike(post_id, data_post, dislikedBy, notif)
+		http.Redirect(w, r, "/post?id="+post_id, http.StatusSeeOther)
+	} else if change_nmb_dislike == "0" {
+		dislikedBy = RemoveDisLike(post_id, data_post, dislikedBy)
+		http.Redirect(w, r, "/post?id="+post_id, http.StatusSeeOther)
+	}
 
-    return dislikedBy
+	return dislikedBy
 }
+
 // verifie Si l'utilisateur connecter à déjà disliker le post
 func CheckIfdisLikedByUser(post_id string, data_post map[string]interface{}) (bool, string) {
-    var user string
-    if data_post["user"] != nil {
-        user = data_post["user"].(string)
-    }
+	var user string
+	if data_post["user"] != nil {
+		user = data_post["user"].(string)
+	}
 
-    // Open the database
-    database,_  := sql.Open("sqlite3", "./db-sqlite.db")
-    defer database.Close()
+	// Open the database
+	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	defer database.Close()
 
-    // créer un string des personnes qui ont liké
-    var dislikedBy string
-    rows, _ := database.Query("SELECT dislikedBy FROM posts WHERE id = ?", post_id)
-    for rows.Next() {
-        err := rows.Scan(&dislikedBy)
-        CheckError(err)
-    }
+	// créer un string des personnes qui ont liké
+	var dislikedBy string
+	rows, _ := database.Query("SELECT dislikedBy FROM posts WHERE id = ?", post_id)
+	for rows.Next() {
+		err := rows.Scan(&dislikedBy)
+		CheckError(err)
+	}
 
-    if dislikedBy != "" {
-        // Split le string en array
-        all_dislikedBy := strings.Split(dislikedBy, " ")
-        // parcour l'array de ceux qui ont disliké pour éviter les doublons
-        for i := 0; i < len(all_dislikedBy); i++ {
-            if all_dislikedBy[i] == user {
-                return false, dislikedBy
-            }
-        }
-    }
+	if dislikedBy != "" {
+		// Split le string en array
+		all_dislikedBy := strings.Split(dislikedBy, " ")
+		// parcour l'array de ceux qui ont disliké pour éviter les doublons
+		for i := 0; i < len(all_dislikedBy); i++ {
+			if all_dislikedBy[i] == user {
+				return false, dislikedBy
+			}
+		}
+	}
 
-    return true, dislikedBy
+	return true, dislikedBy
 }
+
 // ajoute un dislike au post quand l'utilisateur clique sur le bouton
 func AddDisLike(post_id string, data_post map[string]interface{}, dislikedBy string, notif Notif) string {
-    var dislike int
-    user := data_post["user"].(string)
+	var dislike int
+	user := data_post["user"].(string)
 
-    // Open the database
-    database,_  := sql.Open("sqlite3", "./db-sqlite.db")
+	// Open the database
+	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
 
-    tx, err := database.Begin()
-    CheckError(err)
-    // Ajoute +1 disslike des POSTS
-    rows, _ := database.Query("SELECT dislike FROM posts WHERE id = ?", post_id)
-    for rows.Next() {
-        err := rows.Scan(&dislike)
-        CheckError(err)
-    }
-    dislike += 1
+	tx, err := database.Begin()
+	CheckError(err)
+	// Ajoute +1 disslike des POSTS
+	rows, _ := database.Query("SELECT dislike FROM posts WHERE id = ?", post_id)
+	for rows.Next() {
+		err := rows.Scan(&dislike)
+		CheckError(err)
+	}
+	dislike += 1
 
-    // Update the nb of dislike
-    query := "UPDATE posts SET dislike = " + strconv.Itoa(dislike) + " WHERE id = " + post_id
-    stmt, err := tx.Prepare(query)
-    CheckError(err)
-    _, err = stmt.Exec()
-    CheckError(err)
+	// Update the nb of dislike
+	query := "UPDATE posts SET dislike = " + strconv.Itoa(dislike) + " WHERE id = " + post_id
+	stmt, err := tx.Prepare(query)
+	CheckError(err)
+	_, err = stmt.Exec()
+	CheckError(err)
 
-    if dislikedBy == "" {
-        dislikedBy = user
-    } else {
-        dislikedBy += " " + user
-    }
+	if dislikedBy == "" {
+		dislikedBy = user
+	} else {
+		dislikedBy += " " + user
+	}
 
-    // Update the users who disliked
-    query = "UPDATE posts SET dislikedBy =  ? WHERE id = " + post_id
-    stmt, err = tx.Prepare(query)
-    CheckError(err)
-    _, err = stmt.Exec(dislikedBy)
-    CheckError(err)
-    tx.Commit()
-    database.Close()
+	// Update the users who disliked
+	query = "UPDATE posts SET dislikedBy =  ? WHERE id = " + post_id
+	stmt, err = tx.Prepare(query)
+	CheckError(err)
+	_, err = stmt.Exec(dislikedBy)
+	CheckError(err)
+	tx.Commit()
+	database.Close()
 
-    UpdateNotif(notif)
-    return dislikedBy
+	UpdateNotif(notif)
+	return dislikedBy
 }
+
 // remove a dislike on click
 func RemoveDisLike(post_id string, data_post map[string]interface{}, dislikedBy string) string {
-    var dislike int
-    user := data_post["user"].(string)
+	var dislike int
+	user := data_post["user"].(string)
 
-    // Open the database
-    database,_  := sql.Open("sqlite3", "./db-sqlite.db")
-    defer database.Close()
+	// Open the database
+	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	defer database.Close()
 
-    tx, err := database.Begin()
-    // delete a dislike
-    rows, _ := database.Query("SELECT dislike FROM posts WHERE id = ?", post_id)
-    for rows.Next() {
-        err := rows.Scan(&dislike)
-        CheckError(err)
-    }
-    dislike -= 1
+	tx, err := database.Begin()
+	// delete a dislike
+	rows, _ := database.Query("SELECT dislike FROM posts WHERE id = ?", post_id)
+	for rows.Next() {
+		err := rows.Scan(&dislike)
+		CheckError(err)
+	}
+	dislike -= 1
 
-    // Update the nb of like
-    query := "UPDATE posts SET dislike = " + strconv.Itoa(dislike) + " WHERE id = " + post_id
-    stmt, err := tx.Prepare(query)
-    CheckError(err)
-    _, err = stmt.Exec()
-    CheckError(err)
+	// Update the nb of like
+	query := "UPDATE posts SET dislike = " + strconv.Itoa(dislike) + " WHERE id = " + post_id
+	stmt, err := tx.Prepare(query)
+	CheckError(err)
+	_, err = stmt.Exec()
+	CheckError(err)
 
-    all_dislikedBy := strings.Split(dislikedBy, " ")
+	all_dislikedBy := strings.Split(dislikedBy, " ")
 
-    for i := 0; i < len(all_dislikedBy); i++ {
-        if user == all_dislikedBy[i] {
-            all_dislikedBy = append(all_dislikedBy[:i], all_dislikedBy[i+1:]...)
-            break
-        }
-    }
-    dislikedBy = strings.Join(all_dislikedBy, " ")
+	for i := 0; i < len(all_dislikedBy); i++ {
+		if user == all_dislikedBy[i] {
+			all_dislikedBy = append(all_dislikedBy[:i], all_dislikedBy[i+1:]...)
+			break
+		}
+	}
+	dislikedBy = strings.Join(all_dislikedBy, " ")
 
-    // Update the users who liked
-    query = "UPDATE posts SET dislikedBy = ? WHERE id = " + post_id
-    stmt, err = tx.Prepare(query)
-    CheckError(err)
-    _, err = stmt.Exec(dislikedBy)
-    CheckError(err)
-    tx.Commit()
+	// Update the users who liked
+	query = "UPDATE posts SET dislikedBy = ? WHERE id = " + post_id
+	stmt, err = tx.Prepare(query)
+	CheckError(err)
+	_, err = stmt.Exec(dislikedBy)
+	CheckError(err)
+	tx.Commit()
 
-    return dislikedBy
+	return dislikedBy
 }

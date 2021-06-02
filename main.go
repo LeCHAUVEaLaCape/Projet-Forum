@@ -3,10 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"io"
 	"net/http"
-	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"text/template"
@@ -16,7 +13,6 @@ import (
 	. "./cookies"
 
 	_ "github.com/mattn/go-sqlite3"
-	uuid "github.com/satori/go.uuid"
 )
 
 var id, like int
@@ -24,12 +20,6 @@ var username, password, email, age, fewWords, address, photo, state, title, body
 var create_cookie, userFound = false, false
 var categories = []string{"gaming", "informatique", "sport", "culture", "politique", "loisir", "sciences", "sexualite", "finance"}
 var data = make(map[string]interface{})
-
-const MAX_UPLOAD_SIZE = 1024 * 1024 // 1MB
-type Progress struct {
-	TotalSize int64
-	BytesRead int64
-}
 
 func main() {
 	data["user"] = ""
@@ -68,7 +58,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 	GetCookie(data_index, r) // ./cookies/getCookies.go
 
 	if data["user"] != nil {
-		checkNotif(w, r, data_index)
+		CheckNotif(w, r, data_index)
 		GetRole(data_index, false, "")
 	} else {
 		data_index["cookieExist"] = false
@@ -188,7 +178,7 @@ func welcome(w http.ResponseWriter, r *http.Request) {
 
 	GetCookie(data_welcome, r)
 	if data["user"] != nil {
-		checkNotif(w, r, data_welcome)
+		CheckNotif(w, r, data_welcome)
 		GetRole(data_welcome, false, "")
 	}
 
@@ -208,7 +198,7 @@ func user(w http.ResponseWriter, r *http.Request) {
 	data_user["username"] = ""
 	GetCookie(data_user, r)
 	if data["user"] != nil {
-		checkNotif(w, r, data_user)
+		CheckNotif(w, r, data_user)
 		on_user_page := true // Lorsque la page actuelle est le profil d'un utilisateur
 		user_page := r.FormValue("user")
 		GetRole(data_user, on_user_page, user_page)
@@ -253,7 +243,7 @@ func allUsers(w http.ResponseWriter, r *http.Request) {
 	}
 	GetCookie(data_allUsers, r)
 	if data["user"] != nil {
-		checkNotif(w, r, data_allUsers)
+		CheckNotif(w, r, data_allUsers)
 		GetRole(data_allUsers, false, "")
 	}
 
@@ -325,7 +315,7 @@ func newPost(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/logIn", http.StatusSeeOther)
 	}
 	if data["user"] != nil {
-		checkNotif(w, r, data_newPost)
+		CheckNotif(w, r, data_newPost)
 		GetRole(data_newPost, false, "")
 	}
 
@@ -340,7 +330,7 @@ func newPost(w http.ResponseWriter, r *http.Request) {
 		dt := time.Now()
 		// appel de la fonction pour créer le post
 		AddNewPost(title, body, dt.Format("02-01-2006 15:04:05"), data_newPost, category)
-		uploadHandler(w, r)
+		UploadHandler(w, r)
 	}
 	data_newPost["categorie"] = categories
 
@@ -365,7 +355,7 @@ func post(w http.ResponseWriter, r *http.Request) {
 	data_post["already_disliked"] = false
 	GetCookie(data_post, r)
 	if data["user"] != nil {
-		checkNotif(w, r, data_post)
+		CheckNotif(w, r, data_post)
 		GetRole(data_post, false, "")
 	}
 
@@ -420,26 +410,14 @@ func post(w http.ResponseWriter, r *http.Request) {
 
 func delPost(w http.ResponseWriter, r *http.Request) {
 	delete_post := r.FormValue("delPost")
-	var image string
 	// Open the database
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
 	defer database.Close()
 
-	rows, err := database.Query("SELECT image FROM posts WHERE id = ?", delete_post)
-	checkError(err)
-	defer rows.Close()
-	for rows.Next() {
-		err := rows.Scan(&image)
-		checkError(err)
+	// delete the image
+	state := "mainPost"
+	Delete_image(state, delete_post)
 
-	}
-	image = strings.Replace(image, ".", "", 1)
-	fmt.Println(image)
-	err = os.Remove(image)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
 	// DELETE the comments of the main post
 	tx, err := database.Begin()
 	checkError(err)
@@ -489,7 +467,7 @@ func myPosts(w http.ResponseWriter, r *http.Request) {
 	data_myPosts["cookieExist"] = false
 	GetCookie(data_myPosts, r)
 	if data["user"] != nil {
-		checkNotif(w, r, data_myPosts)
+		CheckNotif(w, r, data_myPosts)
 		GetRole(data_myPosts, false, "")
 	}
 
@@ -555,7 +533,7 @@ func myLikedPosts(w http.ResponseWriter, r *http.Request) {
 	data_myLikedPosts["cookieExist"] = false
 	GetCookie(data_myLikedPosts, r)
 	if data["user"] != nil {
-		checkNotif(w, r, data_myLikedPosts)
+		CheckNotif(w, r, data_myLikedPosts)
 		GetRole(data_myLikedPosts, false, "")
 	}
 
@@ -631,54 +609,6 @@ func checkError(err error) {
 	}
 }
 
-// Affiche les notifications de l'utilisateur s'il y en a
-func checkNotif(w http.ResponseWriter, r *http.Request, data_notif map[string]interface{}) {
-	// Open the database
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
-	defer database.Close()
-
-	var notification string
-	var arrNotification []string
-	var test []string
-	var arr_notif [][]string
-	rows, err := database.Query("SELECT notification FROM users WHERE username = ?", data_notif["user"])
-	checkError(err)
-	for rows.Next() {
-		err := rows.Scan(&notification)
-		checkError(err)
-		// get the section splited with the ","
-		arrNotification = strings.Split(notification, ",")
-		// remove the last part of the section which is empty
-		if len(arrNotification[len(arrNotification)-1]) < 1 {
-			arrNotification = arrNotification[0 : len(arrNotification)-1]
-		}
-		// Now split with white spaces and add them to the final array
-		for i := 0; i < len(arrNotification); i++ {
-			test = strings.Split(arrNotification[i], " ")
-			arr_notif = append(arr_notif, test)
-		}
-	}
-	rows.Close()
-	err = rows.Err()
-	checkError(err)
-
-	data_notif["notif"] = arr_notif
-
-	// Delete notif
-	del_notif := r.FormValue("del-notif")
-	userToDel := r.FormValue("user")
-	if del_notif == "1" {
-		tx, err := database.Begin()
-		checkError(err)
-		stmt, err := tx.Prepare("UPDATE users SET notification = ? WHERE username = ?")
-		checkError(err)
-		_, err = stmt.Exec("", userToDel)
-		checkError(err)
-		tx.Commit()
-		http.Redirect(w, r, r.Header.Get("Referer"), 302)
-	}
-}
-
 // page des posts en attente, un admin ou moderateur doit les accepter pour les mettres sur la page principal
 func pendingPosts(w http.ResponseWriter, r *http.Request) {
 	// initiate the data that will be send to html
@@ -690,7 +620,7 @@ func pendingPosts(w http.ResponseWriter, r *http.Request) {
 	GetCookie(data_pendingPosts, r)
 	// Redirection pour ceux qui ne sont pas connecté
 	if data["user"] != nil {
-		checkNotif(w, r, data_pendingPosts)
+		CheckNotif(w, r, data_pendingPosts)
 		GetRole(data_pendingPosts, false, "")
 	}
 	if data_pendingPosts["cookieExist"] == false || data_pendingPosts["role"] == "user" {
@@ -711,103 +641,4 @@ func pendingPosts(w http.ResponseWriter, r *http.Request) {
 	t := template.New("pendingPosts-template")
 	t = template.Must(t.ParseFiles("./html/pendingPosts.html", "./html/header&footer.html"))
 	t.ExecuteTemplate(w, "pendingPosts", data_pendingPosts)
-}
-
-func (pr *Progress) Write(p []byte) (n int, err error) {
-	n, err = len(p), nil
-	pr.BytesRead += int64(n)
-	return
-}
-func uploadHandler(w http.ResponseWriter, r *http.Request) {
-	// if r.Method != "POST" {
-	// 	http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-	// 	return
-	// }
-
-	// 32 MB is the default used by FormFile
-	if err := r.ParseMultipartForm(32 << 20); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	// get a reference to the fileHeaders
-	files := r.MultipartForm.File["file"]
-
-	for _, fileHeader := range files {
-		if fileHeader.Size > MAX_UPLOAD_SIZE {
-			http.Error(w, fmt.Sprintf("The uploaded image is too big: %s. Please use an image less than 1MB in size", fileHeader.Filename), http.StatusBadRequest)
-			return
-		}
-		file, err := fileHeader.Open()
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		defer file.Close()
-		buff := make([]byte, 512)
-		_, err = file.Read(buff)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		filetype := http.DetectContentType(buff)
-		if filetype != "image/jpeg" && filetype != "image/png" {
-			http.Error(w, "The provided file format is not allowed. Please upload a JPEG or PNG image", http.StatusBadRequest)
-			return
-		}
-		_, err = file.Seek(0, io.SeekStart)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		err = os.MkdirAll("./assets/uploads", os.ModePerm)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		name, _ := uuid.NewV4()
-		f, err := os.Create(fmt.Sprintf("./assets/uploads/%s%s", name, filepath.Ext(fileHeader.Filename)))
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		defer f.Close()
-		pr := &Progress{
-			TotalSize: fileHeader.Size,
-		}
-		_, err = io.Copy(f, io.TeeReader(file, pr))
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		database, err := sql.Open("sqlite3", "./db-sqlite.db")
-		checkError(err)
-		defer database.Close()
-		rows, err := database.Query("SELECT id FROM pendingPosts ORDER BY id DESC LIMIT 1")
-		checkError(err)
-		defer rows.Close()
-		for rows.Next() {
-			err := rows.Scan(&id)
-			checkError(err)
-		}
-		var image string
-		rows, err = database.Query("SELECT image FROM pendingPosts WHERE id = ?", id)
-		checkError(err)
-		defer rows.Close()
-		for rows.Next() {
-			err := rows.Scan(&image)
-			checkError(err)
-		}
-		image += "," + "../assets/uploads/" + name.String() + filepath.Ext(fileHeader.Filename)
-		fmt.Println(image)
-
-		//range over database
-		tx, err := database.Begin()
-		stmt, err := tx.Prepare("UPDATE pendingPosts SET image = ? WHERE id = ?")
-		checkError(err)
-		_, err = stmt.Exec(image, id)
-		checkError(err)
-		tx.Commit()
-	}
-	http.Redirect(w, r, "/index", http.StatusSeeOther)
 }
