@@ -31,6 +31,10 @@ func DisplayPosts(r *http.Request, data_info map[string]interface{}, state strin
 	var like, nbComments, photo string
 	var id int
 	var post [][]interface{}
+	var imgstr string
+	var arrimg []string
+	var all_image [][]string
+	var arrimage []interface{}
 
 	// filtre de categorie
 	selected_categories := ""
@@ -77,10 +81,36 @@ func DisplayPosts(r *http.Request, data_info map[string]interface{}, state strin
 			}
 			aPost = append(aPost, like)
 			aPost = append(aPost, nbComments)
-			post = append(post, aPost)
 		}
 
+		// Ajoute les images pour la page pendingPosts seulement
+		if state == "pendingPosts" {
+			rows, err := database.Query("SELECT image FROM pendingPosts WHERE id = ?", id)
+			CheckError(err)
+			defer rows.Close()
+			for rows.Next() {
+				err := rows.Scan(&imgstr)
+				CheckError(err)
+			}
+			arrimg = strings.Split(imgstr, ",")
+			arrimg = arrimg[1:]
+			all_image = append(all_image, arrimg)
+			for i := 0; i < len(all_image); i++ {
+				if i == len(all_image)-1 {
+					arrimage = append(arrimage, all_image[i])
+
+				}
+			}
+			err = rows.Err()
+			CheckError(err)
+
+		}
+		if len(arrimage) > 0 {
+			aPost = append(aPost, arrimage[len(arrimage)-1:])
+		}
+		post = append(post, aPost)
 	}
+
 	// Ajoute le chemin de la photo qui a été choisit par l'utilisateur
 	for i := 0; i < len(post); i++ {
 		rows, err := database.Query("SELECT photo FROM users WHERE username = ?", post[i][2])
@@ -99,6 +129,7 @@ func DisplayPosts(r *http.Request, data_info map[string]interface{}, state strin
 	data_info["categories"] = categories
 }
 
+// Page posts
 func Display_post_comment(post_id string, data_post map[string]interface{}, body string) [8]string {
 	var post [8]string
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")

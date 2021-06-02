@@ -19,10 +19,6 @@ body,
 .author {
   overflow: hidden;
 }
-.message {
-  min-height: 175px !important;
-  border-radius: 10px !important;
-}
 .title {
   width: 100%;
   text-align: center;
@@ -32,7 +28,6 @@ body,
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
-    height: 35%;
 }
 .accept-reject button {
   width: 88%;
@@ -52,4 +47,31 @@ body,
 }
 #reject:hover {
   background-color: #bb5959;
+}
+.see-more div {
+  display: flex;
+  justify-content: center;
+}
+.message-full {
+  min-height: 175px !important;
+  height: unset !important;
+}
+.all-posts {
+  overflow: hidden;
+  margin-bottom: 40px;
+  display: grid !important;
+}
+.img-posts{
+  margin-top: 60px;
+    border-top: solid 1px;
+    padding-top: 30px;
+}
+.img-posts img {
+  height: 230px;
+  border: solid 1px black;
+  margin: 10px;
+}
+.each-posts {
+  justify-content: center;
+  display: flex;
 }

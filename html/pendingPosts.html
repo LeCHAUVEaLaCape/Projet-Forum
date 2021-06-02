@@ -20,6 +20,7 @@
       <div class="post-container">
         <div class="all-posts">
           {{range .allposts}}
+          <div class="each-posts">
           <div class="singlePost-container">
             <!-- ajoute le titre du poste -->
             <div class="title-post">{{index . 0}}</div>
@@ -27,6 +28,20 @@
             <div class="body-post">
               <div class="message">
                 <p>{{index . 1}}</p>
+                <div class="img-posts">
+                  {{range index . 10}}
+                  {{range .}}
+                  <img src="{{.}}">  
+                  {{end}}
+                  {{end}}
+                </div>
+              </div>
+              <div class="see-more">
+                <div>
+                  <button>
+                  <input type="hidden" name="id" value="{{index . 5}}">
+                   <p class="see-more-txt">Lire la suite... </p></button>
+                  </div>
               </div>
             </div>
 
@@ -42,12 +57,7 @@
                 </div>
                 {{end}}
               </div>
-              <!-- Ajoute le nombre de like -->
-              <div class="nb-like">
-                <p class="nb-like-comment">
-                  {{index . 8}} Like(s)<br />{{index . 9}} Commentaire(s)
-                </p>
-              </div>
+
               <!-- Ajoute l'auteur du post et le time -->
               <div class="author-time">
                 <p class="author">
@@ -76,12 +86,14 @@
                   </form>
               </div>
           </div>
+        </div>
           {{end}}
         </div>
       </div>
     </div>
     {{template "footer"}}
   </body>
+  <script src="../assets/js/pendingPosts.js"></script>
 </html>
 
 {{end}}
