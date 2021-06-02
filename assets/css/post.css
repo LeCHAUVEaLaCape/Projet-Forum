@@ -141,6 +141,16 @@ form {
 .nb-like {
   margin-left: 9px;
 }
+.dislike {
+  display: flex;
+  justify-content: flex-end;
+}
+.dislike-button {
+  justify-content: flex-end !important;
+}
+.nb-dislike {
+  margin-left: 9px;
+}
 .comment, .comment-container {
   position: relative;
 }
@@ -160,7 +170,21 @@ form {
 .nb-like:hover .invisible-likers {
   display: initial;
   position: absolute;
-  transform: translate(10px,-20px);
+  transform: translate(10px,-5px);
+  background: white;
+  padding: 8px;
+  text-align: center;
+  font-size: 15px;
+  border: solid 1px black;
+  border-radius: 10px;
+}
+.invisible-dislikers{
+  display: none;
+}
+.nb-dislike:hover .invisible-dislikers {
+  display: initial;
+  position: absolute;
+  transform: translate(10px,-5px);
   background: white;
   padding: 8px;
   text-align: center;

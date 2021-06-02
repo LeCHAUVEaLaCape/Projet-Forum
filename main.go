@@ -225,7 +225,6 @@ func user(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/index", http.StatusSeeOther)
 	}
 
-	fmt.Println(data_user)
 
 	t := template.New("user-template")
 	t = template.Must(t.ParseFiles("./html/user.html", "./html/header&footer.html"))
@@ -381,7 +380,7 @@ func post(w http.ResponseWriter, r *http.Request) {
 	}
 	// Système de disLike
 	change_nmb_dislike := r.FormValue("DisLike")
-	likedBy = DisLike(change_nmb_dislike, data_post, post_id, w, r)
+	dislikedBy = DisLike(change_nmb_dislike, data_post, post_id, w, r)
 
 	if data_post["user"] == nil {
 		data_post["user"] = ""
@@ -400,7 +399,7 @@ func post(w http.ResponseWriter, r *http.Request) {
 	// ajoute les personnes qui ont liké le post principal
 	likedBy = strings.ReplaceAll(likedBy, " ", "<br>")
 	data_post["mainPost_likedBy"] = likedBy
-
+	
 	// ajoute les personnes qui ont disliké le post principal
 	dislikedBy = strings.ReplaceAll(dislikedBy, " ", "<br>")
 	data_post["mainPost_dislikedBy"] = dislikedBy
