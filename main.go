@@ -225,8 +225,6 @@ func user(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/index", http.StatusSeeOther)
 	}
 
-	fmt.Println(data_user)
-
 	t := template.New("user-template")
 	t = template.Must(t.ParseFiles("./html/user.html", "./html/header&footer.html"))
 	t.ExecuteTemplate(w, "user", data_user)
