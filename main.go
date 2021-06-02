@@ -379,7 +379,7 @@ func post(w http.ResponseWriter, r *http.Request) {
 	}
 	// Système de disLike
 	change_nmb_dislike := r.FormValue("DisLike")
-	likedBy = DisLike(change_nmb_dislike, data_post, post_id, w, r)
+	dislikedBy = DisLike(change_nmb_dislike, data_post, post_id, w, r)
 
 	if data_post["user"] == nil {
 		data_post["user"] = ""

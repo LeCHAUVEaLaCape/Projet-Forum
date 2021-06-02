@@ -104,7 +104,6 @@
             <input type="hidden" name="id-post" value="{{index .main_post 0}}" />
             <input type="hidden" name="disliker" value="{{$userconnect}}" />
             <input type="hidden" name="action" value="dislike" />
-            <input type="hidden" name="userToSendNotif" value="{{index .main_post 3}}" />
             <button style="cursor: pointer">+1</button>
           </form>
           {{end}}
@@ -117,7 +116,6 @@
             <button style="cursor: pointer">-1</button>
           </form>
           {{end}}
-          <!-- {{.}} -->
           <span class="nb-dislike">
             {{index .main_post 7}} DisLike(s)
             <div class="invisible-dislikers">{{.mainPost_dislikedBy}}</div>
