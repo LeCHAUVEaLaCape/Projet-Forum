@@ -1,0 +1,64 @@
+{{define "dashboard"}}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forum - Dashboard</title>
+    <link rel="stylesheet" href="../assets/css/index.css" />
+</head>
+<body>
+    
+{{template "header" .}}
+    <div class="page">
+        <!-- liste des admins et modo -->
+        <section>
+            <h2>Admins :</h2>
+            {{range .liste.Admins}}
+                <div>
+                    <div>{{.Username}} {{.Role}}</div>
+                </div>
+            {{end}}
+            <h2>Moderators :</h2>
+            {{range .liste.Moderators}}
+                <div>
+                    <div>{{.Username}} {{.Role}}</div>
+                </div>
+            {{end}}
+            {{if or (eq .role "moderator") (eq .role "admin")}}
+                <h2>Users :</h2>
+                {{range .liste.Users}}
+                    <div>
+                        <div>{{.Username}} {{.Role}}</div>
+                    </div>
+                {{end}}
+            {{end}}
+        </section>
+        <!-- Bouton demande pour passer modo ET/OU liste des demandes -->
+        <section>
+            {{if eq .role "user"}}
+                <form action="" method="POST">
+                <input class="button" type="hidden" name="user" value="{{.user}}">
+                <button type="submit">Demande Moderateur</button>
+                </form>
+            {{end}}
+            {{if eq .role "admin"}}
+                <h2>Demande pour passer Moderateur :</h2>
+                {{range .liste_demande}}
+                    <form action="" method="POST">
+                        <input class="button" type="hidden" name="accepter" value="{{.}}">
+                        <button type="submit">Accepter --> {{.}}</button>
+                    </form>
+                    <form action="" method="POST">
+                        <input class="button" type="hidden" name="refuser" value="{{.}}">
+                        <button type="submit">Refuser --> {{.}}</button>
+                    </form>
+                {{end}}
+            {{end}}
+            </form>
+        </section>
+    </div>
+{{template "footer"}}
+</body>
+</html>
+{{end}}

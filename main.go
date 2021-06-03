@@ -43,6 +43,7 @@ func main() {
 	http.HandleFunc("/myPosts", myPosts)
 	http.HandleFunc("/myLikedPosts", myLikedPosts)
 	http.HandleFunc("/pendingPosts", pendingPosts)
+	http.HandleFunc("/dashboard", Dashboard)
 
 	err := http.ListenAndServe(":8000", nil) // Set listen port
 	checkError(err)
@@ -731,4 +732,25 @@ func feed(data_Info map[string]interface{}) {
 
 	data_Info["commentsPosted"] = comments
 
+}
+func Dashboard(w http.ResponseWriter, r *http.Request) {
+	data_dashboard := make(map[string]interface{})
+	for k, v := range data {
+		data_dashboard[k] = v
+	}
+	GetCookie(data_dashboard, r)
+	if data_dashboard["user"] != nil {
+		CheckNotif(w, r, data_dashboard)
+		GetRole(data_dashboard, false, "")
+	} else {
+		data_dashboard["cookieExist"] = false
+	}
+	RefuserDemande(w, r)
+	AccepterDemande(w, r)
+	ResquestForModo(r)
+	DisplayAdminModo(&data_dashboard)
+	DisplayPendingForModo(&data_dashboard)
+	t := template.New("dashboard-template")
+	t = template.Must(t.ParseFiles("./html/dashboard.html", "./html/header&footer.html"))
+	t.ExecuteTemplate(w, "dashboard", data_dashboard)
 }
