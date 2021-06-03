@@ -210,3 +210,52 @@ button {
   font-size: 18px;
   border-radius: 6px;
 }
+#user{
+  font-size: 21px;
+}
+.post {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 60px;
+}
+.author-post {
+  display: unset !important;
+  justify-content: unset !important;
+}
+.author-time {
+  width: 100% !important;
+  display: flex;
+  justify-content: space-around !important;
+  align-items: center;
+}
+.author {
+  text-align: end;
+}
+.comment {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 45px;
+}
+#message {
+  width: 70%;
+  height: 100px;
+}
+.date {
+  font-size: 12px;
+  text-align: end;
+  margin: 10px 155px 0px 0px;
+}
+#see-more {
+  width: 72.5%;
+}
+#see-more div {
+  display: flex;
+}
+.message-full {
+  min-height: 175px !important;
+  height: unset !important;
+}
