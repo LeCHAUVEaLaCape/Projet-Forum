@@ -1,10 +1,33 @@
+var see_more = document.getElementsByClassName("see-test")
+var message = document.getElementsByClassName("msg-test")
+var see_more_txt = document.getElementsByClassName("see-more-txt")
+
+var click = false
+
+for (let i = 0 ; i < see_more.length ; i++) {
+    see_more[i].addEventListener("click", () => {
+        message[i].classList.toggle("message-full")
+        if (click) {
+            click = false
+            console.log(click)
+            see_more_txt[i].innerHTML = "Lire la suite..."
+            console.log(see_more_txt.innerHTML)
+        } else {
+            click = true
+            see_more_txt[i].innerHTML = "Lire moins..."
+            console.log(click)
+            console.log(see_more_txt.innerHTML)
+        }
+    })
+}
+
+
+
 // var for buttons
 var modify_photo = document.getElementsByClassName("modify")[0]
 var modify_age = document.getElementsByClassName("modify")[1]
 var modify_address = document.getElementsByClassName("modify")[2]
 var modify_fewWords = document.getElementsByClassName("modify")[3]
-
-
 
 // var for photo
 var photo_modifier = document.getElementsByClassName("photo-container")[0]
@@ -48,3 +71,5 @@ show_delete.addEventListener("click", () => {
 hide_delete.addEventListener("click", () => {
     delete_account_container.classList.remove("del-active")
 })
+
+

@@ -471,8 +471,7 @@ func myPosts(w http.ResponseWriter, r *http.Request) {
 		CheckNotif(w, r, data_myPosts)
 		GetRole(data_myPosts, false, "")
 	}
-
-	createdposts(data_myPosts)
+	createdposts(data_myPosts, "indexuser")
 
 	t := template.New("myPosts-template")
 	t = template.Must(t.ParseFiles("./html/myPosts.html", "./html/header&footer.html"))
@@ -493,7 +492,7 @@ func myLikedPosts(w http.ResponseWriter, r *http.Request) {
 		GetRole(data_myLikedPosts, false, "")
 	}
 
-	LikedPosts(data_myLikedPosts)
+	LikedPosts(data_myLikedPosts, "indexlike")
 
 	t := template.New("myLikedPosts-template")
 	t = template.Must(t.ParseFiles("./html/myLikedPosts.html", "./html/header&footer.html"))
@@ -540,7 +539,7 @@ func pendingPosts(w http.ResponseWriter, r *http.Request) {
 	t = template.Must(t.ParseFiles("./html/pendingPosts.html", "./html/header&footer.html"))
 	t.ExecuteTemplate(w, "pendingPosts", data_pendingPosts)
 }
-func LikedPosts(data_Info map[string]interface{}) {
+func LikedPosts(data_Info map[string]interface{}, state string) {
 
 	var all_myLikedPosts [][]interface{}
 	var post_liked bool
@@ -559,12 +558,22 @@ func LikedPosts(data_Info map[string]interface{}) {
 		// find all the posts which the user liked
 		like_splitted := strings.Split(likedBy, " ")
 		for i := 0; i < len(like_splitted); i++ {
-			if like_splitted[i] == data["user"].(string) {
-				post_liked = true
-				break
-			} else {
-				post_liked = false
+			if state == "indexlike" {
+				if like_splitted[i] == data["user"].(string) {
+					post_liked = true
+					break
+				} else {
+					post_liked = false
+				}
+			} else if state == "feedlike" {
+				if like_splitted[i] == data_Info["username"] {
+					post_liked = true
+					break
+				} else {
+					post_liked = false
+				}
 			}
+
 		}
 
 		if post_liked {
@@ -605,12 +614,18 @@ func LikedPosts(data_Info map[string]interface{}) {
 
 	data_Info["all_myLikedPosts"] = all_myLikedPosts
 }
-func createdposts(data_Info map[string]interface{}) {
+func createdposts(data_Info map[string]interface{}, state string) {
 	var all_myPosts [][]interface{}
+
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
 	defer database.Close()
 	//range over database
-	rows, _ := database.Query("SELECT title, body, author, date, id, category FROM posts WHERE author = ?", data["user"].(string))
+	var rows *sql.Rows
+	if state == "userpage" {
+		rows, _ = database.Query("SELECT title, body, author, date, id, category FROM posts WHERE author = ?", data_Info["username"])
+	} else if state == "indexuser" {
+		rows, _ = database.Query("SELECT title, body, author, date, id, category FROM posts WHERE author = ?", data["user"].(string))
+	}
 	defer rows.Close()
 
 	for rows.Next() {
@@ -655,26 +670,28 @@ func createdposts(data_Info map[string]interface{}) {
 
 func feed(data_Info map[string]interface{}) {
 	//Show the liked post by the user
-	LikedPosts(data_Info)
+	LikedPosts(data_Info, "feedlike")
 
 	//Show the post created by the user
-	createdposts(data_Info)
+	createdposts(data_Info, "userpage")
 
 	//Show comment posted
 	// commentaires
-	var comments [][6]string
+	var comments [][11]string
 	var content string
+	var tmp [11]string
 	database_comment, _ := sql.Open("sqlite3", "./db-sqlite.db")
 	defer database_comment.Close()
 	//range over database
 	rows_comment, _ := database_comment.Query("SELECT content, idMainPost, date, id FROM comments WHERE author = ?", data_Info["username"])
 	defer rows_comment.Close()
 	for rows_comment.Next() {
-		var tmp [6]string
+
 		err := rows_comment.Scan(&content, &tmp[1], &tmp[2], &tmp[5])
 		if err != nil {
 			log.Fatal(err)
 		}
+
 		// Remplace les \n par des <br> pour sauter des lignes en html
 		tmp[0] = strings.Replace(content, string('\r'), "", -1)
 		tmp[0] = strings.Replace(content, string('\n'), "<br>", -1)
@@ -695,8 +712,18 @@ func feed(data_Info map[string]interface{}) {
 		if err != nil {
 			log.Fatal(err)
 		}
+
+		rows_posts, _ := database_comment.Query("SELECT id, title, body, author, date FROM posts WHERE id = ?", tmp[1])
+		defer rows_posts.Close()
+		for rows_posts.Next() {
+			err := rows_posts.Scan(&tmp[6], &tmp[7], &tmp[8], &tmp[9], &tmp[10])
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
 		comments = append(comments, tmp)
 	}
+
 	err := rows_comment.Err()
 	if err != nil {
 		log.Fatal(err)

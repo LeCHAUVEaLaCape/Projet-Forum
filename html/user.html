@@ -1,23 +1,26 @@
 {{define "user"}}
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Forum - {{.username}}</title>
-    <link rel="stylesheet" href="../assets/css/user.css" />
-    <link rel="shortcut icon" href="../assets/images/icone.png" />
-  </head>
-  <body>
-    {{template "header" .}}
 
-    <div class="page">
-      <!----------------- 
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Forum - {{.username}}</title>
+  <link rel="stylesheet" href="../assets/css/user.css" />
+  <link rel="shortcut icon" href="../assets/images/icone.png" />
+  <link rel="stylesheet" href="../assets/css/mainPostStyle.css" />
+</head>
+
+<body>
+  {{template "header" .}}
+
+  <div class="page">
+    <!----------------- 
             PROFIL
        ----------------->
-      <div class="left-page">
-        <h1 class="profil">Profil</h1>
+    <div class="left-page">
+      <h1 class="profil">Profil</h1>
       <div class="user-info">
         <div class="username">
           <h3 class="title">Username :</h3>
@@ -53,11 +56,7 @@
             <div>
               <button>
                 <img src="../assets/images/default.png" />
-                <input
-                  type="hidden"
-                  name="photo"
-                  value="../assets/images/default.png"
-                />
+                <input type="hidden" name="photo" value="../assets/images/default.png" />
               </button>
             </div>
           </form>
@@ -65,11 +64,7 @@
             <div>
               <button>
                 <img src="../assets/images/sven.png" />
-                <input
-                  type="hidden"
-                  name="photo"
-                  value="../assets/images/sven.png"
-                />
+                <input type="hidden" name="photo" value="../assets/images/sven.png" />
               </button>
             </div>
           </form>
@@ -77,11 +72,7 @@
             <div>
               <button>
                 <img src="../assets/images/baptiste.png" />
-                <input
-                  type="hidden"
-                  name="photo"
-                  value="../assets/images/baptiste.png"
-                />
+                <input type="hidden" name="photo" value="../assets/images/baptiste.png" />
               </button>
             </div>
           </form>
@@ -89,11 +80,7 @@
             <div>
               <button>
                 <img src="../assets/images/brian.png" />
-                <input
-                  type="hidden"
-                  name="photo"
-                  value="../assets/images/brian.png"
-                />
+                <input type="hidden" name="photo" value="../assets/images/brian.png" />
               </button>
             </div>
           </form>
@@ -101,11 +88,7 @@
             <div>
               <button>
                 <img src="../assets/images/florian.png" />
-                <input
-                  type="hidden"
-                  name="photo"
-                  value="../assets/images/florian.png"
-                />
+                <input type="hidden" name="photo" value="../assets/images/florian.png" />
               </button>
             </div>
           </form>
@@ -113,11 +96,7 @@
             <div>
               <button>
                 <img src="../assets/images/feminin.png" />
-                <input
-                  type="hidden"
-                  name="photo"
-                  value="../assets/images/feminin.png"
-                />
+                <input type="hidden" name="photo" value="../assets/images/feminin.png" />
               </button>
             </div>
           </form>
@@ -125,11 +104,7 @@
             <div>
               <button>
                 <img src="../assets/images/feminin2.png" />
-                <input
-                  type="hidden"
-                  name="photo"
-                  value="../assets/images/feminin2.png"
-                />
+                <input type="hidden" name="photo" value="../assets/images/feminin2.png" />
               </button>
             </div>
           </form>
@@ -165,11 +140,7 @@
             <p>{{.address}}</p>
           </div>
           {{if or (.sameUser) (eq .role "admin")}}
-          <form
-            action="/user?user={{.username}}"
-            method="post"
-            class="input-address"
-          >
+          <form action="/user?user={{.username}}" method="post" class="input-address">
             <div>
               <input type="text" name="address" value="{{.address}}" />
             </div>
@@ -188,11 +159,7 @@
             <p>{{.fewWords}}</p>
           </div>
           {{if or (.sameUser) (eq .role "admin")}}
-          <form
-            action="/user?user={{.username}}"
-            method="post"
-            class="input-fewWords"
-          >
+          <form action="/user?user={{.username}}" method="post" class="input-fewWords">
             <div>
               <input type="text" name="addFewWords" value="{{.fewWords}}" />
             </div>
@@ -205,31 +172,142 @@
         </div>
       </div>
     </div>
-    
+
     <!---------------- 
             FEED
      ---------------->
     <div class="middle-page">
       <h2 class="feed">Feed</h2>
-      <div class="mid-page-container">       
-         <div class="post-part">
-        <h4>Posts liked:</h4>
-        {{range .all_myLikedPosts}}
-        {{.}}
-        {{end}}
+      <div class="mid-page-container">
+        <!-- posts liké par l'utilisateur -->
+        <div class="liked-part">
+          <div class="post">
+            <h4>Posts liked:</h4>
+            {{range .all_myLikedPosts}}
+            <div class="singlePost-container">
+              <!-- ajoute le titre du poste -->
+              <div class="title-post">{{index . 0}}</div>
+              <!-- ajoute le corps du poste -->
+              <div class="body-post">
+                <div class="message">
+                  <p>{{index . 1}}</p>
+                </div>
+                <div class="see-more">
+                  <form action="/post" method="GET">
+                    <button>
+                      <input type="hidden" name="id" value="{{index . 5}}">
+                      <p>Voir le post... </p>
+                    </button>
+                  </form>
+
+                </div>
+              </div>
+
+              <!-- Block des POSTS -->
+              <div class="author-post">
+
+                <!-- Ajoute l'auteur du post et le time -->
+                <div class="author-time">
+                  <p class="author">
+                    <span>post crée par : </span><a id="user" href="/user?user={{index . 2}}">{{index . 2}}</a>
+                  </p>
+                  <span id="time-posted">{{index . 3}}</span>
+                </div>
+              </div>
+
+            </div>
+            {{end}}
+          </div>
+        </div>
+        <!-- posts créé par l'utilisateur -->
+        <div class="post-part">
+          <div class="post">
+            <h4>Posts created:</h4>
+            {{range .all_myPosts}}
+            <div class="singlePost-container">
+              <!-- ajoute le titre du poste -->
+              <div class="title-post">{{index . 0}}</div>
+              <!-- ajoute le corps du poste -->
+              <div class="body-post">
+                <div class="message">
+                  <p>{{index . 1}}</p>
+                </div>
+                <div class="see-more">
+                  <form action="/post" method="GET">
+                    <button>
+                      <input type="hidden" name="id" value="{{index . 5}}">
+                      <p>Voir le post... </p>
+                    </button>
+                  </form>
+                </div>
+              </div>
+              <!-- Block des POSTS -->
+              <div class="author-post">
+                <!-- Ajoute l'auteur du post et le time -->
+                <div class="author-time">
+                  <p class="author">
+                    <span>post crée par : </span><a id="user" href="/user?user={{index . 2}}">{{index . 2}}</a>
+                  </p>
+                  <span id="time-posted">{{index . 3}}</span>
+                </div>
+              </div>
+
+            </div>
+            {{end}}
+          </div>
+        </div>
+        <div class="comment-part"></div>
+        <div class="post">
+          <h4>Posts commented:</h4>
+          {{range .commentsPosted}}
+          <div class="singlePost-container">
+            <!-- ajoute le titre du poste -->
+            <div class="title-post">{{index . 7}}</div>
+            <!-- ajoute le corps du poste -->
+            <div class="body-post">
+              <div class="message">
+                <p>{{index . 8}}</p>
+              </div>
+              <div class="see-more">
+                <form action="/post" method="GET">
+                  <button>
+                    <input type="hidden" name="id" value="{{index . 6}}">
+                    <p>Voir le post... </p>
+                  </button>
+                </form>
+              </div>
+            </div>
+            <!-- Block des POSTS -->
+            <div class="author-post">
+              <!-- Ajoute l'auteur du post et le time -->
+              <div class="author-time">
+                <p class="author">
+                  <span>post crée par : </span><a id="user" href="/user?user={{index . 9}}">{{index . 9}}</a>
+                </p>
+                <span id="time-posted">{{index . 10}}</span>
+              </div>
+            </div>
+            <div class="comment">
+
+              <div id="message" class="message msg-test">
+                {{index . 0}}
+              </div>
+              <div id="see-more" class="see-more see-test">
+                <div>
+                  <button>
+                    <input type="hidden" name="id" value="{{index . 5}}">
+                    <p class="see-more-txt">Lire la suite... </p>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="date">
+              {{index . 2}}
+            </div>
+          </div>
+          {{end}}
+        </div>
       </div>
-      <div class="comment-part">
-        <h4>Posts create:</h4>
-        {{range .all_myPosts}}
-        {{.}}
-        {{end}}
-      </div>
-      <div class="like-part"></div>
-      <h4>Comment post:</h4>
-      {{range .commentsPosted}}
-      {{.}}
-      {{end}}
-    </div>
     </div>
 
     <!------------------
@@ -240,60 +318,61 @@
       <!-----------
         Changement de role (visible que par les Admin, autre que leur propre page)
        ----------->
-       {{if and (eq .role "admin") (ne .username .user)}} 
-       <div class="modif-role">
-         <h4 class="title">Change role of {{.username}}</h4>
-         <form action="/user?user={{.username}}" method="post">
-           <input type="hidden" name="username" value="{{.username}}"/>
-           <select name="change-role" id="chg-role">
-             <option value="user">Utilisateur</option>
-             <option value="moderator">Moderateur</option>
-             <option value="admin">Administrateur</option>
-           </select>
-           <button type="submit">Submit changes</button>
-         </form>
-       </div>
+      {{if and (eq .role "admin") (ne .username .user)}}
+      <div class="modif-role">
+        <h4 class="title">Change role of {{.username}}</h4>
+        <form action="/user?user={{.username}}" method="post">
+          <input type="hidden" name="username" value="{{.username}}" />
+          <select name="change-role" id="chg-role">
+            <option value="user">Utilisateur</option>
+            <option value="moderator">Moderateur</option>
+            <option value="admin">Administrateur</option>
+          </select>
+          <button type="submit">Submit changes</button>
+        </form>
+      </div>
       {{end}}
       <!--------------- 
         DEMANDE pour etre moderateur (visible que par les users sur leur propre page)
        --------------->
       {{if and (.sameUser) (eq .role "user")}}
-        <div class="ask-moderator">
-          <label class="title">Ask to be moderator</label>
-          <button>Submit</button>
-        </div>
+      <div class="ask-moderator">
+        <label class="title">Ask to be moderator</label>
+        <button>Submit</button>
+      </div>
       {{end}}
       <!------------
           Supprimer son compte (visible par tous sauf pour les Admin sur leur propre page)
        ------------->
-        {{if or (eq .username .user) (eq .role "admin")}}
-        <div class="access-delete-account">
-          <p>Delete account</p>
-          <button id="show-delete-account">Delete</button>
-        </div>
-          <div class="del-account-container">
-            <div class="del-account">
-              <form action="/user?user={{.username}}" method="POST">
-                {{if eq .username .user}}
-                <label>You are about to <span>delete your account</span><br>Are you sure ?</label>
-                {{else}}
-                <label>You are about to <span>delete the account</span><br>Are you sure ?</label>
-                {{end}}
-                <input type="hidden" name="del-account" value="{{.username}}">
-                <div class="buttons">
-                  <button>Confirm</button>
-                  <button type="reset" id="hide-delete-account">Cancel</button>
-                </div>
-              </form>
+      {{if or (eq .username .user) (eq .role "admin")}}
+      <div class="access-delete-account">
+        <p>Delete account</p>
+        <button id="show-delete-account">Delete</button>
+      </div>
+      <div class="del-account-container">
+        <div class="del-account">
+          <form action="/user?user={{.username}}" method="POST">
+            {{if eq .username .user}}
+            <label>You are about to <span>delete your account</span><br>Are you sure ?</label>
+            {{else}}
+            <label>You are about to <span>delete the account</span><br>Are you sure ?</label>
+            {{end}}
+            <input type="hidden" name="del-account" value="{{.username}}">
+            <div class="buttons">
+              <button>Confirm</button>
+              <button type="reset" id="hide-delete-account">Cancel</button>
             </div>
-          </div>
-       {{end}}
+          </form>
+        </div>
+      </div>
+      {{end}}
 
     </div>
   </div>
 
-    {{template "footer"}}
-  </body>
+  {{template "footer"}}
+</body>
+
 </html>
 <script src="../assets/js/user.js"></script>
 {{end}}
