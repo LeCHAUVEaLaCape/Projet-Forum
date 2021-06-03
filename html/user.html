@@ -211,7 +211,25 @@
      ---------------->
     <div class="middle-page">
       <h2 class="feed">Feed</h2>
-      <div class="mid-page-container"></div>
+      <div class="mid-page-container">       
+         <div class="post-part">
+        <h4>Posts liked:</h4>
+        {{range .all_myLikedPosts}}
+        {{.}}
+        {{end}}
+      </div>
+      <div class="comment-part">
+        <h4>Posts create:</h4>
+        {{range .all_myPosts}}
+        {{.}}
+        {{end}}
+      </div>
+      <div class="like-part"></div>
+      <h4>Comment post:</h4>
+      {{range .commentsPosted}}
+      {{.}}
+      {{end}}
+    </div>
     </div>
 
     <!------------------

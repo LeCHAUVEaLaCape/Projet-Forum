@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -203,12 +204,13 @@ func user(w http.ResponseWriter, r *http.Request) {
 		user_page := r.FormValue("user")
 		GetRole(data_user, on_user_page, user_page)
 		// Change un role lorsqu'un Admin submit le formulaire
+
 		ChangeRole(w, r) // ./config/modifDB.go
 	}
 
 	// Récupère les infos de l'utilisateur
 	GetInfoUser(w, r, data_user) // ./config/modifDB.go
-
+	feed(data_user)
 	// Check if the user logged is on his personnal page
 	if data_user["username"] == data_user["user"] && data_user["cookieExist"] != false {
 		data_user["sameUser"] = true
@@ -457,7 +459,6 @@ func delComment(w http.ResponseWriter, r *http.Request) {
 
 // Page qui affiche les posts créé par l'utilisateur connecté
 func myPosts(w http.ResponseWriter, r *http.Request) {
-	var all_myPosts [][]interface{}
 
 	// initiate the data that will be send to html
 	data_myPosts := make(map[string]interface{})
@@ -471,49 +472,7 @@ func myPosts(w http.ResponseWriter, r *http.Request) {
 		GetRole(data_myPosts, false, "")
 	}
 
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
-	defer database.Close()
-	//range over database
-	rows, _ := database.Query("SELECT title, body, author, date, id, category FROM posts WHERE author = ?", data["user"].(string))
-	defer rows.Close()
-
-	for rows.Next() {
-		myPosts := []interface{}{"", "", "", "", "", "", ""}
-		rows.Scan(&myPosts[0], &myPosts[1], &myPosts[2], &myPosts[3], &id, &myPosts[6])
-		// si le RegExp correspond à la DB
-		// Remplace les \n par des <br> pour sauter des lignes en html
-		myPosts[1] = strings.Replace(myPosts[1].(string), string('\r'), "", -1)
-		myPosts[1] = strings.Replace(myPosts[1].(string), string('\n'), "<br>", -1)
-		myPosts[5] = strconv.Itoa(id)
-		if myPosts[6] != nil {
-			temp := []interface{}{} // string
-			for _, e := range myPosts[6].(string) {
-				j, _ := strconv.Atoi(string(e))
-				temp = append(temp, categories[j])
-			}
-			myPosts = append(myPosts, temp)
-		} else {
-			myPosts[6] = []string{}
-			myPosts = append(myPosts, []string{})
-		}
-		all_myPosts = append(all_myPosts, myPosts)
-	}
-
-	// Ajoute le chemin de la photo qui a été choisit par l'utilisateur
-	for i := 0; i < len(all_myPosts); i++ {
-		rows, err := database.Query("SELECT photo FROM users WHERE username = ?", all_myPosts[i][2])
-		checkError(err)
-		defer rows.Close()
-		for rows.Next() {
-			err := rows.Scan(&photo)
-			checkError(err)
-		}
-		err = rows.Err()
-		checkError(err)
-		all_myPosts[i][4] = photo
-	}
-
-	data_myPosts["all_myPosts"] = all_myPosts
+	createdposts(data_myPosts)
 
 	t := template.New("myPosts-template")
 	t = template.Must(t.ParseFiles("./html/myPosts.html", "./html/header&footer.html"))
@@ -522,9 +481,6 @@ func myPosts(w http.ResponseWriter, r *http.Request) {
 
 // Page qui affiche les posts liké par l'utilisateur connecté
 func myLikedPosts(w http.ResponseWriter, r *http.Request) {
-	var all_myLikedPosts [][]interface{}
-	var post_liked bool
-
 	// initiate the data that will be send to html
 	data_myLikedPosts := make(map[string]interface{})
 	for k, v := range data {
@@ -536,6 +492,58 @@ func myLikedPosts(w http.ResponseWriter, r *http.Request) {
 		CheckNotif(w, r, data_myLikedPosts)
 		GetRole(data_myLikedPosts, false, "")
 	}
+
+	LikedPosts(data_myLikedPosts)
+
+	t := template.New("myLikedPosts-template")
+	t = template.Must(t.ParseFiles("./html/myLikedPosts.html", "./html/header&footer.html"))
+	t.ExecuteTemplate(w, "myLikedPosts", data_myLikedPosts)
+}
+
+// verifie les erreurs
+func checkError(err error) {
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
+// page des posts en attente, un admin ou moderateur doit les accepter pour les mettres sur la page principal
+func pendingPosts(w http.ResponseWriter, r *http.Request) {
+	// initiate the data that will be send to html
+	data_pendingPosts := make(map[string]interface{})
+	for k, v := range data {
+		data_pendingPosts[k] = v
+	}
+
+	GetCookie(data_pendingPosts, r)
+	// Redirection pour ceux qui ne sont pas connecté
+	if data["user"] != nil {
+		CheckNotif(w, r, data_pendingPosts)
+		GetRole(data_pendingPosts, false, "")
+	}
+	if data_pendingPosts["cookieExist"] == false || data_pendingPosts["role"] == "user" {
+		http.Redirect(w, r, "/logIn", http.StatusSeeOther)
+	}
+
+	post_accepted := r.FormValue("post-accepted")
+	id_pendingPost := r.FormValue("id-pendingPost")
+	// supprime ou déplace le post s'il est accepté ou non
+	if post_accepted != "" && id_pendingPost != "" {
+		PostAcceptedOrNot(post_accepted, id_pendingPost) // ./config/modifDB.go
+	}
+
+	// affiche le post
+	state = "pendingPosts"
+	DisplayPosts(r, data_pendingPosts, state) // ./config/post.go
+
+	t := template.New("pendingPosts-template")
+	t = template.Must(t.ParseFiles("./html/pendingPosts.html", "./html/header&footer.html"))
+	t.ExecuteTemplate(w, "pendingPosts", data_pendingPosts)
+}
+func LikedPosts(data_Info map[string]interface{}) {
+
+	var all_myLikedPosts [][]interface{}
+	var post_liked bool
 
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
 	defer database.Close()
@@ -595,50 +603,105 @@ func myLikedPosts(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	data_myLikedPosts["all_myLikedPosts"] = all_myLikedPosts
+	data_Info["all_myLikedPosts"] = all_myLikedPosts
+}
+func createdposts(data_Info map[string]interface{}) {
+	var all_myPosts [][]interface{}
+	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	defer database.Close()
+	//range over database
+	rows, _ := database.Query("SELECT title, body, author, date, id, category FROM posts WHERE author = ?", data["user"].(string))
+	defer rows.Close()
 
-	t := template.New("myLikedPosts-template")
-	t = template.Must(t.ParseFiles("./html/myLikedPosts.html", "./html/header&footer.html"))
-	t.ExecuteTemplate(w, "myLikedPosts", data_myLikedPosts)
+	for rows.Next() {
+		myPosts := []interface{}{"", "", "", "", "", "", ""}
+		rows.Scan(&myPosts[0], &myPosts[1], &myPosts[2], &myPosts[3], &id, &myPosts[6])
+		// si le RegExp correspond à la DB
+		// Remplace les \n par des <br> pour sauter des lignes en html
+		myPosts[1] = strings.Replace(myPosts[1].(string), string('\r'), "", -1)
+		myPosts[1] = strings.Replace(myPosts[1].(string), string('\n'), "<br>", -1)
+		myPosts[5] = strconv.Itoa(id)
+		if myPosts[6] != nil {
+			temp := []interface{}{} // string
+			for _, e := range myPosts[6].(string) {
+				j, _ := strconv.Atoi(string(e))
+				temp = append(temp, categories[j])
+			}
+			myPosts = append(myPosts, temp)
+		} else {
+			myPosts[6] = []string{}
+			myPosts = append(myPosts, []string{})
+		}
+		all_myPosts = append(all_myPosts, myPosts)
+	}
+
+	// Ajoute le chemin de la photo qui a été choisit par l'utilisateur
+	for i := 0; i < len(all_myPosts); i++ {
+		rows, err := database.Query("SELECT photo FROM users WHERE username = ?", all_myPosts[i][2])
+		checkError(err)
+		defer rows.Close()
+		for rows.Next() {
+			err := rows.Scan(&photo)
+			checkError(err)
+		}
+		err = rows.Err()
+		checkError(err)
+		all_myPosts[i][4] = photo
+	}
+
+	data_Info["all_myPosts"] = all_myPosts
+
 }
 
-// verifie les erreurs
-func checkError(err error) {
+func feed(data_Info map[string]interface{}) {
+	//Show the liked post by the user
+	LikedPosts(data_Info)
+
+	//Show the post created by the user
+	createdposts(data_Info)
+
+	//Show comment posted
+	// commentaires
+	var comments [][6]string
+	var content string
+	database_comment, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	defer database_comment.Close()
+	//range over database
+	rows_comment, _ := database_comment.Query("SELECT content, idMainPost, date, id FROM comments WHERE author = ?", data_Info["username"])
+	defer rows_comment.Close()
+	for rows_comment.Next() {
+		var tmp [6]string
+		err := rows_comment.Scan(&content, &tmp[1], &tmp[2], &tmp[5])
+		if err != nil {
+			log.Fatal(err)
+		}
+		// Remplace les \n par des <br> pour sauter des lignes en html
+		tmp[0] = strings.Replace(content, string('\r'), "", -1)
+		tmp[0] = strings.Replace(content, string('\n'), "<br>", -1)
+
+		// Ajoute le chemin de la photo qui a été choisit par l'utilisateur
+		rows, err := database_comment.Query("SELECT photo FROM users WHERE username = ?", data_Info["username"])
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer rows.Close()
+		for rows.Next() {
+			err := rows.Scan(&tmp[4])
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+		err = rows.Err()
+		if err != nil {
+			log.Fatal(err)
+		}
+		comments = append(comments, tmp)
+	}
+	err := rows_comment.Err()
 	if err != nil {
-		fmt.Println(err)
-	}
-}
-
-// page des posts en attente, un admin ou moderateur doit les accepter pour les mettres sur la page principal
-func pendingPosts(w http.ResponseWriter, r *http.Request) {
-	// initiate the data that will be send to html
-	data_pendingPosts := make(map[string]interface{})
-	for k, v := range data {
-		data_pendingPosts[k] = v
+		log.Fatal(err)
 	}
 
-	GetCookie(data_pendingPosts, r)
-	// Redirection pour ceux qui ne sont pas connecté
-	if data["user"] != nil {
-		CheckNotif(w, r, data_pendingPosts)
-		GetRole(data_pendingPosts, false, "")
-	}
-	if data_pendingPosts["cookieExist"] == false || data_pendingPosts["role"] == "user" {
-		http.Redirect(w, r, "/logIn", http.StatusSeeOther)
-	}
+	data_Info["commentsPosted"] = comments
 
-	post_accepted := r.FormValue("post-accepted")
-	id_pendingPost := r.FormValue("id-pendingPost")
-	// supprime ou déplace le post s'il est accepté ou non
-	if post_accepted != "" && id_pendingPost != "" {
-		PostAcceptedOrNot(post_accepted, id_pendingPost) // ./config/modifDB.go
-	}
-
-	// affiche le post
-	state = "pendingPosts"
-	DisplayPosts(r, data_pendingPosts, state) // ./config/post.go
-
-	t := template.New("pendingPosts-template")
-	t = template.Must(t.ParseFiles("./html/pendingPosts.html", "./html/header&footer.html"))
-	t.ExecuteTemplate(w, "pendingPosts", data_pendingPosts)
 }
