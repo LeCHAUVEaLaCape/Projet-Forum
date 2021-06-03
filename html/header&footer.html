@@ -16,17 +16,17 @@
           <a href="/allUsers" id="all-users">All Users</a>
           <a href="/newPost" id="post">Post</a>
           {{if or (eq .role "admin") (eq .role "moderator")}}
-          <a href="/pendingPosts">Pending Posts</a>
+          <a href="/pendingPosts" id="pending">Pending Posts</a>
           {{end}}
         </div>
         <div class="auth">
           {{if .cookieExist}}
-          <div>
+          <div >
             <a class="account" href="/user?user={{.user}}">{{.user}}</a>
             {{if eq .role "admin"}}
-            <div>Admin</div>
+            <div><img src="https://discord.com/assets/7d7c9561cc5ab5259ff8023b8ef86c99.svg" alt="admin"> Admin</div>
             {{else if eq .role "moderator"}}
-            <div>Moderator</div>
+            <div><img src="https://discord.com/assets/bd766f88fab518680708df9935b50e85.svg" alt="modo">Moderator</div>
             {{end}}
           </div>
           <div class="notif-bell">
@@ -46,7 +46,7 @@
 {{if .cookieExist}}
 <div class="notif-container">
   <div id="notif">
-    <h3>Vos notifications :</h3>
+    <h3>Vos Notifications :</h3>
     {{$lenNotif := len .notif}}
     <div id="all-notif">
       {{if gt $lenNotif 0}}
@@ -56,7 +56,7 @@
         <button><img id="del-notif" src="../assets/images/trash.png"></button>
       </form>
       {{range .notif}}
-      <p class="notif">{{index . 1}} a&nbsp;<span class="action">{{index . 2}}</span>&nbsp;votre&nbsp;<a href="/post?id={{index . 0}}">post</a></p>
+      <p class="notif"><strong>{{index . 1}}</strong> a&nbsp;<span class="action">{{index . 2}}</span>&nbsp;votre&nbsp;<a href="/post?id={{index . 0}}">post</a></p>
       {{end}}
       {{end}}
     </div>

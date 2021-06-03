@@ -28,7 +28,7 @@
       </form>
       <div data-aos="fade-up" data-aos-duration="3000"class="users-container">
         <div class="all-admin">
-          <h3>Tous les Admins</h3>
+          <h3><img src="https://discord.com/assets/7d7c9561cc5ab5259ff8023b8ef86c99.svg" alt="admin"> Admins</h3>
           <div class="container">
             {{$length := len .allAdmin}} 
             {{if gt $length 0}} 
@@ -39,7 +39,7 @@
           </div>
         </div>
         <div class="all-moderator">
-          <h3>Tous les modérateurs</h3>
+          <h3><img src="https://discord.com/assets/bd766f88fab518680708df9935b50e85.svg" alt="modo"> Moderators</h3>
           <div class="container">
             {{$length := len .allModerator}} 
             {{if gt $length 0}} 
@@ -50,7 +50,7 @@
           </div>
         </div>
         <div class="all-users">
-          <h3>Tous les utilisateurs</h3>
+          <h3><img src="https://discord.com/assets/f1719ecb228ce3c17b203ca4c15115c0.svg" alt="user"> Users</h3>
           <div class="container">
           {{$length := len .allUsers}} 
           {{if gt $length 0}} 
@@ -81,8 +81,8 @@
 {{define "aUser"}}
 {{range .}}
 <div class="user-card">
-  <a href="/user?user={{index . 0}}"> {{index . 0}} : </a>
-  {{index . 1}}
+    <a href="/user?user={{index . 0}}"> {{index . 0}} : </a>
+    <p>{{index . 1}}</p>
 </div>
 {{end}}
 {{end}}

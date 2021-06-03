@@ -228,6 +228,14 @@ func user(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/index", http.StatusSeeOther)
 	}
 
+	namereport := r.FormValue("namereport")
+	nameuser := r.FormValue("nameuser")
+
+	if namereport != "" && nameuser != "" {
+		Report(namereport, nameuser)
+
+	}
+
 	t := template.New("user-template")
 	t = template.Must(t.ParseFiles("./html/user.html", "./html/header&footer.html"))
 	t.ExecuteTemplate(w, "user", data_user)
@@ -666,7 +674,6 @@ func createdposts(data_Info map[string]interface{}, state string) {
 	}
 
 	data_Info["all_myPosts"] = all_myPosts
-
 }
 
 func feed(data_Info map[string]interface{}) {
@@ -750,7 +757,53 @@ func Dashboard(w http.ResponseWriter, r *http.Request) {
 	ResquestForModo(r)
 	DisplayAdminModo(&data_dashboard)
 	DisplayPendingForModo(&data_dashboard)
+	selectReport(data_dashboard)
+	fmt.Println(data_dashboard["report"])
 	t := template.New("dashboard-template")
 	t = template.Must(t.ParseFiles("./html/dashboard.html", "./html/header&footer.html"))
 	t.ExecuteTemplate(w, "dashboard", data_dashboard)
+}
+func Report(namereport string, nameuser string) {
+	// Open the database
+	var nameUser string
+	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	defer database.Close()
+	//verify if the user is already in the table
+	rows_double, _ := database.Query("SELECT nameUser FROM report")
+	defer rows_double.Close()
+	for rows_double.Next() {
+		err := rows_double.Scan(&nameUser)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if nameUser == nameUser {
+			return
+		}
+	}
+	tx, err := database.Begin()
+	checkError(err)
+	stmt, err := tx.Prepare("INSERT INTO report ( nameReporter, nameUser) VALUES (?,?)")
+	checkError(err)
+	_, err = stmt.Exec(namereport, nameuser)
+	checkError(err)
+
+	tx.Commit()
+}
+func selectReport(data_dashboard map[string]interface{}) {
+	// Open the database
+	var slicereport [2]string
+	var all_Report [][2]string
+	database_report, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	defer database_report.Close()
+	rows_report, _ := database_report.Query("SELECT nameReporter, nameUser FROM report")
+	defer rows_report.Close()
+	for rows_report.Next() {
+		err := rows_report.Scan(&slicereport[0], &slicereport[1])
+		if err != nil {
+			log.Fatal(err)
+		}
+		all_Report = append(all_Report, slicereport)
+
+	}
+	data_dashboard["report"] = all_Report
 }
