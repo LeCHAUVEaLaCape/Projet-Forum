@@ -179,14 +179,12 @@ input:focus{
   margin-bottom: 20px;
 }
 .logIn a {
-  color: #DFA003;
+  color: blue;
   cursor: pointer;
   text-decoration: underline;
 }
 .logIn a:hover {
-  background: -webkit-linear-gradient(#DFA003, brown, yellow);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: darkblue;
   cursor: pointer;
   text-decoration: underline;
   font-size: 18px;

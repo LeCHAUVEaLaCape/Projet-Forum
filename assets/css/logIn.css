@@ -172,14 +172,14 @@ span {
   font-family: 'Merriweather', serif;
 }
 .create-account a {
-  color: #DFA003;
+  color: blue;
   text-decoration: underline;
   font-style: italic;
   font-size: 16px;
   font-family: 'Merriweather', serif;
 }
 .create-account a:hover {
-  filter: brightness(130%);
+  color: darkblue;
 }
 
 .wrong-username,
@@ -190,18 +190,18 @@ span {
 
 .wrong-username a,
 .wrong-password a {
-  color: #DFA003;
+  color: blue;
   text-decoration: underline;
   font-family: 'Merriweather', serif;
   font-style: italic;
 }
 .wrong-username a:hover,
 .wrong-password a:hover {
-  filter: brightness(130%);
+  color: darkblue;
 }
 .wrong-username p,
 .wrong-password p {
-  color: #e70808;
+  color: #DFA003;
   font-family: 'Merriweather', serif;
   font-style: italic;
 }
