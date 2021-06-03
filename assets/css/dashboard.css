@@ -1,0 +1,10 @@
+.report-container {
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+.report-container h2{
+    font-size: 25px;
+}

@@ -366,21 +366,21 @@
         </div>
       </div>
       {{end}}
+      <!------------
+          Report un utilisateur ou modérateur (visible que par les modérateurs)
+       ------------->
       {{if and (eq .role "moderator") (ne .username .user)}}
       <div class="report">
         <form action="" method="post">
-          <input type="hidden" name="nameuser" value="{{.username}}">
-          <input type="hidden" name="namereport" value="{{.user}}">
+          <input type="hidden" name="nameUser" value="{{.username}}">
+          <input type="hidden" name="nameReporter" value="{{.user}}">
+          <input type="text" name="reasonReport">
         <button>report</button>
       </form>
       </div>
-      
-      
       {{end}}
-
     </div>
   </div>
-
   {{template "footer"}}
 </body>
 

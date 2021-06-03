@@ -36,7 +36,7 @@ func CreateDB() {
 	CheckError(err)
 	statement.Exec()
 	// Create report table in the database
-	statement, err = database.Prepare("CREATE TABLE IF NOT EXISTS report (nameReporter TEXT, nameUser TEXT)")
+	statement, err = database.Prepare("CREATE TABLE IF NOT EXISTS report (nameUser TEXT, reasonReport TEXT, answerReport TEXT, reported TEXT, nameReporter TEXT)")
 	CheckError(err)
 	statement.Exec()
 }

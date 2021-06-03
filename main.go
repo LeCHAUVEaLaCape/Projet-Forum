@@ -228,12 +228,12 @@ func user(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/index", http.StatusSeeOther)
 	}
 
-	namereport := r.FormValue("namereport")
-	nameuser := r.FormValue("nameuser")
+	nameUser := r.FormValue("nameUser")
+	nameReporter := r.FormValue("nameReporter")
+	reasonReport := r.FormValue("reasonReport")
 
-	if namereport != "" && nameuser != "" {
-		Report(namereport, nameuser)
-
+	if nameUser != "" && nameReporter != "" && reasonReport != "" {
+		Report(nameUser, nameReporter, reasonReport)
 	}
 
 	t := template.New("user-template")
@@ -548,6 +548,8 @@ func pendingPosts(w http.ResponseWriter, r *http.Request) {
 	t = template.Must(t.ParseFiles("./html/pendingPosts.html", "./html/header&footer.html"))
 	t.ExecuteTemplate(w, "pendingPosts", data_pendingPosts)
 }
+
+// get all posts liked by Someone
 func LikedPosts(data_Info map[string]interface{}, state string) {
 
 	var all_myLikedPosts [][]interface{}
@@ -623,6 +625,8 @@ func LikedPosts(data_Info map[string]interface{}, state string) {
 
 	data_Info["all_myLikedPosts"] = all_myLikedPosts
 }
+
+// get all posts created by someone
 func createdposts(data_Info map[string]interface{}, state string) {
 	var all_myPosts [][]interface{}
 
@@ -676,6 +680,7 @@ func createdposts(data_Info map[string]interface{}, state string) {
 	data_Info["all_myPosts"] = all_myPosts
 }
 
+// get all posts liked/created/commented by someone
 func feed(data_Info map[string]interface{}) {
 	//Show the liked post by the user
 	LikedPosts(data_Info, "feedlike")
@@ -738,8 +743,9 @@ func feed(data_Info map[string]interface{}) {
 	}
 
 	data_Info["commentsPosted"] = comments
-
 }
+
+// page to see whose asking to be moderator and the reports
 func Dashboard(w http.ResponseWriter, r *http.Request) {
 	data_dashboard := make(map[string]interface{})
 	for k, v := range data {
@@ -758,47 +764,65 @@ func Dashboard(w http.ResponseWriter, r *http.Request) {
 	DisplayAdminModo(&data_dashboard)
 	DisplayPendingForModo(&data_dashboard)
 	selectReport(data_dashboard)
-	fmt.Println(data_dashboard["report"])
+
+	// get input of the admin that accept or not the report
+	answerReport := r.FormValue("answerReport")
+	nameReported := r.FormValue("nameReported")
+	reportAccepted := r.FormValue("reportAccepted") // /!\ checkbox
+
+	if answerReport != "" && nameReported != "" {
+		if reportAccepted == "" {
+			reportAccepted = "0"
+		}
+		deleteUserFromReport(answerReport, nameReported, reportAccepted)
+	}
+
 	t := template.New("dashboard-template")
 	t = template.Must(t.ParseFiles("./html/dashboard.html", "./html/header&footer.html"))
 	t.ExecuteTemplate(w, "dashboard", data_dashboard)
 }
-func Report(namereport string, nameuser string) {
+
+// add the report to the database
+func Report(nameUser string, nameReporter string, reasonReport string) {
 	// Open the database
-	var nameUser string
+	var nameReported string
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
 	defer database.Close()
 	//verify if the user is already in the table
 	rows_double, _ := database.Query("SELECT nameUser FROM report")
 	defer rows_double.Close()
 	for rows_double.Next() {
-		err := rows_double.Scan(&nameUser)
+		err := rows_double.Scan(&nameReported)
 		if err != nil {
 			log.Fatal(err)
 		}
-		if nameUser == nameUser {
+		if nameReported == nameUser {
 			return
 		}
 	}
+
+	// add the user to the table report
 	tx, err := database.Begin()
 	checkError(err)
-	stmt, err := tx.Prepare("INSERT INTO report ( nameReporter, nameUser) VALUES (?,?)")
+	stmt, err := tx.Prepare("INSERT INTO report (nameUser, reasonReport, answerReport, reported, nameReporter) VALUES (?,?,'','',?)")
 	checkError(err)
-	_, err = stmt.Exec(namereport, nameuser)
+	_, err = stmt.Exec(nameUser, reasonReport, nameReporter)
 	checkError(err)
 
 	tx.Commit()
 }
+
+// get all the report pending
 func selectReport(data_dashboard map[string]interface{}) {
+	var slicereport [3]string
+	var all_Report [][3]string
 	// Open the database
-	var slicereport [2]string
-	var all_Report [][2]string
 	database_report, _ := sql.Open("sqlite3", "./db-sqlite.db")
 	defer database_report.Close()
-	rows_report, _ := database_report.Query("SELECT nameReporter, nameUser FROM report")
+	rows_report, _ := database_report.Query("SELECT nameReporter, nameUser, reasonReport FROM report WHERE reported = ?", "")
 	defer rows_report.Close()
 	for rows_report.Next() {
-		err := rows_report.Scan(&slicereport[0], &slicereport[1])
+		err := rows_report.Scan(&slicereport[0], &slicereport[1], &slicereport[2])
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -806,4 +830,24 @@ func selectReport(data_dashboard map[string]interface{}) {
 
 	}
 	data_dashboard["report"] = all_Report
+}
+
+func deleteUserFromReport(answerReport string, nameReported string, reportAccepted string) {
+	// Open the database
+	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	defer database.Close()
+
+	// if the report is accepted from the admnin
+	if reportAccepted == "1" {
+		// delete everything from this user
+		DelAccount(nameReported)
+		// Update the db report
+		tx, err := database.Begin()
+		checkError(err)
+		stmt, err := tx.Prepare("UPDATE report SET answerReport = ?, reported = ? WHERE nameUser = ?")
+		checkError(err)
+		_, err = stmt.Exec(answerReport, "reportAccepted", nameReported)
+		checkError(err)
+		tx.Commit()
+	}
 }

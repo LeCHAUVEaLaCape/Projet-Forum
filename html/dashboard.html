@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forum - Dashboard</title>
     <link rel="stylesheet" href="../assets/css/index.css" />
+    <link rel="stylesheet" href="../assets/css/dashboard.css" />
 </head>
 <body>
     
@@ -57,11 +58,31 @@
             {{end}}
             </form>
         </section>
-        {{range .report}}
-        <h2>Celui qui report</h2>
-        {{index . 0}}
-        <h2>Celui signalé</h2>
-        {{index . 1}}
+        {{if eq .role "admin"}}
+        <div class="report-container">
+            {{range .report}}
+            <div class="report">
+                <div class="reporter">
+                    <h2>Celui qui report</h2>
+                    {{index . 0}}
+                </div>
+                <div class="user-reported">
+                    <h2>Celui signalé</h2>
+                    {{index . 1}}
+                </div>
+                <div class="reason-reported">
+                    <h2>raison</h2>
+                    {{index . 2}}
+                </div>
+            </div>
+            <form action="" method="POST">
+                <input type="text" name="answerReport">
+                <input type="hidden" name="nameReported" value="{{index . 1}}">
+                <input type="checkbox" name="reportAccepted" value="1">
+                <button>Submit</button>
+            </form>
+            {{end}}
+        </div>
         {{end}}
     </div>
 {{template "footer"}}
