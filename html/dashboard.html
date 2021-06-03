@@ -57,6 +57,12 @@
             {{end}}
             </form>
         </section>
+        {{range .report}}
+        <h2>Celui qui report</h2>
+        {{index . 0}}
+        <h2>Celui signalé</h2>
+        {{index . 1}}
+        {{end}}
     </div>
 {{template "footer"}}
 </body>

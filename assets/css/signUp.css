@@ -174,14 +174,16 @@ input:focus{
   outline: none;
 }
 .logIn {
-  font-size: 14px;
+  font-size: 20px;
   padding: 20px;
   margin-bottom: 20px;
+  font-family: 'Merriweather', serif;
 }
 .logIn a {
   color: blue;
   cursor: pointer;
   text-decoration: underline;
+
 }
 .logIn a:hover {
   color: darkblue;

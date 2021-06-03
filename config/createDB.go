@@ -35,4 +35,8 @@ func CreateDB() {
 	statement, err = database.Prepare("CREATE TABLE IF NOT EXISTS pendingForModerator (username TEXT)")
 	CheckError(err)
 	statement.Exec()
+	// Create report table in the database
+	statement, err = database.Prepare("CREATE TABLE IF NOT EXISTS report (nameReporter TEXT, nameUser TEXT)")
+	CheckError(err)
+	statement.Exec()
 }
