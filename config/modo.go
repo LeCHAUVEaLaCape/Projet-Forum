@@ -2,6 +2,7 @@ package config
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 
 	erreur "./err"
@@ -60,6 +61,7 @@ func ResquestForModo(r *http.Request) {
 			return
 		}
 	}
+	fmt.Println(username)
 	rows.Close()
 	// add the inputs to the database
 	tx, err := database.Begin()

@@ -97,13 +97,11 @@ span {
 }
 .enter-username input:hover,
 .enter-password input:hover {
-  cursor: pointer;
   box-shadow: 0px 0px 8px #000000 ,2px 2px 10px #DFA003 ;
 
 }
 .enter-username input:focus,
 .enter-password input:focus {
-  cursor: pointer;
   box-shadow: 0px 0px 8px #000000 ,2px 2px 10px #DFA003 ;
   outline: none;
 }
@@ -127,6 +125,7 @@ span {
   cursor: pointer;
   position: relative;
   background: linear-gradient(45deg, #DFA003, brown, yellow, brown , #DFA003);
+  overflow: hidden;
 }
 .submit button::before {
   content: "";

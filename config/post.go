@@ -135,10 +135,10 @@ func Display_post_comment(post_id string, data_post map[string]interface{}, body
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
 	defer database.Close()
 	//range over database
-	rows, _ := database.Query("SELECT id, title, body, author, date, like FROM posts WHERE id = ?", post_id)
+	rows, _ := database.Query("SELECT id, title, body, author, date, like, dislike FROM posts WHERE id = ?", post_id)
 	defer rows.Close()
 	for rows.Next() {
-		err := rows.Scan(&post[0], &post[1], &body, &post[3], &post[4], &post[6])
+		err := rows.Scan(&post[0], &post[1], &body, &post[3], &post[4], &post[6], &post[7])
 		CheckError(err)
 	}
 	// Remplace les \n par des <br> pour sauter des lignes en html

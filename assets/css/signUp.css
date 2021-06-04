@@ -113,13 +113,11 @@ input {
 }
 
 input:hover{
-  cursor: pointer;
   box-shadow: 0px 0px 8px #000000 ,2px 2px 10px #DFA003 ;
   background-color: black;
   transform:skewY(-0.5deg);
 }
 input:focus{
-  cursor: pointer;
   box-shadow: 0px 0px 8px #000000 ,2px 2px 10px #DFA003 ;
   background-color: black;
   outline: none;

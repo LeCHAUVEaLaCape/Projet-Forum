@@ -228,10 +228,13 @@ func user(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/index", http.StatusSeeOther)
 	}
 
+	// Add the user that ask for being moderator
+	ResquestForModo(r)
+
+	// Add the user when a moderator reports him
 	nameUser := r.FormValue("nameUser")
 	nameReporter := r.FormValue("nameReporter")
 	reasonReport := r.FormValue("reasonReport")
-
 	if nameUser != "" && nameReporter != "" && reasonReport != "" {
 		Report(nameUser, nameReporter, reasonReport)
 	}
@@ -409,7 +412,6 @@ func post(w http.ResponseWriter, r *http.Request) {
 	// ajoute les personnes qui ont liké le post principal
 	likedBy = strings.ReplaceAll(likedBy, " ", "<br>")
 	data_post["mainPost_likedBy"] = likedBy
-
 	// ajoute les personnes qui ont disliké le post principal
 	dislikedBy = strings.ReplaceAll(dislikedBy, " ", "<br>")
 	data_post["mainPost_dislikedBy"] = dislikedBy
@@ -760,7 +762,6 @@ func Dashboard(w http.ResponseWriter, r *http.Request) {
 	}
 	RefuserDemande(w, r)
 	AccepterDemande(w, r)
-	ResquestForModo(r)
 	DisplayAdminModo(&data_dashboard)
 	DisplayPendingForModo(&data_dashboard)
 	selectReport(data_dashboard)

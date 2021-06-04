@@ -1,10 +1,115 @@
-.report-container {
+.full-screen {
+    display: flex;
+    margin-top: 50px;
+}
+#dashboard {
+    text-align: center;
+}
+.all-screen {
     width: 100vw;
+}
+.left-screen {
+    width: 50vw;
+    border-right: solid 1px;
+}
+section {
+    justify-content: center;
+}
+.all-demands {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 50px;
+    width: 70%;
+}
+#lower-section {
+    min-height: 270px;
+    margin-top: 50px;
+    border-top: solid 1px black;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding-top: 40px;
+}
+.demand {
+    display: flex;
+    justify-content: center;
+}
+.demand form {
+    margin: 10px;
+}
+.demand button {
+    font-size: 17px;
+    padding: 4px;
+}
+.single-demand {
+    padding: 10px;
+    border: solid 1px black;
+    border-radius: 9px;
+    margin: 10px;
+    width: 40%;
+}
+section div, section h2 {
+    text-align: center;
+}
+#report-txt {
+    margin-top: 50px;
+}
+.report-container-container {
+    width: 50vw;
     display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
 }
+.report-container {
+    border-right: solid 1px black;
+    padding: 15px;
+}
 .report-container h2{
     font-size: 25px;
+}
+#report-txt {
+    text-align: center;
+}
+.report-action a, .single-demand a{
+    color: blue;
+    text-decoration: underline;
+}
+.report-action p {
+    margin: 10px 0px;
+}
+.reason-reported {
+    background-color: white;
+    border: solid 1px black;
+    border-radius: 5px;
+}
+.answer-report {
+    display: grid;
+    place-items: center;
+    padding: 15px;
+}
+.answer-report button {
+    font-size: 17px;    
+}
+.single-report-container {
+    display: flex;
+    border: solid 1px black;
+    border-radius: 5px;
+    padding: 10px;
+    margin: 35px 0px;
+}
+#check-report {
+    cursor: pointer;
+    height: 17px;
+    width: 17px;
+}
+.input-txt {
+    width: 200px;
+    height: 25px;
+}
+button {
+    cursor: pointer;
 }

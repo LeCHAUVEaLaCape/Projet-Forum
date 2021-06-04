@@ -55,7 +55,6 @@ section {
   border-radius: 10px;
 }
 .search div input:hover{
-  cursor: pointer;
   box-shadow: 0px 0px 8px #000000 ,5px 5px 10px #DFA003 ;
   background-color: black;
 }
@@ -84,7 +83,6 @@ section {
   box-shadow: 0px 0px 8px #000000 ,5px 5px 10px #DFA003 ;
   color: black;
   background: linear-gradient(45deg, #DFA003, brown, yellow, brown , #DFA003);
-  cursor: pointer;
 }
 .search div button::before{
   content: "";

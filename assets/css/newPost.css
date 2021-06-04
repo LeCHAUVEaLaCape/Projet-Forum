@@ -2,86 +2,218 @@ body,
 * {
   margin: 0;
   padding: 0;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   color: black;
   text-decoration: none;
   overflow-x: hidden;
 }
-.page {
-  height: 1000px;
+section{
+  height: 100vh;
   width: 100vw;
+  
+}
+.page {
+  overflow: hidden;
+  min-height: 100%;
+  width: 80%;
+  margin-left: 10%;
   background-color: #eee;
-  padding-top: 130px;
-  font-size: 20px;
+  border-style: solid;
+  border-width: 4px;
+  border-image: linear-gradient(to bottom, #DFA003, brown, yellow, brown, #DFA003) 1 100%;
 }
 .title {
+  margin-top: 150px;
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-wrap: wrap;
+  text-align: center;
+}
+.title label{
+  font-size: 60px;
+  font-family:"Modusa";
+  border-bottom-style: solid;
+  border-width: 2px;
+  border-image: linear-gradient(45deg, #DFA003, brown, yellow, brown, #DFA003) 1 ;
+
 }
 .title div {
   width: 500px;
-  text-align: center;
+  height: 200px;
 }
 .title input {
-  width: 99%;
+  margin-top: 30px;
+  height: 30px;
+  width: 490px;
+  font-family: 'Merriweather', serif;
+  border-style: solid;
+  border-width: 2px;
+  border-image: linear-gradient(45deg, #DFA003, brown, yellow, brown , #DFA003) 1;
+  background-color: white;
+  color: black;
+  border-radius: 10px;
+}
+.title input:hover{
+  box-shadow: 0px 0px 8px #000000 ,0px 0px 10px #DFA003 ;
+}
+.title input:focus{
+  outline: none;
+  box-shadow: 0px 0px 8px #000000 ,0px 0px 10px #DFA003 ;
 }
 .body {
-  min-height: 650px;
   display: flex;
   justify-content: center;
-  flex-wrap: wrap;
+  align-items: center;
+  text-align: center;
+}
+.body label {
+  font-size: 60px;
+  font-family:"Modusa";
+  border-bottom-style: solid;
+  border-width: 2px;
+  border-image: linear-gradient(45deg, #DFA003, brown, yellow, brown, #DFA003) 1 ;
 }
 .body-container {
   width: 500px;
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-top: 50px;
+  height: 200px;
+  min-height: 600px;
 }
 .body textarea {
-  width: 100%;
-  height: 90%;
+  margin-top: 30px;
+  width: 490px;
+  height: 450px;
+  font-family: 'Merriweather', serif;
+  border-style: solid;
+  border-width: 2px;
+  border-image: linear-gradient(45deg, #DFA003, brown, yellow, brown , #DFA003) 1;
+  background-color: white;
+  color: black;
+  border-radius: 10px;
   resize: none;
+}
+.body textarea:hover{
+  box-shadow: 0px 0px 8px #000000 ,0px 0px 10px #DFA003 ;
+}
+.body textarea:focus {
+  outline: none;
+  box-shadow: 0px 0px 8px #000000 ,0px 0px 10px #DFA003 ;
+
 }
 .button {
   display: flex;
   justify-content: center;
+  align-items: center;
+  height: 150px;
 }
 .button button {
-  height: 40px;
-  width: 80px;
-  font-size: 20px;
-  cursor: pointer;
+  transition: all 0.3s;
+  text-decoration: none;
+  border: solid 2px black;
+  border-radius: 10px;
+  height: 100px;
+  padding: 10px 10px 10px 10px;
+  overflow: hidden;
+  font-family: "Modusa";
+  font-size: 30px;
+  background-color: white;
+  color: black;
 }
-.all-check {
-  width: 100vw;
+.button button:hover{
+  box-shadow: 0px 0px 8px #000000 ,0px 0px 10px #DFA003 ;
+  background: linear-gradient(45deg, #DFA003, brown, yellow, brown , #DFA003);
+  cursor: pointer;
+
+}
+.uploading{
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
+  height: 100px;
+}
+.uploading p{
+  font-size: 30px;
+  text-align: center;
+  text-transform: capitalize;
+  font-family: 'Merriweather', serif;
+  font-weight: bold;
+  border-bottom-style: solid;
+  border-width: 1px;
+  border-image: linear-gradient(45deg, #DFA003, brown, yellow, brown , #DFA003) 1;
+  margin-bottom: 12px;
+}
+.uploading label{
+  transition: all 0.3s;
+  font-size: 18px;
+  font-family: 'Merriweather', serif;
+  font-weight: bold;
+  border: solid 2px black;
+  padding: 5px 5px 5px 5px;
+  border-radius: 10%;
+  background-color: white;
+}
+.uploading label:hover{
+  box-shadow: 0px 0px 8px #000000 ,0px 0px 10px #DFA003 ;
+  background: linear-gradient(45deg, #DFA003, brown, yellow, brown , #DFA003);
+  cursor: pointer;
+}
+.uploading input{
+  display: none;
+
+}
+.all-check {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 30px 0px 30px 0px;
 }
 .all-check div {
-  margin: 50px 0px 50px 0px;
-  width: 620px;
+  width: 500px;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
 }
 .checkbox {
-  width: 33% !important;
-  margin: 0px !important;
-}
-.checkbox div {
-  margin: 0px !important;
+  width: 30% !important;
 }
 .checkbox p {
   width: 120px;
+  font-size: 18px;
   margin-left: 10px;
   text-align: center;
   text-transform: capitalize;
+  font-family: 'Merriweather', serif;
+  font-weight: bold;
 }
 .checkbox input {
   cursor: pointer;
+  width: 12px;
+
+}
+.checkbox input:hover{
+  cursor: pointer;
+  width: 20px;
+}
+/* 
++----------------------------------------------------------------------+
+| Scroll Bar
++----------------------------------------------------------------------+
+*/
+::-webkit-scrollbar {
+  width: 10px;
+  background-color: white;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgb(0, 0, 0);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #DFA003;
+}
+
+::-webkit-scrollbar-button {
+  height: 8px;
+  background-color: black;
 }
