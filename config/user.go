@@ -14,7 +14,8 @@ var username, email string
 // Fill the database with the input of the users
 func AddUser(input_username string, input_email string, input_password string, info map[string]interface{}) {
 	// Open the database
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	database, err := sql.Open("sqlite3", "./db-sqlite.db")
+	CheckError(err)
 	defer database.Close()
 
 	// range over the database and check if there is double username/email
@@ -26,10 +27,12 @@ func AddUser(input_username string, input_email string, input_password string, i
 		if username == input_username {
 			info["username_used"] = true
 			fmt.Println("Username :", input_username+" déjà utilisé")
+			rows.Close()
 			return
 		} else if email == input_email {
 			info["email_used"] = true
 			fmt.Println("Email :", input_email+" déjà utilisé")
+			rows.Close()
 			return
 		}
 	}
@@ -64,12 +67,14 @@ func AddUser(input_username string, input_email string, input_password string, i
 // Envoie le role de l'utilisateur connecté à la page
 func GetRole(data_info map[string]interface{}, on_user_page bool, user_page string) {
 	// Open the database
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	database, err := sql.Open("sqlite3", "./db-sqlite.db")
+	CheckError(err)
 	defer database.Close()
 
 	var role string
 	// Prend le role de la personne connecté
-	rows, _ := database.Query("SELECT role FROM users WHERE username = ?", data_info["user"])
+	rows, err := database.Query("SELECT role FROM users WHERE username = ?", data_info["user"])
+	CheckError(err)
 	for rows.Next() {
 		rows.Scan(&role)
 	}
@@ -78,11 +83,12 @@ func GetRole(data_info map[string]interface{}, on_user_page bool, user_page stri
 
 	// Lorsque la page actuelle est le profil d'un utilisateur : Prend le role de cet utilisateur
 	if on_user_page && user_page != "" {
-		rows, _ := database.Query("SELECT role FROM users WHERE username = ?", user_page)
+		rows, err := database.Query("SELECT role FROM users WHERE username = ?", user_page)
+		CheckError(err)
 		for rows.Next() {
 			rows.Scan(&role)
 		}
-		rows.Close()
+		defer rows.Close()
 		data_info["roleUserPage"] = role
 	}
 }
@@ -90,8 +96,8 @@ func GetRole(data_info map[string]interface{}, on_user_page bool, user_page stri
 // Affiche les notifications de l'utilisateur s'il y en a
 func CheckNotif(w http.ResponseWriter, r *http.Request, data_notif map[string]interface{}) {
 	// Open the database
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
-	defer database.Close()
+	database, err := sql.Open("sqlite3", "./db-sqlite.db")
+	CheckError(err)
 
 	var notification string
 	var arrNotification []string
@@ -114,7 +120,6 @@ func CheckNotif(w http.ResponseWriter, r *http.Request, data_notif map[string]in
 			arr_notif = append(arr_notif, test)
 		}
 	}
-	rows.Close()
 	err = rows.Err()
 	CheckError(err)
 
@@ -131,6 +136,10 @@ func CheckNotif(w http.ResponseWriter, r *http.Request, data_notif map[string]in
 		_, err = stmt.Exec("", userToDel)
 		CheckError(err)
 		tx.Commit()
+		rows.Close()
+		database.Close()
 		http.Redirect(w, r, r.Header.Get("Referer"), 302)
 	}
+	rows.Close()
+	database.Close()
 }

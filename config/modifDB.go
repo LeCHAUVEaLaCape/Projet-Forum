@@ -40,26 +40,21 @@ func UpdateInfoUsers(w http.ResponseWriter, r *http.Request, id int) {
 	change_photo := r.FormValue("photo")
 	user := r.FormValue("user")
 
-	var state string
 	// add the input to his data in the DB
 	if add_few_words != "" {
-		state = "fewWords"
-		UpdateInfoUser(add_few_words, state, user)
+		UpdateInfoUser(add_few_words, "fewWords", user)
 		http.Redirect(w, r, "/user?user="+username, http.StatusSeeOther)
 	}
 	if add_address != "" {
-		state = "address"
-		UpdateInfoUser(add_address, state, user)
+		UpdateInfoUser(add_address, "address", user)
 		http.Redirect(w, r, "/user?user="+username, http.StatusSeeOther)
 	}
 	if add_age != "" {
-		state = "age"
-		UpdateInfoUser(add_age, state, user)
+		UpdateInfoUser(add_age, "age", user)
 		http.Redirect(w, r, "/user?user="+username, http.StatusSeeOther)
 	}
 	if change_photo != "" {
-		state = "photo"
-		UpdateInfoUser(change_photo, state, user)
+		UpdateInfoUser(change_photo, "photo", user)
 		http.Redirect(w, r, "/user?user="+username, http.StatusSeeOther)
 	}
 }
@@ -67,7 +62,6 @@ func UpdateInfoUsers(w http.ResponseWriter, r *http.Request, id int) {
 func UpdateInfoUser(input string, state string, user string) {
 	// Open the database
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
-	defer database.Close()
 
 	tx, err := database.Begin()
 	CheckError(err)
@@ -77,6 +71,7 @@ func UpdateInfoUser(input string, state string, user string) {
 	_, err = stmt.Exec(input, user)
 	CheckError(err)
 	tx.Commit()
+	database.Close()
 }
 
 func ModifPostAndComment(modif_post string, id_mainPost string, modif_comment string, id_comment string) {
@@ -105,7 +100,8 @@ func ModifPostAndComment(modif_post string, id_mainPost string, modif_comment st
 
 // Supprime le compte et remplace le auteurs des posts et commentaires par "user deleted"
 func DelAccount(delete_account string) {
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	database, err := sql.Open("sqlite3", "./db-sqlite.db")
+	CheckError(err)
 	defer database.Close()
 
 	tx, err := database.Begin()
@@ -136,20 +132,22 @@ func DelAccount(delete_account string) {
 
 // Supprime ou déplace le post s'il a été accepté ou non
 func PostAcceptedOrNot(post_accepted string, id_pendingPost string) {
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	database, err := sql.Open("sqlite3", "./db-sqlite.db")
+	CheckError(err)
 	defer database.Close()
 
 	tx, err := database.Begin()
 	// Accepter le post et le transferer jusqu'a la BDD posts
 	if post_accepted == "true" {
 		var transfer_post [10]string
-		rows, _ := database.Query("SELECT title, body, like, author, date, category, likedBy, nbComments, dislikedBy, image FROM pendingPosts WHERE id = " + id_pendingPost)
+		rows, err := database.Query("SELECT title, body, like, author, date, category, likedBy, nbComments, dislikedBy, image FROM pendingPosts WHERE id = " + id_pendingPost)
+		CheckError(err)
 		for rows.Next() {
 			rows.Scan(&transfer_post[0], &transfer_post[1], &transfer_post[2], &transfer_post[3], &transfer_post[4], &transfer_post[5], &transfer_post[6], &transfer_post[7], &transfer_post[8], &transfer_post[9])
 		}
 		rows.Close()
 		// add the inputs to the database
-		stmt, err := tx.Prepare("INSERT INTO posts (title, body, like, author, date, category, likedBy, nbComments, dislikedBy, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+		stmt, err := tx.Prepare("INSERT INTO posts (title, body, like, author, date, category, likedBy, nbComments, dislikedBy, image, dislike) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)")
 		CheckError(err)
 		_, err = stmt.Exec(transfer_post[0], transfer_post[1], transfer_post[2], transfer_post[3], transfer_post[4], transfer_post[5], transfer_post[6], transfer_post[7], &transfer_post[8], &transfer_post[9])
 		CheckError(err)
@@ -164,7 +162,6 @@ func PostAcceptedOrNot(post_accepted string, id_pendingPost string) {
 	_, err = stmt.Exec(id_pendingPost)
 	CheckError(err)
 	tx.Commit()
-
 }
 
 // Modifie le role d'un utilisateur quand un Admin le veut
@@ -174,8 +171,8 @@ func ChangeRole(w http.ResponseWriter, r *http.Request) {
 
 	if newRole != "" && user_to_modify_role != "" {
 		// Open the database
-		database, _ := sql.Open("sqlite3", "./db-sqlite.db")
-		defer database.Close()
+		database, err := sql.Open("sqlite3", "./db-sqlite.db")
+		CheckError(err)
 
 		tx, err := database.Begin()
 		CheckError(err)
@@ -185,6 +182,7 @@ func ChangeRole(w http.ResponseWriter, r *http.Request) {
 		_, err = stmt.Exec(newRole, user_to_modify_role)
 		CheckError(err)
 		tx.Commit()
+		database.Close()
 		http.Redirect(w, r, r.Header.Get("Referer"), 302)
 	}
 }

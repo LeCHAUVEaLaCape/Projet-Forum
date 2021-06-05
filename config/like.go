@@ -46,12 +46,15 @@ func CheckIfLikedByUser(post_id string, data_post map[string]interface{}) (bool,
 	}
 
 	// Open the database
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	database, err := sql.Open("sqlite3", "./db-sqlite.db")
+	CheckError(err)
 	defer database.Close()
 
 	// créer un string des personnes qui ont liké
 	var likedBy string
-	rows, _ := database.Query("SELECT likedBy FROM posts WHERE id = ?", post_id)
+	rows, err := database.Query("SELECT likedBy FROM posts WHERE id = ?", post_id)
+	CheckError(err)
+	defer rows.Close()
 	for rows.Next() {
 		err := rows.Scan(&likedBy)
 		CheckError(err)
@@ -77,12 +80,14 @@ func AddLike(post_id string, data_post map[string]interface{}, likedBy string, n
 	user := data_post["user"].(string)
 
 	// Open the database
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	database, err := sql.Open("sqlite3", "./db-sqlite.db")
+	CheckError(err)
 
 	tx, err := database.Begin()
 	CheckError(err)
 	// Ajoute +1 like des POSTS
-	rows, _ := database.Query("SELECT like FROM posts WHERE id = ?", post_id)
+	rows, err := database.Query("SELECT like FROM posts WHERE id = ?", post_id)
+	CheckError(err)
 	for rows.Next() {
 		err := rows.Scan(&like)
 		CheckError(err)
@@ -109,6 +114,7 @@ func AddLike(post_id string, data_post map[string]interface{}, likedBy string, n
 	_, err = stmt.Exec(likedBy)
 	CheckError(err)
 	tx.Commit()
+	rows.Close()
 	database.Close()
 
 	UpdateNotif(notif)
@@ -121,12 +127,15 @@ func RemoveLike(post_id string, data_post map[string]interface{}, likedBy string
 	user := data_post["user"].(string)
 
 	// Open the database
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	database, err := sql.Open("sqlite3", "./db-sqlite.db")
+	CheckError(err)
 	defer database.Close()
 
 	tx, err := database.Begin()
 	// delete a like
-	rows, _ := database.Query("SELECT like FROM posts WHERE id = ?", post_id)
+	rows, err := database.Query("SELECT like FROM posts WHERE id = ?", post_id)
+	CheckError(err)
+	defer rows.Close()
 	for rows.Next() {
 		err := rows.Scan(&like)
 		CheckError(err)
@@ -163,7 +172,8 @@ func RemoveLike(post_id string, data_post map[string]interface{}, likedBy string
 
 func UpdateNotif(notif Notif) {
 	// Open the database
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	database, err := sql.Open("sqlite3", "./db-sqlite.db")
+	CheckError(err)
 	defer database.Close()
 
 	var notification string
@@ -219,12 +229,15 @@ func CheckIfdisLikedByUser(post_id string, data_post map[string]interface{}) (bo
 	}
 
 	// Open the database
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	database, err := sql.Open("sqlite3", "./db-sqlite.db")
+	CheckError(err)
 	defer database.Close()
 
 	// créer un string des personnes qui ont liké
 	var dislikedBy string
-	rows, _ := database.Query("SELECT dislikedBy FROM posts WHERE id = ?", post_id)
+	rows, err := database.Query("SELECT dislikedBy FROM posts WHERE id = ?", post_id)
+	CheckError(err)
+	defer rows.Close()
 	for rows.Next() {
 		err := rows.Scan(&dislikedBy)
 		CheckError(err)
@@ -250,12 +263,14 @@ func AddDisLike(post_id string, data_post map[string]interface{}, dislikedBy str
 	user := data_post["user"].(string)
 
 	// Open the database
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	database, err := sql.Open("sqlite3", "./db-sqlite.db")
+	CheckError(err)
 
 	tx, err := database.Begin()
 	CheckError(err)
 	// Ajoute +1 disslike des POSTS
-	rows, _ := database.Query("SELECT dislike FROM posts WHERE id = ?", post_id)
+	rows, err := database.Query("SELECT dislike FROM posts WHERE id = ?", post_id)
+	CheckError(err)
 	for rows.Next() {
 		err := rows.Scan(&dislike)
 		CheckError(err)
@@ -282,6 +297,7 @@ func AddDisLike(post_id string, data_post map[string]interface{}, dislikedBy str
 	_, err = stmt.Exec(dislikedBy)
 	CheckError(err)
 	tx.Commit()
+	rows.Close()
 	database.Close()
 
 	UpdateNotif(notif)
@@ -294,12 +310,15 @@ func RemoveDisLike(post_id string, data_post map[string]interface{}, dislikedBy 
 	user := data_post["user"].(string)
 
 	// Open the database
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	database, err := sql.Open("sqlite3", "./db-sqlite.db")
+	CheckError(err)
 	defer database.Close()
 
 	tx, err := database.Begin()
 	// delete a dislike
-	rows, _ := database.Query("SELECT dislike FROM posts WHERE id = ?", post_id)
+	rows, err := database.Query("SELECT dislike FROM posts WHERE id = ?", post_id)
+	CheckError(err)
+	defer rows.Close()
 	for rows.Next() {
 		err := rows.Scan(&dislike)
 		CheckError(err)

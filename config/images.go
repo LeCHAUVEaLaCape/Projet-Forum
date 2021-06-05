@@ -97,7 +97,6 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		var image string
 		rows, err = database.Query("SELECT image FROM pendingPosts WHERE id = ?", id)
 		CheckError(err)
-		defer rows.Close()
 		for rows.Next() {
 			err := rows.Scan(&image)
 			CheckError(err)
@@ -111,6 +110,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		_, err = stmt.Exec(image, id)
 		CheckError(err)
 		tx.Commit()
+		rows.Close()
 	}
 	http.Redirect(w, r, "/index", http.StatusSeeOther)
 }
@@ -118,12 +118,12 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 func Delete_image(state string, id string) {
 	var image string
 	var each_image []string
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	database, err := sql.Open("sqlite3", "./db-sqlite.db")
+	CheckError(err)
 	defer database.Close()
 
 	// delete the image
 	var rows *sql.Rows
-	var err error
 	if state == "pendingPosts" {
 		rows, err = database.Query("SELECT image FROM pendingPosts WHERE id = ?", id)
 	} else if state == "mainPost" {

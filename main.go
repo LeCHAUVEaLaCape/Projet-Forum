@@ -2,9 +2,12 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"text/template"
@@ -12,12 +15,18 @@ import (
 
 	. "./config"
 	. "./cookies"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/facebook"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
+// Refuser une demande d'un user pour devenir modo créé un fichier db-journal (peut etre la page dashboard)
+// Lors de la suppression d'un user, retirer sa demande de devenir admin + sur ses commentaires de posts, retirer le lien cliquable + son nom dans la liste de likedBy
+// Utiliser l'ID utilisateur comme identifiant (998168070934676) sinon 2 comptes avec le meme nom peuvent se connecter
+
 var id, like int
-var username, password, email, age, fewWords, address, photo, state, title, body, author, date, content, likedBy, nbComments string
+var username, email, age, fewWords, address, photo, state, title, body, author, date, content, likedBy, nbComments string
 var create_cookie, userFound = false, false
 var categories = []string{"gaming", "informatique", "sport", "culture", "politique", "loisir", "sciences", "sexualite", "finance"}
 var data = make(map[string]interface{})
@@ -42,8 +51,10 @@ func main() {
 	http.HandleFunc("/delComment", delComment)
 	http.HandleFunc("/myPosts", myPosts)
 	http.HandleFunc("/myLikedPosts", myLikedPosts)
-	http.HandleFunc("/pendingPosts", pendingPosts)
+	http.HandleFunc("/PendingPosts", PendingPosts)
 	http.HandleFunc("/dashboard", Dashboard)
+	http.HandleFunc("/loginFB", HandleFacebookLogin)
+	http.HandleFunc("/oauth2callback", HandleFacebookCallback)
 
 	err := http.ListenAndServe(":8000", nil) // Set listen port
 	checkError(err)
@@ -57,7 +68,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 		data_index[k] = v
 	}
 	data_index["cookieExist"] = false
-	GetCookie(data_index, r) // ./cookies/getCookies.go
+	GetCookie(w, data_index, r) // ./cookies/getCookies.go
 
 	if data["user"] != nil {
 		CheckNotif(w, r, data_index)
@@ -74,6 +85,46 @@ func index(w http.ResponseWriter, r *http.Request) {
 	t.ExecuteTemplate(w, "index", data_index)
 }
 
+// Generate the log In page
+func logIn(w http.ResponseWriter, r *http.Request) {
+	// initiate the data that will be send to html
+	data_logIn := make(map[string]interface{})
+	for k, v := range data {
+		data_logIn[k] = v
+	}
+	data_logIn["cookieExist"] = false
+	GetCookie(w, data_logIn, r)
+
+	if data_logIn["cookieExist"] == true {
+		http.Redirect(w, r, "/index", http.StatusSeeOther)
+	}
+
+	// get user input to log in
+	user_login := r.FormValue("user-login")
+	password_login := r.FormValue("password-login")
+	if FBuser.Name != "" {
+		create_cookie = true
+		data["user"] = FBuser.Name
+		data["cookieExist"] = true
+		AddUser(FBuser.Name, "", "", data_logIn)
+		SearchUserToLog(data_logIn, user_login, "")
+	} else {
+		create_cookie = false
+		SearchUserToLog(data_logIn, user_login, password_login)
+	}
+
+	if create_cookie {
+		// Créé un cookie si user bien authentifié
+		CreateCookie(w, r)
+		data_logIn["wrongPassword"] = false
+		http.Redirect(w, r, "/index", http.StatusSeeOther)
+	}
+
+	t := template.New("logIn-template")
+	t = template.Must(t.ParseFiles("./html/LogIn.html", "./html/header&footer.html"))
+	t.ExecuteTemplate(w, "LogIn", data_logIn)
+}
+
 // Generate the sign in page
 func SignUp(w http.ResponseWriter, r *http.Request) {
 	// initiate the data that will be send to html
@@ -84,7 +135,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 
 	// Check if a cookie exist
 	data_SignUp["cookieExist"] = false
-	GetCookie(data_SignUp, r)
+	GetCookie(w, data_SignUp, r)
 
 	// if a cookie already exist, redirect
 	if data_SignUp["cookieExist"] == true {
@@ -114,31 +165,17 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	t.ExecuteTemplate(w, "SignUp", data_SignUp)
 }
 
-// Generate the log In page
-func logIn(w http.ResponseWriter, r *http.Request) {
-	// initiate the data that will be send to html
-	data_logIn := make(map[string]interface{})
-	for k, v := range data {
-		data_logIn[k] = v
-	}
-	data_logIn["cookieExist"] = false
-	GetCookie(data_logIn, r)
-
-	if data_logIn["cookieExist"] == true {
-		http.Redirect(w, r, "/index", http.StatusSeeOther)
-	}
-
-	// get user input to log in
-	user_login := r.FormValue("user-login")
-	password_login := r.FormValue("password-login")
+func SearchUserToLog(data_logIn map[string]interface{}, user_login string, password_login string) {
+	var password string
 
 	// Open the database
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	database, err := sql.Open("sqlite3", "./db-sqlite.db")
+	checkError(err)
 	defer database.Close()
 
-	create_cookie = false
 	// Parcourir la BDD
-	rows, _ := database.Query("SELECT username, password FROM users")
+	rows, err := database.Query("SELECT username, password FROM users")
+	checkError(err)
 	defer rows.Close()
 	for rows.Next() {
 		rows.Scan(&username, &password)
@@ -157,17 +194,6 @@ func logIn(w http.ResponseWriter, r *http.Request) {
 			data_logIn["wrongUsername"] = true
 		}
 	}
-
-	if create_cookie {
-		// Créé un cookie si user bien authentifié
-		CreateCookie(w, r)
-		data_logIn["wrongPassword"] = false
-		http.Redirect(w, r, "/index", http.StatusSeeOther)
-	}
-
-	t := template.New("logIn-template")
-	t = template.Must(t.ParseFiles("./html/LogIn.html", "./html/header&footer.html"))
-	t.ExecuteTemplate(w, "LogIn", data_logIn)
 }
 
 // Generate the Welcome page
@@ -178,7 +204,7 @@ func welcome(w http.ResponseWriter, r *http.Request) {
 		data_welcome[k] = v
 	}
 
-	GetCookie(data_welcome, r)
+	GetCookie(w, data_welcome, r)
 	if data["user"] != nil {
 		CheckNotif(w, r, data_welcome)
 		GetRole(data_welcome, false, "")
@@ -198,20 +224,20 @@ func user(w http.ResponseWriter, r *http.Request) {
 	}
 	data_user["cookieExist"] = false
 	data_user["username"] = ""
-	GetCookie(data_user, r)
-	if data["user"] != nil {
-		CheckNotif(w, r, data_user)
-		on_user_page := true // Lorsque la page actuelle est le profil d'un utilisateur
-		user_page := r.FormValue("user")
-		GetRole(data_user, on_user_page, user_page)
-		// Change un role lorsqu'un Admin submit le formulaire
+	GetCookie(w, data_user, r)
 
+	if data["user"] != nil {
+		CheckNotif(w, r, data_user)                 // ./config/user.go
+		on_user_page := true                        // Lorsque la page actuelle est le profil d'un utilisateur
+		user_page := r.FormValue("user")            //
+		GetRole(data_user, on_user_page, user_page) // Enregistre le role de l'utilisateur
+		// Change un role lorsqu'un Admin submit le formulaire
 		ChangeRole(w, r) // ./config/modifDB.go
 	}
 
 	// Récupère les infos de l'utilisateur
 	GetInfoUser(w, r, data_user) // ./config/modifDB.go
-	feed(data_user)
+	Feed(data_user)
 	// Check if the user logged is on his personnal page
 	if data_user["username"] == data_user["user"] && data_user["cookieExist"] != false {
 		data_user["sameUser"] = true
@@ -225,11 +251,17 @@ func user(w http.ResponseWriter, r *http.Request) {
 	delete_account := r.FormValue("del-account")
 	if delete_account != "" {
 		DelAccount(delete_account) // ./config/modifDB.GO
+		if data_user["sameUser"] == true {
+			DeleteCookie(w)
+		}
 		http.Redirect(w, r, "/index", http.StatusSeeOther)
 	}
 
 	// Add the user that ask for being moderator
-	ResquestForModo(r)
+	userAskingForModo := r.FormValue("user")
+	if userAskingForModo != "" {
+		ResquestForModo(userAskingForModo)
+	}
 
 	// Add the user when a moderator reports him
 	nameUser := r.FormValue("nameUser")
@@ -255,14 +287,15 @@ func allUsers(w http.ResponseWriter, r *http.Request) {
 	for k, v := range data {
 		data_allUsers[k] = v
 	}
-	GetCookie(data_allUsers, r)
+	GetCookie(w, data_allUsers, r)
 	if data["user"] != nil {
 		CheckNotif(w, r, data_allUsers)
 		GetRole(data_allUsers, false, "")
 	}
 
 	// Open the database
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	database, err := sql.Open("sqlite3", "./db-sqlite.db")
+	checkError(err)
 	defer database.Close()
 
 	var role string
@@ -311,7 +344,11 @@ func logOut(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Redirect(w, r, "/index", http.StatusSeeOther)
 	}
+
 	DeleteCookie(w)
+
+	// reset the login from FB
+	FBuser.Name = ""
 	http.Redirect(w, r, "/index", http.StatusSeeOther)
 	delete(data, "user")
 }
@@ -323,7 +360,7 @@ func newPost(w http.ResponseWriter, r *http.Request) {
 	for k, v := range data {
 		data_newPost[k] = v
 	}
-	GetCookie(data_newPost, r)
+	GetCookie(w, data_newPost, r)
 	// Redirection pour ceux qui ne sont pas connecté
 	if data_newPost["cookieExist"] == false {
 		http.Redirect(w, r, "/logIn", http.StatusSeeOther)
@@ -367,7 +404,7 @@ func post(w http.ResponseWriter, r *http.Request) {
 	data_post["cookieExist"] = false
 	data_post["already_liked"] = false
 	data_post["already_disliked"] = false
-	GetCookie(data_post, r)
+	GetCookie(w, data_post, r)
 	if data["user"] != nil {
 		CheckNotif(w, r, data_post)
 		GetRole(data_post, false, "")
@@ -424,7 +461,8 @@ func post(w http.ResponseWriter, r *http.Request) {
 func delPost(w http.ResponseWriter, r *http.Request) {
 	delete_post := r.FormValue("delPost")
 	// Open the database
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	database, err := sql.Open("sqlite3", "./db-sqlite.db")
+	checkError(err)
 	defer database.Close()
 
 	// delete the image
@@ -454,7 +492,8 @@ func delComment(w http.ResponseWriter, r *http.Request) {
 	delete_comment := r.FormValue("delComment")
 	idMainPost := r.FormValue("id-mainPost")
 	// Open the database
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	database, err := sql.Open("sqlite3", "./db-sqlite.db")
+	checkError(err)
 	defer database.Close()
 
 	// DELETE the comments of the main post
@@ -477,12 +516,12 @@ func myPosts(w http.ResponseWriter, r *http.Request) {
 		data_myPosts[k] = v
 	}
 	data_myPosts["cookieExist"] = false
-	GetCookie(data_myPosts, r)
+	GetCookie(w, data_myPosts, r)
 	if data["user"] != nil {
 		CheckNotif(w, r, data_myPosts)
 		GetRole(data_myPosts, false, "")
 	}
-	createdposts(data_myPosts, "indexuser")
+	Createdposts(data_myPosts, "indexuser")
 
 	t := template.New("myPosts-template")
 	t = template.Must(t.ParseFiles("./html/myPosts.html", "./html/header&footer.html"))
@@ -497,7 +536,7 @@ func myLikedPosts(w http.ResponseWriter, r *http.Request) {
 		data_myLikedPosts[k] = v
 	}
 	data_myLikedPosts["cookieExist"] = false
-	GetCookie(data_myLikedPosts, r)
+	GetCookie(w, data_myLikedPosts, r)
 	if data["user"] != nil {
 		CheckNotif(w, r, data_myLikedPosts)
 		GetRole(data_myLikedPosts, false, "")
@@ -518,14 +557,14 @@ func checkError(err error) {
 }
 
 // page des posts en attente, un admin ou moderateur doit les accepter pour les mettres sur la page principal
-func pendingPosts(w http.ResponseWriter, r *http.Request) {
+func PendingPosts(w http.ResponseWriter, r *http.Request) {
 	// initiate the data that will be send to html
 	data_pendingPosts := make(map[string]interface{})
 	for k, v := range data {
 		data_pendingPosts[k] = v
 	}
 
-	GetCookie(data_pendingPosts, r)
+	GetCookie(w, data_pendingPosts, r)
 	// Redirection pour ceux qui ne sont pas connecté
 	if data["user"] != nil {
 		CheckNotif(w, r, data_pendingPosts)
@@ -557,12 +596,13 @@ func LikedPosts(data_Info map[string]interface{}, state string) {
 	var all_myLikedPosts [][]interface{}
 	var post_liked bool
 
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	database, err := sql.Open("sqlite3", "./db-sqlite.db")
+	checkError(err)
 	defer database.Close()
 
 	//range over database
-	rows, _ := database.Query("SELECT title, body, author, date, id, category, likedBy FROM posts")
-	defer rows.Close()
+	rows, err := database.Query("SELECT title, body, author, date, id, category, likedBy FROM posts")
+	checkError(err)
 
 	for rows.Next() {
 		myLikedPosts := []interface{}{"", "", "", "", "", "", ""}
@@ -608,6 +648,7 @@ func LikedPosts(data_Info map[string]interface{}, state string) {
 			all_myLikedPosts = append(all_myLikedPosts, myLikedPosts)
 		}
 	}
+	rows.Close()
 
 	if post_liked {
 		// Ajoute le chemin de la photo qui a été choisit par l'utilisateur
@@ -629,19 +670,21 @@ func LikedPosts(data_Info map[string]interface{}, state string) {
 }
 
 // get all posts created by someone
-func createdposts(data_Info map[string]interface{}, state string) {
+func Createdposts(data_Info map[string]interface{}, state string) {
 	var all_myPosts [][]interface{}
 
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	database, err := sql.Open("sqlite3", "./db-sqlite.db")
+	checkError(err)
 	defer database.Close()
 	//range over database
 	var rows *sql.Rows
 	if state == "userpage" {
-		rows, _ = database.Query("SELECT title, body, author, date, id, category FROM posts WHERE author = ?", data_Info["username"])
+		rows, err = database.Query("SELECT title, body, author, date, id, category FROM posts WHERE author = ?", data_Info["username"])
+		checkError(err)
 	} else if state == "indexuser" {
-		rows, _ = database.Query("SELECT title, body, author, date, id, category FROM posts WHERE author = ?", data["user"].(string))
+		rows, err = database.Query("SELECT title, body, author, date, id, category FROM posts WHERE author = ?", data["user"].(string))
+		checkError(err)
 	}
-	defer rows.Close()
 
 	for rows.Next() {
 		myPosts := []interface{}{"", "", "", "", "", "", ""}
@@ -665,6 +708,7 @@ func createdposts(data_Info map[string]interface{}, state string) {
 		all_myPosts = append(all_myPosts, myPosts)
 	}
 
+	rows.Close()
 	// Ajoute le chemin de la photo qui a été choisit par l'utilisateur
 	for i := 0; i < len(all_myPosts); i++ {
 		rows, err := database.Query("SELECT photo FROM users WHERE username = ?", all_myPosts[i][2])
@@ -683,66 +727,56 @@ func createdposts(data_Info map[string]interface{}, state string) {
 }
 
 // get all posts liked/created/commented by someone
-func feed(data_Info map[string]interface{}) {
+func Feed(data_Info map[string]interface{}) {
 	//Show the liked post by the user
 	LikedPosts(data_Info, "feedlike")
 
 	//Show the post created by the user
-	createdposts(data_Info, "userpage")
+	Createdposts(data_Info, "userpage")
 
 	//Show comment posted
 	// commentaires
 	var comments [][11]string
 	var content string
 	var tmp [11]string
-	database_comment, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	database_comment, err := sql.Open("sqlite3", "./db-sqlite.db")
+	checkError(err)
 	defer database_comment.Close()
 	//range over database
-	rows_comment, _ := database_comment.Query("SELECT content, idMainPost, date, id FROM comments WHERE author = ?", data_Info["username"])
+	rows_comment, err := database_comment.Query("SELECT content, idMainPost, date, id FROM comments WHERE author = ?", data_Info["username"])
+	checkError(err)
 	defer rows_comment.Close()
 	for rows_comment.Next() {
 
 		err := rows_comment.Scan(&content, &tmp[1], &tmp[2], &tmp[5])
-		if err != nil {
-			log.Fatal(err)
-		}
-
+		checkError(err)
 		// Remplace les \n par des <br> pour sauter des lignes en html
 		tmp[0] = strings.Replace(content, string('\r'), "", -1)
 		tmp[0] = strings.Replace(content, string('\n'), "<br>", -1)
 
 		// Ajoute le chemin de la photo qui a été choisit par l'utilisateur
 		rows, err := database_comment.Query("SELECT photo FROM users WHERE username = ?", data_Info["username"])
-		if err != nil {
-			log.Fatal(err)
-		}
+		checkError(err)
 		defer rows.Close()
 		for rows.Next() {
 			err := rows.Scan(&tmp[4])
-			if err != nil {
-				log.Fatal(err)
-			}
+			checkError(err)
 		}
 		err = rows.Err()
-		if err != nil {
-			log.Fatal(err)
-		}
+		checkError(err)
 
-		rows_posts, _ := database_comment.Query("SELECT id, title, body, author, date FROM posts WHERE id = ?", tmp[1])
+		rows_posts, err := database_comment.Query("SELECT id, title, body, author, date FROM posts WHERE id = ?", tmp[1])
+		checkError(err)
 		defer rows_posts.Close()
 		for rows_posts.Next() {
 			err := rows_posts.Scan(&tmp[6], &tmp[7], &tmp[8], &tmp[9], &tmp[10])
-			if err != nil {
-				log.Fatal(err)
-			}
+			checkError(err)
 		}
 		comments = append(comments, tmp)
 	}
 
-	err := rows_comment.Err()
-	if err != nil {
-		log.Fatal(err)
-	}
+	err = rows_comment.Err()
+	checkError(err)
 
 	data_Info["commentsPosted"] = comments
 }
@@ -753,7 +787,7 @@ func Dashboard(w http.ResponseWriter, r *http.Request) {
 	for k, v := range data {
 		data_dashboard[k] = v
 	}
-	GetCookie(data_dashboard, r)
+	GetCookie(w, data_dashboard, r)
 	if data_dashboard["user"] != nil {
 		CheckNotif(w, r, data_dashboard)
 		GetRole(data_dashboard, false, "")
@@ -764,7 +798,7 @@ func Dashboard(w http.ResponseWriter, r *http.Request) {
 	AccepterDemande(w, r)
 	DisplayAdminModo(&data_dashboard)
 	DisplayPendingForModo(&data_dashboard)
-	selectReport(data_dashboard)
+	SelectReport(data_dashboard)
 
 	// get input of the admin that accept or not the report
 	answerReport := r.FormValue("answerReport")
@@ -775,7 +809,7 @@ func Dashboard(w http.ResponseWriter, r *http.Request) {
 		if reportAccepted == "" {
 			reportAccepted = "0"
 		}
-		deleteUserFromReport(answerReport, nameReported, reportAccepted)
+		DeleteUserFromReport(answerReport, nameReported, reportAccepted)
 	}
 
 	t := template.New("dashboard-template")
@@ -787,10 +821,12 @@ func Dashboard(w http.ResponseWriter, r *http.Request) {
 func Report(nameUser string, nameReporter string, reasonReport string) {
 	// Open the database
 	var nameReported string
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	database, err := sql.Open("sqlite3", "./db-sqlite.db")
+	checkError(err)
 	defer database.Close()
 	//verify if the user is already in the table
-	rows_double, _ := database.Query("SELECT nameUser FROM report")
+	rows_double, err := database.Query("SELECT nameUser FROM report")
+	checkError(err)
 	defer rows_double.Close()
 	for rows_double.Next() {
 		err := rows_double.Scan(&nameReported)
@@ -814,13 +850,15 @@ func Report(nameUser string, nameReporter string, reasonReport string) {
 }
 
 // get all the report pending
-func selectReport(data_dashboard map[string]interface{}) {
+func SelectReport(data_dashboard map[string]interface{}) {
 	var slicereport [3]string
 	var all_Report [][3]string
 	// Open the database
-	database_report, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	database_report, err := sql.Open("sqlite3", "./db-sqlite.db")
+	checkError(err)
 	defer database_report.Close()
-	rows_report, _ := database_report.Query("SELECT nameReporter, nameUser, reasonReport FROM report WHERE reported = ?", "")
+	rows_report, err := database_report.Query("SELECT nameReporter, nameUser, reasonReport FROM report WHERE reported = ?", "")
+	checkError(err)
 	defer rows_report.Close()
 	for rows_report.Next() {
 		err := rows_report.Scan(&slicereport[0], &slicereport[1], &slicereport[2])
@@ -833,9 +871,10 @@ func selectReport(data_dashboard map[string]interface{}) {
 	data_dashboard["report"] = all_Report
 }
 
-func deleteUserFromReport(answerReport string, nameReported string, reportAccepted string) {
+func DeleteUserFromReport(answerReport string, nameReported string, reportAccepted string) {
 	// Open the database
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	database, err := sql.Open("sqlite3", "./db-sqlite.db")
+	checkError(err)
 	defer database.Close()
 
 	// if the report is accepted from the admnin
@@ -851,4 +890,76 @@ func deleteUserFromReport(answerReport string, nameReported string, reportAccept
 		checkError(err)
 		tx.Commit()
 	}
+}
+
+var (
+	oauthConf = &oauth2.Config{
+		ClientID:     "166859168782629",
+		ClientSecret: "d7fc1ba6430a4c122b41caf0282fea44",
+		RedirectURL:  "http://localhost:8000/oauth2callback",
+		Scopes:       []string{"public_profile"},
+		Endpoint:     facebook.Endpoint,
+	}
+	oauthStateString = "eeeeeeee"
+)
+
+type Info struct {
+	Name string
+	Id   int
+}
+
+var info Info
+var FBuser = &info
+
+func HandleFacebookLogin(w http.ResponseWriter, r *http.Request) {
+	Url, err := url.Parse(oauthConf.Endpoint.AuthURL)
+	if err != nil {
+		log.Fatal("Parse: ", err)
+	}
+	parameters := url.Values{}
+	parameters.Add("client_id", oauthConf.ClientID)
+	parameters.Add("scope", strings.Join(oauthConf.Scopes, " "))
+	parameters.Add("redirect_uri", oauthConf.RedirectURL)
+	parameters.Add("response_type", "code")
+	parameters.Add("state", oauthStateString)
+	Url.RawQuery = parameters.Encode()
+	url := Url.String()
+	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+}
+
+func HandleFacebookCallback(w http.ResponseWriter, r *http.Request) {
+	state := r.FormValue("state")
+	if state != oauthStateString {
+		fmt.Println("invalid oauth state, expected , got \n", oauthStateString, state)
+		http.Redirect(w, r, "/logIn", http.StatusTemporaryRedirect)
+		return
+	}
+
+	code := r.FormValue("code")
+
+	token, err := oauthConf.Exchange(oauth2.NoContext, code)
+	if err != nil {
+		fmt.Println("oauthConf.Exchange() failed with \n", err)
+		http.Redirect(w, r, "/logIn", http.StatusTemporaryRedirect)
+		return
+	}
+
+	resp, err := http.Get("https://graph.facebook.com/me?access_token=" +
+		url.QueryEscape(token.AccessToken))
+	if err != nil {
+		fmt.Println("Get: \n", err)
+		http.Redirect(w, r, "/logIn", http.StatusTemporaryRedirect)
+		return
+	}
+	defer resp.Body.Close()
+
+	response, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println("ReadAll: \n", err)
+		http.Redirect(w, r, "/logIn", http.StatusTemporaryRedirect)
+		return
+	}
+	json.Unmarshal(response, &info)
+	info.Name = strings.ReplaceAll(info.Name, " ", "_")
+	http.Redirect(w, r, "/logIn", http.StatusTemporaryRedirect)
 }

@@ -2,10 +2,9 @@ package config
 
 import (
 	"database/sql"
-	"fmt"
 	"net/http"
 
-	erreur "./err"
+	. "./err"
 )
 
 type dataUsers struct {
@@ -21,9 +20,11 @@ type dataForDashboard struct {
 
 // modo.go
 func DisplayAdminModo(data *map[string]interface{}) {
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	database, err := sql.Open("sqlite3", "./db-sqlite.db")
+	CheckError(err)
 	defer database.Close()
-	rows, _ := database.Query("SELECT id, username, role FROM users")
+	rows, err := database.Query("SELECT id, username, role FROM users")
+	CheckError(err)
 	defer rows.Close()
 	var tmp dataForDashboard
 	for rows.Next() {
@@ -41,18 +42,19 @@ func DisplayAdminModo(data *map[string]interface{}) {
 }
 
 // modo.go
-func ResquestForModo(r *http.Request) {
-	username := r.FormValue("user")
+func ResquestForModo(username string) {
 	if username == "" {
 		return
 	}
 	// Open the database
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	database, err := sql.Open("sqlite3", "./db-sqlite.db")
+	CheckError(err)
 	defer database.Close()
 
 	// range over the database and check if there is double username
 	rows, err := database.Query("SELECT username FROM pendingForModerator")
-	erreur.CheckError(err)
+	CheckError(err)
+	defer rows.Close()
 	for rows.Next() {
 		tmp := ""
 		rows.Scan(&tmp)
@@ -61,27 +63,26 @@ func ResquestForModo(r *http.Request) {
 			return
 		}
 	}
-	fmt.Println(username)
-	rows.Close()
 	// add the inputs to the database
 	tx, err := database.Begin()
-	erreur.CheckError(err)
+	CheckError(err)
 	stmt, err := tx.Prepare("INSERT INTO pendingForModerator (username) VALUES (?)")
-	erreur.CheckError(err)
+	CheckError(err)
 	_, err = stmt.Exec(username)
-	erreur.CheckError(err)
+	CheckError(err)
 	tx.Commit()
 }
 
 // modo.go
 func DisplayPendingForModo(data *map[string]interface{}) {
 	// Open the database
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	database, err := sql.Open("sqlite3", "./db-sqlite.db")
+	CheckError(err)
 	defer database.Close()
 	var res []string
 	// range over the database
 	rows, err := database.Query("SELECT username FROM pendingForModerator")
-	erreur.CheckError(err)
+	CheckError(err)
 	for rows.Next() {
 		tmp := ""
 		rows.Scan(&tmp)
@@ -98,20 +99,22 @@ func AccepterDemande(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Open the database
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
-	defer database.Close()
+	database, err := sql.Open("sqlite3", "./db-sqlite.db")
+	CheckError(err)
+
 	tx, err := database.Begin()
-	erreur.CheckError(err)
+	CheckError(err)
 	stmt, err := tx.Prepare("UPDATE users SET role = ? WHERE username = ?")
-	erreur.CheckError(err)
+	CheckError(err)
 	_, err = stmt.Exec("moderator", user_accepter)
-	erreur.CheckError(err)
+	CheckError(err)
 	// Supprimer la ligne de l'utilisateur dans la BDD pendingForModerator
 	stmt, err = tx.Prepare("DELETE FROM pendingForModerator WHERE username = ?")
-	erreur.CheckError(err)
+	CheckError(err)
 	_, err = stmt.Exec(user_accepter)
-	erreur.CheckError(err)
+	CheckError(err)
 	tx.Commit()
+	database.Close()
 	http.Redirect(w, r, r.Header.Get("Referer"), http.StatusFound)
 }
 
@@ -121,15 +124,16 @@ func RefuserDemande(w http.ResponseWriter, r *http.Request) {
 	if user_refuser == "" {
 		return
 	}
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
-	defer database.Close()
+	database, err := sql.Open("sqlite3", "./db-sqlite.db")
+	CheckError(err)
 	tx, err := database.Begin()
-	erreur.CheckError(err)
+	CheckError(err)
 	// Supprimer la ligne de l'utilisateur dans la BDD pendingForModerator
 	stmt, err := tx.Prepare("DELETE FROM pendingForModerator WHERE username = ?")
-	erreur.CheckError(err)
+	CheckError(err)
 	_, err = stmt.Exec(user_refuser)
-	erreur.CheckError(err)
+	CheckError(err)
 	tx.Commit()
+	database.Close()
 	http.Redirect(w, r, r.Header.Get("Referer"), http.StatusFound)
 }

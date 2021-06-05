@@ -64,6 +64,7 @@
 </div>
 <script src="../assets/js/header.js"></script>
 {{end}} 
+{{template "disconnected" .}}
 {{end}} 
 
 <!-- footer -->
@@ -84,7 +85,7 @@
     </div>
     <div class="troll2">
       <p>00 00 00 00 00</p>
-      <p>ForRome@FauxRhum.forum</p>
+      <p>contact@FauxRhum.com</p>
     </div>
   </div>
   <div class="right">
@@ -94,4 +95,27 @@
         href="https://www.linkedin.com/in/brian-peyre/">Linkedin</a></p>
   </div>
 </div>
+{{end}}
+
+{{define "disconnected"}}
+  <div class="disconnected-container">
+    <div class="disconnected-wrapper">
+      <h2>Your session expired.</h2>
+      <h3>You have been disconnected</h3>
+      <div class="reconnect-link">
+        <a href="/logIn">Login</a>
+        <a href="/index">Cancel</a>
+      </div>
+    </div>
+  </div>
+  <script>
+    var cookieExist = "{{.cookieExist}}";
+    var disconnected_container = document.getElementsByClassName("disconnected-container")[0]
+    console.log(disconnected_container)
+    if (cookieExist) {
+      setTimeout(function () {
+        disconnected_container.classList.add("disconnected-container-active")
+      }, 1000 * 60 * 5);
+    }
+  </script>
 {{end}}

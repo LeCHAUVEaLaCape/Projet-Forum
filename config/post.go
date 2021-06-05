@@ -47,7 +47,8 @@ func DisplayPosts(r *http.Request, data_info map[string]interface{}, state strin
 	// RegExp
 	var filter = regexp.MustCompile(selected_categories)
 
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	database, err := sql.Open("sqlite3", "./db-sqlite.db")
+	CheckError(err)
 	defer database.Close()
 	//range over database
 	var query string
@@ -56,7 +57,8 @@ func DisplayPosts(r *http.Request, data_info map[string]interface{}, state strin
 	} else if state == "index" {
 		query = "SELECT title, body, author, date, id, category, like, nbComments FROM posts"
 	}
-	rows, _ := database.Query(query)
+	rows, err := database.Query(query)
+	CheckError(err)
 	defer rows.Close()
 
 	for rows.Next() {
@@ -132,10 +134,12 @@ func DisplayPosts(r *http.Request, data_info map[string]interface{}, state strin
 // Page posts
 func Display_post_comment(post_id string, data_post map[string]interface{}, body string) [8]string {
 	var post [8]string
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	database, err := sql.Open("sqlite3", "./db-sqlite.db")
+	CheckError(err)
 	defer database.Close()
 	//range over database
-	rows, _ := database.Query("SELECT id, title, body, author, date, like, dislike FROM posts WHERE id = ?", post_id)
+	rows, err := database.Query("SELECT id, title, body, author, date, like, dislike FROM posts WHERE id = ?", post_id)
+	CheckError(err)
 	defer rows.Close()
 	for rows.Next() {
 		err := rows.Scan(&post[0], &post[1], &body, &post[3], &post[4], &post[6], &post[7])
@@ -145,7 +149,7 @@ func Display_post_comment(post_id string, data_post map[string]interface{}, body
 	post[2] = strings.Replace(body, string('\r'), "", -1)
 	post[2] = strings.Replace(body, string('\n'), "<br>", -1)
 	// Ajoute le chemin de la photo qui a été choisit par l'utilisateur
-	rows, err := database.Query("SELECT photo FROM users WHERE username = ?", post[3])
+	rows, err = database.Query("SELECT photo FROM users WHERE username = ?", post[3])
 	CheckError(err)
 	defer rows.Close()
 	for rows.Next() {
