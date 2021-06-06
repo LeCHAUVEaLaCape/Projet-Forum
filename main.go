@@ -897,13 +897,7 @@ func DeleteUserFromReport(answerReport string, nameReported string, reportAccept
 	}
 }
 
-//
-//
-//
 // Facebook
-//
-//
-//
 
 var oauthConf = &oauth2.Config{
 	ClientID:     "166859168782629",
@@ -967,13 +961,7 @@ func HandleFacebookCallback(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/logIn", http.StatusTemporaryRedirect)
 }
 
-//
-//
-//
 // 	Google
-//
-//
-//
 
 var googleOauthConfig = &oauth2.Config{
 	RedirectURL:  "http://localhost:8000/GoogleCallBack",
