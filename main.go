@@ -15,14 +15,15 @@ import (
 
 	. "./config"
 	. "./cookies"
+
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/facebook"
+	"golang.org/x/oauth2/google"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
 // Refuser une demande d'un user pour devenir modo créé un fichier db-journal (peut etre la page dashboard)
-// Lors de la suppression d'un user, retirer sa demande de devenir admin + sur ses commentaires de posts, retirer le lien cliquable + son nom dans la liste de likedBy
 // Utiliser l'ID utilisateur comme identifiant (998168070934676) sinon 2 comptes avec le meme nom peuvent se connecter
 
 var id, like int
@@ -53,8 +54,12 @@ func main() {
 	http.HandleFunc("/myLikedPosts", myLikedPosts)
 	http.HandleFunc("/PendingPosts", PendingPosts)
 	http.HandleFunc("/dashboard", Dashboard)
+	// Login with facebook
 	http.HandleFunc("/loginFB", HandleFacebookLogin)
-	http.HandleFunc("/oauth2callback", HandleFacebookCallback)
+	http.HandleFunc("/FBloginCallBack", HandleFacebookCallback)
+	// Login with google
+	http.HandleFunc("/loginGoogle", handleGoogleLogin)
+	http.HandleFunc("/GoogleCallBack", handleGoogleCallback)
 
 	err := http.ListenAndServe(":8000", nil) // Set listen port
 	checkError(err)
@@ -102,15 +107,14 @@ func logIn(w http.ResponseWriter, r *http.Request) {
 	// get user input to log in
 	user_login := r.FormValue("user-login")
 	password_login := r.FormValue("password-login")
+	create_cookie = false
 	if FBuser.Name != "" {
-		create_cookie = true
+		AddUser(FBuser.Name, FBuser.Email, "", data_logIn)
+		SearchUserToLog(data_logIn, FBuser.Name, "", "logFromExternalWebsite")
 		data["user"] = FBuser.Name
 		data["cookieExist"] = true
-		AddUser(FBuser.Name, "", "", data_logIn)
-		SearchUserToLog(data_logIn, user_login, "")
 	} else {
-		create_cookie = false
-		SearchUserToLog(data_logIn, user_login, password_login)
+		SearchUserToLog(data_logIn, user_login, password_login, "logFromInternalDB")
 	}
 
 	if create_cookie {
@@ -165,7 +169,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	t.ExecuteTemplate(w, "SignUp", data_SignUp)
 }
 
-func SearchUserToLog(data_logIn map[string]interface{}, user_login string, password_login string) {
+func SearchUserToLog(data_logIn map[string]interface{}, user_login string, password_login string, state string) {
 	var password string
 
 	// Open the database
@@ -182,7 +186,7 @@ func SearchUserToLog(data_logIn map[string]interface{}, user_login string, passw
 		// Si l'input username est trouvé
 		if user_login == username {
 			// Compare l'input password avec celui de la BDD
-			if ComparePasswords(password, []byte(password_login)) {
+			if state == "logFromExternalWebsite" || ComparePasswords(password, []byte(password_login)) {
 				create_cookie = true
 				data["user"] = username
 				data["cookieExist"] = true
@@ -192,6 +196,7 @@ func SearchUserToLog(data_logIn map[string]interface{}, user_login string, passw
 			}
 		} else if user_login != "" {
 			data_logIn["wrongUsername"] = true
+
 		}
 	}
 }
@@ -258,7 +263,7 @@ func user(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Add the user that ask for being moderator
-	userAskingForModo := r.FormValue("user")
+	userAskingForModo := r.FormValue("askingToBeModo")
 	if userAskingForModo != "" {
 		ResquestForModo(userAskingForModo)
 	}
@@ -892,20 +897,26 @@ func DeleteUserFromReport(answerReport string, nameReported string, reportAccept
 	}
 }
 
-var (
-	oauthConf = &oauth2.Config{
-		ClientID:     "166859168782629",
-		ClientSecret: "d7fc1ba6430a4c122b41caf0282fea44",
-		RedirectURL:  "http://localhost:8000/oauth2callback",
-		Scopes:       []string{"public_profile"},
-		Endpoint:     facebook.Endpoint,
-	}
-	oauthStateString = "eeeeeeee"
-)
+//
+//
+//
+// Facebook
+//
+//
+//
+
+var oauthConf = &oauth2.Config{
+	ClientID:     "166859168782629",
+	ClientSecret: "d7fc1ba6430a4c122b41caf0282fea44",
+	RedirectURL:  "http://localhost:8000/FBloginCallBack",
+	Scopes:       []string{"public_profile", "email"},
+	Endpoint:     facebook.Endpoint,
+}
 
 type Info struct {
-	Name string
-	Id   int
+	Name  string `json:"name"`
+	Id    int    `json:"id"`
+	Email string `json:"email"`
 }
 
 var info Info
@@ -921,20 +932,12 @@ func HandleFacebookLogin(w http.ResponseWriter, r *http.Request) {
 	parameters.Add("scope", strings.Join(oauthConf.Scopes, " "))
 	parameters.Add("redirect_uri", oauthConf.RedirectURL)
 	parameters.Add("response_type", "code")
-	parameters.Add("state", oauthStateString)
 	Url.RawQuery = parameters.Encode()
 	url := Url.String()
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
 
 func HandleFacebookCallback(w http.ResponseWriter, r *http.Request) {
-	state := r.FormValue("state")
-	if state != oauthStateString {
-		fmt.Println("invalid oauth state, expected , got \n", oauthStateString, state)
-		http.Redirect(w, r, "/logIn", http.StatusTemporaryRedirect)
-		return
-	}
-
 	code := r.FormValue("code")
 
 	token, err := oauthConf.Exchange(oauth2.NoContext, code)
@@ -943,8 +946,7 @@ func HandleFacebookCallback(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/logIn", http.StatusTemporaryRedirect)
 		return
 	}
-
-	resp, err := http.Get("https://graph.facebook.com/me?access_token=" +
+	resp, err := http.Get("https://graph.facebook.com/me?fields=id,name,email&access_token=" +
 		url.QueryEscape(token.AccessToken))
 	if err != nil {
 		fmt.Println("Get: \n", err)
@@ -960,6 +962,56 @@ func HandleFacebookCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	json.Unmarshal(response, &info)
+	info.Name = strings.ReplaceAll(info.Name, " ", "_")
+
+	http.Redirect(w, r, "/logIn", http.StatusTemporaryRedirect)
+}
+
+//
+//
+//
+// 	Google
+//
+//
+//
+
+var googleOauthConfig = &oauth2.Config{
+	RedirectURL:  "http://localhost:8000/GoogleCallBack",
+	ClientID:     "898237617000-u5csvedvkad68jphcudkrr9vc1pt6pdl.apps.googleusercontent.com",
+	ClientSecret: "aijCBZHXUMczE-cD-N-o1s4V",
+	Scopes:       []string{"https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email"},
+	Endpoint:     google.Endpoint,
+}
+var (
+	// TODO: randomize it
+	oauthStateString = "pseudo-random"
+)
+
+func handleGoogleLogin(w http.ResponseWriter, r *http.Request) {
+	url := googleOauthConfig.AuthCodeURL(oauthStateString)
+	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+}
+
+func handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
+	state := r.FormValue("state")
+	code := r.FormValue("code")
+	if state != oauthStateString {
+		fmt.Println("invalid oauth state")
+	}
+	token, err := googleOauthConfig.Exchange(oauth2.NoContext, code)
+	if err != nil {
+		checkError(err)
+	}
+	response, err := http.Get("https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + token.AccessToken)
+	if err != nil {
+		checkError(err)
+	}
+	defer response.Body.Close()
+	contents, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		checkError(err)
+	}
+	json.Unmarshal(contents, &info)
 	info.Name = strings.ReplaceAll(info.Name, " ", "_")
 	http.Redirect(w, r, "/logIn", http.StatusTemporaryRedirect)
 }

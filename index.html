@@ -138,7 +138,7 @@
                 <!-- Ajoute l'auteur du post et le time -->
                 <div class="author-time">
                   <p class="author">
-                    <span class="created-by">post crée par : </span>
+                    <span class="created-by">posted by : </span>
                     {{$author := index . 2}} {{if ne $author "user deleted"}}
                     <a class="user" href="/user?user={{$author}}"
                       >{{$author}}</a
@@ -162,6 +162,5 @@
     {{template "footer"}}
   </body>
   <script src="./assets/js/index.js"></script>
-
 </html>
 {{end}}

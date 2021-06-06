@@ -1,86 +1,133 @@
 {{define "SignUp"}}
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Faux Rhum - Sign Up</title>
+    <link rel="stylesheet" href="../assets/css/SignUp.css" />
+    <link rel="shortcut icon" href="../assets/images/logoforum.png" />
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300&display=swap"
+      rel="stylesheet"
+    />
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Faux Rhum - Sign Up</title>
-  <link rel="stylesheet" href="../assets/css/SignUp.css" />
-  <link rel="shortcut icon" href="../assets/images/logoforum.png" />
-  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300&display=swap" rel="stylesheet">
-</head>
-
-<body>
-  <section>
-    {{template "header" .}}
-    <div class="page">
-      <div class="title">
-        <div  data-aos="fade-down" data-aos-duration="1000"  class="join"><strong>J</strong>oin <strong>U</strong>s</div>
-      </div>
-      <div class="formulaire" data-aos="zoom-in" data-aos-duration="1000">
-        <form method="POST" action="?" autocomplete="off">
-          <div class="username">
-            <label for="username">  <img src="https://discord.com/assets/f7b28657f23a942ed82d45ed23094d63.svg" alt="masque"> Username <span>*</span></label>
-            <!-- prettier-ignore -->
-            <input type="text" name="username" id="username" minlength="3" pattern="^[A-Za-z0-9]{3}[A-Za-z0-9]*$"
-              required>                      
-            <p>Make sure it's at least 3 characters</p>
-            {{if .username_used}}
-            <div class="username-taken" id="username-taken">
-              <div>
-                <p class="input-taken">Username already taken !</p>
+  <body>
+    <section>
+      {{template "header" .}}
+      <div class="page">
+        <div class="title">
+          <div data-aos="fade-down" data-aos-duration="1000" class="join">
+            <strong>J</strong>oin <strong>U</strong>s
+          </div>
+        </div>
+        <div class="register">
+          <div class="formulaire" data-aos="zoom-in" data-aos-duration="1000">
+            <form method="POST" action="?" autocomplete="off">
+              <h3 id="account-title">Create an account manually</h3>
+              <div class="username">
+                <label for="username">
+                  <img
+                    src="https://discord.com/assets/f7b28657f23a942ed82d45ed23094d63.svg"
+                    alt="masque"
+                  />
+                  Username <span>*</span></label
+                >
+                <!-- prettier-ignore -->
+                <input type="text" name="username" id="username" minlength="3" pattern="^[A-Za-z0-9]{3}[A-Za-z0-9]*$"
+                required>
+                <p>Make sure it's at least 3 characters</p>
+                {{if .username_used}}
+                <div class="username-taken" id="username-taken">
+                  <div>
+                    <p class="input-taken">Username already taken !</p>
+                  </div>
+                </div>
+                {{end}}
               </div>
-            </div>
-            {{end}}
-          </div>
 
-          <div class="email">
-            <label for="email"> <img src="https://discord.com/assets/701414a67cb18fe339ec2bbe21a1d448.svg" alt="email"> Email address <span>*</span></label>
-            <!-- prettier-ignore -->
-            <input type="email" name="email" id="email" pattern=".*@.*\..*" required />
-            {{if .email_used}}
-            <div class="email-taken" id="email-taken">
-              <div>
-                <p class="input-taken">Email already taken !</p>
+              <div class="email">
+                <label for="email">
+                  <img
+                    src="https://discord.com/assets/701414a67cb18fe339ec2bbe21a1d448.svg"
+                    alt="email"
+                  />
+                  Email address <span>*</span></label
+                >
+                <!-- prettier-ignore -->
+                <input type="email" name="email" id="email" pattern=".*@.*\..*" required />
+                {{if .email_used}}
+                <div class="email-taken" id="email-taken">
+                  <div>
+                    <p class="input-taken">Email already taken !</p>
+                  </div>
+                </div>
+                {{end}}
               </div>
-            </div>
-            {{end}}
-          </div>
 
-          <div class="passwd">
-            <label for="password"> <img src="https://discord.com/assets/c35b8b5c0666ad99ab0e820f8aa90002.svg" alt="passwd"> Password <span>*</span> </label>
-            <!-- prettier-ignore -->
-            <input type="password" name="password" id="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
-              required />
-            <p>Make sure it's at least 8 characters, at least one number, one uppercase and lowercase letter</p>
+              <div class="passwd">
+                <label for="password">
+                  <img
+                    src="https://discord.com/assets/c35b8b5c0666ad99ab0e820f8aa90002.svg"
+                    alt="passwd"
+                  />
+                  Password <span>*</span>
+                </label>
+                <!-- prettier-ignore -->
+                <input type="password" name="password" id="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+                required />
+                <p>
+                  Make sure it's at least 8 characters, at least one number, one
+                  uppercase and lowercase letter
+                </p>
+              </div>
+              {{if .accountCreated}}
+              <div class="account-created" id="account-created">
+                <div>
+                  <p>Account successfully created !</p>
+                </div>
+              </div>
+              {{end}}
+              <div class="sub">
+                <button type="submit">Create account</button>
+              </div>
+              <p class="logIn">
+                Already have an account? <a href="/logIn">Click here</a>
+              </p>
+            </form>
           </div>
-          {{if .accountCreated}}
-          <div class="account-created" id="account-created">
-            <div>
-              <p>Account successfully created !</p>
+          <div class="sign-FB-git-google">
+            <h3 id="tier-title">Sign up with</h3>
+            <div class="facebook-login">
+              <a href="/loginFB">
+              <img
+                id="img-fb"
+                src="../assets/images/logo/fb-logo.jpg"
+                alt="fb-signUp"
+              />
+            </a>
+            </div>
+            <div class="facebook-login">
+              <a href="/loginGoogle">
+              <img
+                id="img-google"
+                src="../assets/images/logo/google-logo.jpg"
+                alt="google-signUp"
+              />
+            </a>
             </div>
           </div>
-          {{end}}
-          <div class="sub">
-            <button type="submit">Create account</button>
-          </div>
-          <p class="logIn">Already have an account? <a href="/logIn">Click here</a></p>
-        </form>
+        </div>
       </div>
-
-    </div>
-
-  </section>
-  {{template "footer"}}
-</body>
-<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-<script>
+    </section>
+    {{template "footer"}}
+  </body>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
     AOS.init();
-</script>
-<script type="text/javascript" src="../js/script.js"></script>
-
+  </script>
 </html>
 {{end}}

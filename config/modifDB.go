@@ -106,8 +106,13 @@ func DelAccount(delete_account string) {
 
 	tx, err := database.Begin()
 	CheckError(err)
+	// Supprimer la ligne de l'utilisateur dans la BDD users
+	stmt, err := tx.Prepare("DELETE FROM pendingForModerator WHERE username = ?")
+	CheckError(err)
+	_, err = stmt.Exec(delete_account)
+	CheckError(err)
 	// changer l'auteur dans la BDD users
-	stmt, err := tx.Prepare("UPDATE posts SET author = ? WHERE author = ?")
+	stmt, err = tx.Prepare("UPDATE posts SET author = ? WHERE author = ?")
 	CheckError(err)
 	_, err = stmt.Exec("user deleted", delete_account)
 	CheckError(err)

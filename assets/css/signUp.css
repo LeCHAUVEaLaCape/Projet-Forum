@@ -29,7 +29,7 @@ section{
   height: 100%;
   width: 80%;
   margin-left: 10%;
-  margin-top: 58px;
+  margin-top: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -249,4 +249,42 @@ span {
 ::selection {
   color: white;
   background-color: black;
+}
+.formulaire {
+  border-right: solid 1px black;
+  width: 450px;
+}
+.register {
+  display: flex;
+  margin-top: 50px;
+}
+.sign-FB-git-google {
+  width: 450px;
+}
+#account-title {
+  text-align: center;
+  font-size: 25px;
+  text-decoration: underline;
+}
+#tier-title {
+  text-align: center;
+  font-size: 25px;
+  margin: 18px 0px 35px 0px;
+  text-decoration: underline;
+}
+#img-fb {
+  height: 80px;
+  border-radius: 22px;
+  cursor: pointer;
+}
+#img-google {
+  height: 100px;
+  border-radius: 22px;
+  cursor: pointer;
+}
+.facebook-login {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 150px;
 }
