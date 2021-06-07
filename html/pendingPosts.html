@@ -23,13 +23,13 @@
           <div class="each-posts">
           <div class="singlePost-container">
             <!-- ajoute le titre du poste -->
-            <div class="title-post">{{index . 0}}</div>
+            <div class="title-post">{{.Title}}</div>
             <!-- ajoute le corps du poste -->
             <div class="body-post">
               <div class="message">
-                <p>{{index . 1}}</p>
+                <p>{{.Body}}</p>
                 <div class="img-posts">
-                  {{range index . 10}}
+                  {{range .Arrimage}}
                   {{range .}}
                   <img src="{{.}}">  
                   {{end}}
@@ -39,7 +39,7 @@
               <div class="see-more">
                 <div>
                   <button>
-                  <input type="hidden" name="id" value="{{index . 5}}">
+                    <input type="hidden" name="id" value="{{.Id}}">
                    <p class="see-more-txt">Lire la suite... </p></button>
                   </div>
               </div>
@@ -51,7 +51,7 @@
             <div class="author-post">
               <!-- ajoute les catégorie de trie -->
               <div class="categories">
-                {{range index . 7}}
+                {{range .Category_Tab}}
                 <div class="categorie">
                   <div class="color {{.}}"><p class="each-cat">{{.}}</p></div>
                 </div>
@@ -62,17 +62,16 @@
               <div class="author-time">
                 <p class="author">
                   <span class="created-by">post crée par : </span>
-                  {{$author := index . 2}} 
-                  {{if ne $author "user deleted"}}
-                  <a class="user" href="/user?user={{$author}}">{{$author}}</a>
-                  <img src="{{index . 4}}" />
+                  {{if ne .Author "user deleted"}}
+                  <a class="user" href="/user?user={{.Author}}">{{.Author}}</a>
+                  <img src="{{.Photo}}" />
                   {{else}}
                   <a class="user" style="color: black; text-decoration: none"
-                  >{{$author}}</a
+                  >{{.Author}}</a
                 >
                 {{end}}
                 </p>
-                <span id="time-posted">{{index . 3}}</span>
+                <span id="time-posted">{{.Date}}</span>
               </div>
             </div>
           </div>
@@ -81,12 +80,12 @@
               <div class="accept-reject">
                   <form action="" method="POST">
                       <input type="hidden" name="post-accepted" value="true">
-                      <input type="hidden" name="id-pendingPost" value="{{index . 5}}">
+                      <input type="hidden" name="id-pendingPost" value="{{.Id}}">
                       <button id="accept">Accepter</button>
                     </form>
                     <form action="" method="POST">
                         <input type="hidden" name="post-accepted" value="false">
-                      <input type="hidden" name="id-pendingPost" value="{{index . 5}}">
+                        <input type="hidden" name="id-pendingPost" value="{{.Id}}">
                       <button id="reject">Rejeter</button>
                   </form>
               </div>

@@ -2,11 +2,27 @@ package config
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 	"regexp"
 	"strconv"
 	"strings"
 )
+
+type Post struct {
+	Id           string `json:"id"`
+	Title        string
+	Body         string
+	Like         string
+	Author       string
+	Date         string
+	Category     string
+	Category_Tab []string
+	LikedBy      string
+	NbComments   string
+	Photo        string
+	Arrimage     []interface{}
+}
 
 func AddNewPost(title string, body string, dt string, data_newPost map[string]interface{}, category []string) {
 	// Open the database
@@ -25,10 +41,8 @@ func AddNewPost(title string, body string, dt string, data_newPost map[string]in
 
 // Affiche les posts pour la page INDEX et pendingPosts
 func DisplayPosts(r *http.Request, data_info map[string]interface{}, state string) {
-	var categories = []string{"gaming", "informatique", "sport", "culture", "politique", "loisir", "sciences", "sexualite", "finance"}
-	var like, nbComments, photo string
+	var categories []string = GetCategories()
 	var id int
-	var post [][]interface{}
 	var imgstr string
 	var arrimg []string
 	var all_image [][]string
@@ -39,7 +53,7 @@ func DisplayPosts(r *http.Request, data_info map[string]interface{}, state strin
 	for i := range categories {
 		tmp := r.FormValue(categories[i])
 		if tmp != "" {
-			selected_categories += strconv.Itoa(i)
+			selected_categories += tmp
 		}
 	}
 	// RegExp
@@ -58,29 +72,29 @@ func DisplayPosts(r *http.Request, data_info map[string]interface{}, state strin
 	rows, err := database.Query(query)
 	CheckError(err)
 	defer rows.Close()
-
+	var post []Post
 	for rows.Next() {
-		aPost := []interface{}{"", "", "", "", "", "", ""}
-		rows.Scan(&aPost[0], &aPost[1], &aPost[2], &aPost[3], &id, &aPost[6], &like, &nbComments)
+		var aPost Post
+		rows.Scan(&aPost.Title, &aPost.Body, &aPost.Author, &aPost.Date, &aPost.Id, &aPost.Category, &aPost.Like, &aPost.NbComments)
 		// si le RegExp correspond à la DB
-		if filter.MatchString(aPost[6].(string)) {
+		if filter.MatchString(aPost.Category) {
 			// Remplace les \n par des <br> pour sauter des lignes en html
-			aPost[1] = strings.Replace(aPost[1].(string), string('\r'), "", -1)
-			aPost[1] = strings.Replace(aPost[1].(string), string('\n'), "<br>", -1)
-			aPost[5] = strconv.Itoa(id)
-			if aPost[6] != nil {
-				temp := []interface{}{} // string
-				for _, e := range aPost[6].(string) {
+			aPost.Body = strings.Replace(strings.Replace(aPost.Body, string('\r'), "", -1), string('\n'), "<br>", -1)
+
+			if aPost.Category != "" {
+				for _, e := range aPost.Category {
 					j, _ := strconv.Atoi(string(e))
-					temp = append(temp, categories[j])
+					if j >= len(categories) {
+						continue
+					}
+					aPost.Category_Tab = append(aPost.Category_Tab, categories[j])
 				}
-				aPost = append(aPost, temp)
-			} else {
-				aPost[6] = []string{}
-				aPost = append(aPost, []string{})
+				//
+				if len(aPost.Category_Tab) == 0 {
+					continue
+				}
 			}
-			aPost = append(aPost, like)
-			aPost = append(aPost, nbComments)
+			post = append(post, aPost)
 		}
 
 		// Ajoute les images pour la page pendingPosts seulement
@@ -101,31 +115,28 @@ func DisplayPosts(r *http.Request, data_info map[string]interface{}, state strin
 
 				}
 			}
-			err = rows.Err()
-			CheckError(err)
-
+			CheckError(rows.Err())
 		}
 		if len(arrimage) > 0 {
-			aPost = append(aPost, arrimage[len(arrimage)-1:])
+			aPost.Arrimage = arrimage[len(arrimage)-1:]
 		}
-		post = append(post, aPost)
 	}
 
 	// Ajoute le chemin de la photo qui a été choisit par l'utilisateur
 	for i := 0; i < len(post); i++ {
-		rows, err := database.Query("SELECT photo FROM users WHERE username = ?", post[i][2])
+		rows, err := database.Query("SELECT photo FROM users WHERE username = ?", post[i].Photo)
 		CheckError(err)
 		defer rows.Close()
 		for rows.Next() {
-			err := rows.Scan(&photo)
+			err := rows.Scan(&post[i].Photo)
 			CheckError(err)
 		}
 		err = rows.Err()
 		CheckError(err)
-		post[i][4] = photo
 	}
 
 	data_info["allposts"] = post
+	fmt.Println(data_info["allposts"])
 	data_info["categories"] = categories
 }
 

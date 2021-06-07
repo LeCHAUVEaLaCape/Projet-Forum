@@ -10,7 +10,6 @@ import (
 
 var id int
 var username, email, photo, likedBy string
-var categories = []string{"gaming", "informatique", "sport", "culture", "politique", "loisir", "sciences", "sexualite", "finance"}
 
 // Fill the database with the input of the users
 func AddUser(input_username string, input_email string, input_password string, info map[string]interface{}) {
@@ -202,7 +201,7 @@ func Feed(data_Info map[string]interface{}) {
 
 // get all posts liked by Someone
 func LikedPosts(data_Info map[string]interface{}, state string) {
-
+	var categories = GetCategories()
 	var all_myLikedPosts [][]interface{}
 	var post_liked bool
 
@@ -283,7 +282,7 @@ func LikedPosts(data_Info map[string]interface{}, state string) {
 func Createdposts(data_Info map[string]interface{}, state string) {
 	var all_myPosts [][]interface{}
 	var photo string
-	var categories = []string{"gaming", "informatique", "sport", "culture", "politique", "loisir", "sciences", "sexualite", "finance"}
+	var categories = GetCategories()
 
 	database, err := sql.Open("sqlite3", "./db-sqlite.db")
 	CheckError(err)

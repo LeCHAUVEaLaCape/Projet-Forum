@@ -1,0 +1,52 @@
+{{define "categoriesManager"}}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forum - categoriesManager</title>
+    <link rel="stylesheet" href="../assets/css/index.css" />
+</head>
+<body>
+    
+{{template "header" .}}
+    <div class="page">
+        {{if eq .role "admin"}}
+            <section>
+                <h2>Ajouter une nouvelle categorie</h2>
+                <form action="" method="POST">
+                    <input class="button" type="text" name="newCategorie" >
+                    <button type="submit">Submit</button>
+                </form>
+            </section>
+            <!-- liste des categories -->
+            <section>
+                <h2>Liste des Categories</h2>
+                {{range $key , $value := .categories}}
+                    <div>{{$value.Nom}} {{$value.Actif}}</div>
+                    {{if eq $value.Actif false}}
+                        <form action="" method="POST">
+                            <input class="button" type="hidden" name="{{$value.Nom}}_false" value="{{$value.Nom}}">
+                            <button type="submit">Activer</button>
+                        </form>
+                    {{end}}
+                    {{if eq $value.Actif true}}
+                        <form action="" method="POST">
+                            <input class="button" type="hidden" name="{{$value.Nom}}_true" value="{{$value.Nom}}">
+                            <button type="submit">Desactiver</button>
+                        </form>
+                    {{end}}
+                    {{if gt $key 8}}
+                    <form action="" method="POST">
+                        <input class="button" type="text" name="{{$value.Nom}}_DEL" >
+                        <button type="submit">Rename</button>
+                    </form>
+                    {{end}}
+                {{end}}
+            </section>
+        {{end}}
+    </div>
+{{template "footer"}}
+</body>
+</html>
+{{end}}

@@ -20,7 +20,7 @@ func main() {
 	data["user"] = ""
 
 	CreateDB() // ./config/CreateDB
-
+	InitCategoriePrincipale()
 	fmt.Println("Please connect to http://localhost:8000")
 	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets")))) // Join Assets Directory to the server
 	http.HandleFunc("/", index)
@@ -38,6 +38,7 @@ func main() {
 	http.HandleFunc("/myLikedPosts", myLikedPosts)
 	http.HandleFunc("/pendingPosts", PendingPosts)
 	http.HandleFunc("/dashboard", Dashboard)
+	http.HandleFunc("/categories", CategoriesHandleur)
 
 	// Login with facebook
 	http.HandleFunc("/loginFB", HandleFacebookLogin) // ./oauth/facebook.go
@@ -247,13 +248,19 @@ func newPost(w http.ResponseWriter, r *http.Request) {
 	// Input de la page
 	title := r.FormValue("title")
 	body := r.FormValue("body")
-	category := []string{r.FormValue("gaming"), r.FormValue("informatique"), r.FormValue("sport"), r.FormValue("culture"), r.FormValue("politique"), r.FormValue("loisir"), r.FormValue("sciences"), r.FormValue("sexualite"), r.FormValue("finance")}
+
+	categories := GetCategories()
+	var category []string
+	for i := range categories {
+		category = append(category, r.FormValue(categories[i]))
+	}
+
 	if title != "" && body != "" {
 		dt := time.Now()                                                                  // Capture la date de submit
 		AddNewPost(title, body, dt.Format("02-01-2006 15:04:05"), data_newPost, category) // ./config/post.go
 		UploadHandler(w, r)                                                               // ./config/images.go
 	}
-	data_newPost["categorie"] = []string{"gaming", "informatique", "sport", "culture", "politique", "loisir", "sciences", "sexualite", "finance"}
+	data_newPost["categorie"] = GetCategories()
 
 	t := template.New("newPost-template")
 	t = template.Must(t.ParseFiles("./html/newPost.html", "./html/header&footer.html"))
@@ -413,4 +420,16 @@ func SetDataToSend(w http.ResponseWriter, r *http.Request, data_info map[string]
 	} else {
 		data_info["cookieExist"] = false
 	}
+}
+func CategoriesHandleur(w http.ResponseWriter, r *http.Request) {
+	dataCategorie := make(map[string]interface{})
+	SetDataToSend(w, r, dataCategorie, data, false, "")
+	NewCategorie(w, r)
+	dataCategorie["categories"] = DisplayCategories()
+	ActiverCategorie(w, r)
+	DesactiverCategorie(w, r)
+	RenommerCategorie(w, r)
+	t := template.New("categoriesManager-template")
+	t = template.Must(t.ParseFiles("./html/categoriesManager.html", "./html/header&footer.html"))
+	t.ExecuteTemplate(w, "categoriesManager", dataCategorie)
 }
