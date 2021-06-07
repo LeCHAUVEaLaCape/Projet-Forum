@@ -61,11 +61,16 @@
               <!-- Ajoute l'auteur du post et le time -->
               <div class="author-time">
                 <p class="author">
-                  <span class="created-by">post crée par : </span
-                  ><a class="user" href="/user?user={{index . 2}}"
-                    >{{index . 2}}</a
-                  >
+                  <span class="created-by">post crée par : </span>
+                  {{$author := index . 2}} 
+                  {{if ne $author "user deleted"}}
+                  <a class="user" href="/user?user={{$author}}">{{$author}}</a>
                   <img src="{{index . 4}}" />
+                  {{else}}
+                  <a class="user" style="color: black; text-decoration: none"
+                  >{{$author}}</a
+                >
+                {{end}}
                 </p>
                 <span id="time-posted">{{index . 3}}</span>
               </div>

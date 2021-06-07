@@ -195,8 +195,16 @@
       <div class="author-comment">
         <div class="author-time">
           <p class="author">
-            <span>commented by : </span><a id="user" href="/user?user={{index . 1}}">{{index . 1}}</a>
+            <span>commented by : </span>
+            {{$author := index . 1}} 
+            {{if ne $author "user deleted"}}
+            <a id="user" href="/user?user={{$author}}">{{$author}}</a>
             <img src="{{index . 4}}" />
+            {{else}}
+            <a class="user" style="color: black; text-decoration: none"
+            >{{$author}}</a
+          >
+          {{end}}
           </p>
           <span>{{index . 2}}</span>
         </div>

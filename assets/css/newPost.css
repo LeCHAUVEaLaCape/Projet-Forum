@@ -217,3 +217,7 @@ section{
   height: 8px;
   background-color: black;
 }
+input[type=text],textarea[type=text] {
+  font-size: 20px;
+  padding: 3px;
+}

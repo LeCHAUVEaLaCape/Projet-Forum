@@ -186,3 +186,9 @@
     align-items: center;
     font-size: 15px;
   }
+  .author-time {
+    font-size: 14px;
+  }
+  .user {
+    font-size: 21px;
+  }
