@@ -453,10 +453,11 @@
        ------------->
         {{if and (eq .role "moderator") (ne .username .user)}}
         <div class="report">
+          <p>Report {{.username}}</p>
           <form action="" method="post">
             <input type="hidden" name="nameUser" value="{{.username}}" />
             <input type="hidden" name="nameReporter" value="{{.user}}" />
-            <input type="text" name="reasonReport" />
+            <input type="text" name="reasonReport" required/>
             <button>report</button>
           </form>
         </div>

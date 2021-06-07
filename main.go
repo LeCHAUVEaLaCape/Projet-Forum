@@ -357,6 +357,7 @@ func PendingPosts(w http.ResponseWriter, r *http.Request) {
 	id_pendingPost := r.FormValue("id-pendingPost")
 	if post_accepted != "" && id_pendingPost != "" {
 		PostAcceptedOrNot(post_accepted, id_pendingPost) // ./config/modifDB.go
+		http.Redirect(w, r, "/pendingPosts", http.StatusSeeOther)
 	}
 
 	t := template.New("pendingPosts-template")
@@ -382,8 +383,13 @@ func Dashboard(w http.ResponseWriter, r *http.Request) {
 	answerReport := r.FormValue("answerReport")
 	nameReported := r.FormValue("nameReported")
 	reportAccepted := r.FormValue("reportAccepted") // /!\ checkbox
-	if answerReport != "" && nameReported != "" && reportAccepted == "" {
+	if answerReport != "" && nameReported != "" {
+		if reportAccepted == "" {
+			reportAccepted = "0"
+		}
+		fmt.Println(reportAccepted)
 		DeleteUserFromReport(answerReport, nameReported, reportAccepted) // ./config/report.go
+		http.Redirect(w, r, "/dashboard", http.StatusSeeOther)
 	}
 
 	t := template.New("dashboard-template")

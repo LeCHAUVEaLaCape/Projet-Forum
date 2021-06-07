@@ -43,7 +43,7 @@
   .message p {
     overflow: auto;
   }
-  span {
+  .post-part span {
     font-size: 12px;
   }
  .user {
@@ -58,7 +58,7 @@
     align-items: center;
     width: 100%;
   }
-  button {
+  .post-part button {
     cursor: pointer;
     border: solid 0px;
   }

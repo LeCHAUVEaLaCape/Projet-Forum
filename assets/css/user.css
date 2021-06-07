@@ -263,3 +263,24 @@ button {
 .mid-page-container h4 {
   font-size: 40px;
 }
+.report {
+  height: 130px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.report form {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  height: 70px;
+}
+.report input[type=text] {
+  height: 20px;
+  width: 220px;
+}
+.report p {
+  text-align: center;
+  font-size: 26px;
+}
