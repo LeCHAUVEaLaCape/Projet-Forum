@@ -6,8 +6,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-
-	. "./err"
 )
 
 func AddNewPost(title string, body string, dt string, data_newPost map[string]interface{}, category []string) {

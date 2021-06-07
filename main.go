@@ -19,7 +19,7 @@ var data = make(map[string]interface{})
 func main() {
 	data["user"] = ""
 
-	CreateDB()
+	CreateDB() // ./config/CreateDB
 
 	fmt.Println("Please connect to http://localhost:8000")
 	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets")))) // Join Assets Directory to the server
@@ -48,7 +48,7 @@ func main() {
 	http.HandleFunc("/GoogleCallBack", HandleGoogleCallback)
 
 	err := http.ListenAndServe(":8000", nil)
-	checkError(err)
+	CheckError(err)
 }
 
 // Generate the main page when first loading the site
@@ -235,8 +235,6 @@ func logOut(w http.ResponseWriter, r *http.Request) {
 
 // Generate the page to create new Post (accessible only to logged in users)
 func newPost(w http.ResponseWriter, r *http.Request) {
-	category := []string{r.FormValue("gaming"), r.FormValue("informatique"), r.FormValue("sport"), r.FormValue("culture"), r.FormValue("politique"), r.FormValue("loisir"), r.FormValue("sciences"), r.FormValue("sexualite"), r.FormValue("finance")}
-
 	// initiate the data that will be send to html
 	data_newPost := make(map[string]interface{})
 	SetDataToSend(w, r, data_newPost, data, false, "")
@@ -249,12 +247,13 @@ func newPost(w http.ResponseWriter, r *http.Request) {
 	// Input de la page
 	title := r.FormValue("title")
 	body := r.FormValue("body")
+	category := []string{r.FormValue("gaming"), r.FormValue("informatique"), r.FormValue("sport"), r.FormValue("culture"), r.FormValue("politique"), r.FormValue("loisir"), r.FormValue("sciences"), r.FormValue("sexualite"), r.FormValue("finance")}
 	if title != "" && body != "" {
 		dt := time.Now()                                                                  // Capture la date de submit
 		AddNewPost(title, body, dt.Format("02-01-2006 15:04:05"), data_newPost, category) // ./config/post.go
 		UploadHandler(w, r)                                                               // ./config/images.go
 	}
-	data_newPost["categorie"] = category
+	data_newPost["categorie"] = []string{"gaming", "informatique", "sport", "culture", "politique", "loisir", "sciences", "sexualite", "finance"}
 
 	t := template.New("newPost-template")
 	t = template.Must(t.ParseFiles("./html/newPost.html", "./html/header&footer.html"))
@@ -313,23 +312,6 @@ func post(w http.ResponseWriter, r *http.Request) {
 	t.ExecuteTemplate(w, "post", data_post)
 }
 
-func SetDataToSend(w http.ResponseWriter, r *http.Request, data_info map[string]interface{}, data map[string]interface{}, on_user_page bool, user_page string) {
-	// Copy the main map to get all important info
-	for k, v := range data {
-		data_info[k] = v
-	}
-	data_info["cookieExist"] = false
-	data_info["username"] = ""
-	GetCookie(w, data_info, r) // ./cookies/getCookies.go
-
-	if data["user"] != nil {
-		CheckNotif(w, r, data_info)
-		GetRole(data_info, on_user_page, user_page)
-	} else {
-		data_info["cookieExist"] = false
-	}
-}
-
 // Page qui affiche les posts créé par l'utilisateur connecté
 func myPosts(w http.ResponseWriter, r *http.Request) {
 	// initiate the data that will be send to html
@@ -354,13 +336,6 @@ func myLikedPosts(w http.ResponseWriter, r *http.Request) {
 	t := template.New("myLikedPosts-template")
 	t = template.Must(t.ParseFiles("./html/myLikedPosts.html", "./html/header&footer.html"))
 	t.ExecuteTemplate(w, "myLikedPosts", data_myLikedPosts)
-}
-
-// verifie les erreurs
-func checkError(err error) {
-	if err != nil {
-		fmt.Println(err)
-	}
 }
 
 // page des posts en attente, un admin ou moderateur doit les accepter pour les mettres sur la page principal
@@ -414,4 +389,22 @@ func Dashboard(w http.ResponseWriter, r *http.Request) {
 	t := template.New("dashboard-template")
 	t = template.Must(t.ParseFiles("./html/dashboard.html", "./html/header&footer.html"))
 	t.ExecuteTemplate(w, "dashboard", data_dashboard)
+}
+
+// Copie les données principales, verifie si un cookie existe, les notifications ...
+func SetDataToSend(w http.ResponseWriter, r *http.Request, data_info map[string]interface{}, data map[string]interface{}, on_user_page bool, user_page string) {
+	// Copy the main map to get all important info
+	for k, v := range data {
+		data_info[k] = v
+	}
+	data_info["cookieExist"] = false
+	data_info["username"] = ""
+	GetCookie(w, data_info, r) // ./cookies/getCookies.go
+
+	if data["user"] != nil {
+		CheckNotif(w, r, data_info)
+		GetRole(data_info, on_user_page, user_page)
+	} else {
+		data_info["cookieExist"] = false
+	}
 }

@@ -3,8 +3,6 @@ package config
 import (
 	"database/sql"
 	"net/http"
-
-	. "./err"
 )
 
 type dataUsers struct {

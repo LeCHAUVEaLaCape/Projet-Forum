@@ -3,8 +3,6 @@ package config
 import (
 	"database/sql"
 	"net/http"
-
-	. "./err"
 )
 
 func GetInfoUser(w http.ResponseWriter, r *http.Request, data_user map[string]interface{}) {
@@ -137,6 +135,7 @@ func DelAccount(delete_account string) {
 
 // supprime un commentaire
 func DelComment(w http.ResponseWriter, r *http.Request) {
+	var nbComment int
 	delete_comment := r.FormValue("delComment")
 	idMainPost := r.FormValue("id-mainPost")
 	// Open the database
@@ -144,10 +143,24 @@ func DelComment(w http.ResponseWriter, r *http.Request) {
 	CheckError(err)
 	defer database.Close()
 
-	// DELETE the comments of the main post
 	tx, err := database.Begin()
 	CheckError(err)
-	stmt, err := tx.Prepare("DELETE FROM comments WHERE id = ?")
+
+	// remove 1 to the nb of comments when delete post
+	rows, err := database.Query("SELECT nbComments FROM posts WHERE id = " + idMainPost)
+	CheckError(err)
+	for rows.Next() {
+		rows.Scan(&nbComment)
+	}
+	nbComment -= 1
+	rows.Close()
+	stmt, err := tx.Prepare("UPDATE posts SET nbComments = ? WHERE id = ?")
+	CheckError(err)
+	_, err = stmt.Exec(nbComment, idMainPost)
+	CheckError(err)
+
+	// DELETE the comments of the main post
+	stmt, err = tx.Prepare("DELETE FROM comments WHERE id = ?")
 	CheckError(err)
 	_, err = stmt.Exec(delete_comment)
 	CheckError(err)

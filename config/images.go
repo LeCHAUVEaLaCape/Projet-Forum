@@ -9,8 +9,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	. "./err"
-
 	uuid "github.com/satori/go.uuid"
 )
 

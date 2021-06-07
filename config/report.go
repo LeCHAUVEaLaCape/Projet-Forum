@@ -3,8 +3,6 @@ package config
 import (
 	"database/sql"
 	"log"
-
-	. "./err"
 )
 
 // add the report to the database

@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"strings"
 	"time"
-
-	. "./err"
 )
 
 func Adding_comment(w http.ResponseWriter, r *http.Request, add_comment string, post *[8]string, user string) {

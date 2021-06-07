@@ -2,8 +2,6 @@ package config
 
 import (
 	"database/sql"
-
-	. "./err"
 )
 
 func CreateDB() {
