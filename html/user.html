@@ -411,6 +411,12 @@
           </form>
         </div>
         {{end}}
+        <!-- Bouton pour l'admin pour allez dashboard -->
+        {{if and (.sameUser) (eq .role "admin")}}
+        <div>
+          <a href="/dashboard">Dashboard</a>
+        </div>
+        {{end}}
         <!------------
           Supprimer son compte (visible par tous sauf pour les Admin sur leur propre page)
        ------------->

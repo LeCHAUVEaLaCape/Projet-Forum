@@ -1,115 +1,334 @@
-.full-screen {
-    display: flex;
-    margin-top: 50px;
+body,
+* {
+    margin: 0;
+    padding: 0;
+    color: black;
+    text-decoration: none;
+    overflow-x: hidden;
 }
-#dashboard {
-    text-align: center;
-}
-.all-screen {
+
+section {
+    height: 100vh;
     width: 100vw;
 }
+
+.page {
+    overflow: hidden;
+    min-height: 100%;
+    width: 80%;
+    margin-left: 10%;
+    background-color: #eee;
+    border-style: solid;
+    border-width: 4px;
+    border-image: linear-gradient(to bottom, #DFA003, brown, yellow, brown, #DFA003) 1 100%;
+}
+
+.page h1 {
+    font-size: 60px;
+    font-family: "Modusa";
+    text-decoration: underline;
+    text-align: center;
+}
+
+.full-screen {
+    width: 100%;
+    display: flex;
+    margin-top: 20px;
+}
+
 .left-screen {
-    width: 50vw;
-    border-right: solid 1px;
+    width: 50%;
+    border-right: solid 2px;
+    display: flex;
+    flex-direction: column;
 }
-section {
-    justify-content: center;
+
+.right-screen {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
 }
+
+/* 
++----------------------------------------------------------------------+
+| List
++----------------------------------------------------------------------+
+*/
+#upper-section {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    min-height: 200px;
+    width: 100%;
+}
+
+#upper-section h2 {
+    font-size: 30px;
+    font-family: "Modusa";
+    text-decoration: underline;
+}
+
+#upper-section h2 img {
+    width: 5%;
+
+}
+
+#upper-section div {
+    font-size: 25px;
+    font-family: 'Merriweather', serif;
+    margin-top: 2px;
+    font-style: italic;
+    margin-left: 15px;
+}
+
+/* 
++----------------------------------------------------------------------+
+| Demandes
++----------------------------------------------------------------------+
+*/
 .all-demands {
+    min-height: 200px;
     display: flex;
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
     margin-top: 50px;
-    width: 70%;
+    padding-top: 20px;
+    border-top: black 2px solid;
 }
-#lower-section {
-    min-height: 270px;
-    margin-top: 50px;
-    border-top: solid 1px black;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding-top: 40px;
+
+.all-demands h2 {
+    width: 100%;
+    text-align: center;
+    font-size: 30px;
+    font-family: "Modusa";
+    text-decoration: underline;
+    margin-bottom: 20px;
 }
+
+.single-demand {
+    padding: 10px;
+    border: solid 2px black;
+    border-radius: 10px;
+    background-color: white;
+    margin: 10px;
+    width: 40%;
+    text-align: center;
+}
+
+.single-demand h4 {
+    font-family: 'Merriweather', serif;
+}
+
+.single-demand h4 a {
+    color: blue;
+    font-family: 'Merriweather', serif;
+}
+
+.single-demand h4 a:hover {
+    color: darkblue;
+    cursor: pointer;
+}
+
 .demand {
     display: flex;
     justify-content: center;
 }
+
 .demand form {
     margin: 10px;
 }
+
 .demand button {
-    font-size: 17px;
-    padding: 4px;
+    transition: all 0.3s;
+    text-decoration: none;
+    border: solid 2px black;
+    border-radius: 10px;
+    height: 50px;
+    padding: 4px 4px 4px 4px;
+    overflow: hidden;
+    font-family: "Modusa";
+    font-size: 25px;
+    background: linear-gradient(45deg, #DFA003, brown, yellow, brown, #DFA003);
+    color: black;
 }
-.single-demand {
-    padding: 10px;
-    border: solid 1px black;
-    border-radius: 9px;
-    margin: 10px;
-    width: 40%;
+
+.demand button:hover {
+    box-shadow: 0px 0px 2px #000000;
+    cursor: pointer;
+    color: black;
+    filter: brightness(140%);
 }
-section div, section h2 {
-    text-align: center;
-}
+
+
+
+/* 
++----------------------------------------------------------------------+
+| Report
++----------------------------------------------------------------------+
+*/
 #report-txt {
-    margin-top: 50px;
+    width: 100%;
+    text-align: center;
+    font-size: 30px;
+    font-family: "Modusa";
+    text-decoration: underline;
+    margin-bottom: 20px;
 }
-.report-container-container {
-    width: 50vw;
+
+.all-reports {
     display: flex;
     justify-content: center;
+    flex-direction: column;
     align-items: center;
     text-align: center;
 }
-.report-container {
-    border-right: solid 1px black;
-    padding: 15px;
-}
-.report-container h2{
-    font-size: 25px;
-}
-#report-txt {
-    text-align: center;
-}
-.report-action a, .single-demand a{
-    color: blue;
-    text-decoration: underline;
-}
-.report-action p {
-    margin: 10px 0px;
-}
-.reason-reported {
-    background-color: white;
-    border: solid 1px black;
-    border-radius: 5px;
-}
-.answer-report {
-    display: grid;
-    place-items: center;
-    padding: 15px;
-}
-.answer-report button {
-    font-size: 17px;    
-}
+
 .single-report-container {
     display: flex;
-    border: solid 1px black;
-    border-radius: 5px;
-    padding: 10px;
-    margin: 35px 0px;
+    border: solid 2px black;
+    border-radius: 10px;
+    margin: 50px;
 }
+
+.report-container {
+    border-right: solid 2px black;
+    background-color: white;
+    padding: 20px;
+}
+
+.report-action p {
+    font-family: 'Merriweather', serif;
+    font-size: 20px;
+}
+
+.report-action a,
+.single-demand a {
+    font-size: 20px;
+    color: blue;
+    text-decoration: underline;
+    font-family: 'Merriweather', serif;
+}
+
+.report-action a:hover,
+.single-demand a:hover {
+    color: darkblue;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+
+.reason-reported {
+    margin: 10px;
+    background-color: black;
+    border: solid black 2px;
+    border-radius: 10px;
+}
+
+.reason-reported p {
+    color: white;
+    font-family: 'Merriweather', serif;
+    font-size: 20px;
+}
+
+.answer-report {
+    background-color: white;
+    padding: 20px;
+}
+
+.answer-report form div {
+    width: 100%;
+    height: 50px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.answer-report h4 {
+    font-family: 'Merriweather', serif;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.answer-report h6 {
+    font-family: 'Merriweather', serif;
+    font-size: 16px;
+    font-style: italic;
+}
+
+.answer-report button {
+    margin: 5px;
+    transition: all 0.3s;
+    text-decoration: none;
+    border: solid 2px black;
+    border-radius: 10px;
+    height: 40px;
+    padding: 2px 2px 2px 2px;
+    overflow: hidden;
+    font-family: "Modusa";
+    font-size: 20px;
+    background: linear-gradient(45deg, #DFA003, brown, yellow, brown, #DFA003);
+    color: black;
+}
+
+.answer-report button:hover {
+    box-shadow: 0px 0px 2px #000000;
+    cursor: pointer;
+    color: black;
+    filter: brightness(140%);
+
+}
+
 #check-report {
     cursor: pointer;
-    height: 17px;
-    width: 17px;
+    height: 18px;
+    width: 18px;
 }
-.input-txt {
+
+#check-report:hover {
+    height: 20px;
+    width: 20px;
+}
+
+#input-txt {
     width: 200px;
-    height: 25px;
+    height: 30px;
+    border-style: solid;
+    border-width: 2px;
+    border-image: linear-gradient(45deg, #DFA003, brown, yellow, brown, #DFA003)1;
+    font-family: 'Merriweather', serif;
+    color: black;
 }
-button {
-    cursor: pointer;
+
+#input-txt:hover {
+    box-shadow: 0px 0px 4px #000000, 2px 2px 6px #DFA003;
+
+}
+
+#input-txt:focus {
+    box-shadow: 0px 0px 4px #000000, 2px 2px 6px #DFA003;
+    outline: none;
+}
+
+/* 
++----------------------------------------------------------------------+
+| Scroll Bar
++----------------------------------------------------------------------+
+*/
+::-webkit-scrollbar {
+    width: 10px;
+    background-color: white;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: rgb(0, 0, 0);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #DFA003;
+}
+
+::-webkit-scrollbar-button {
+    height: 8px;
+    background-color: black;
 }

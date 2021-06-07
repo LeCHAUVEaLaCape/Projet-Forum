@@ -6,7 +6,7 @@
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="../assets/css/allUsers.css" />
+  <link rel="stylesheet" href="../assets/css/allusers.css" />
   <link rel="shortcut icon" href="../assets/images/logoforum.png" />
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300&display=swap" rel="stylesheet">
@@ -19,20 +19,20 @@
     <div  id="top" class="page">
       <form style="overflow: hidden;" action="/user" method="get">
         <div class="search">
-          <label data-aos="fade-down" data-aos-duration="3000" for="user"><img src="https://discord.com/assets/31abf4145cf7c27ea0e1a2e4328283fd.svg" alt="bas"><strong>S</strong>earch an <strong>U</strong>ser <img src="https://discord.com/assets/31abf4145cf7c27ea0e1a2e4328283fd.svg" alt="bas"></label>
+          <label for="user"><img src="https://discord.com/assets/31abf4145cf7c27ea0e1a2e4328283fd.svg" alt="bas"><strong>S</strong>earch an <strong>U</strong>ser <img src="https://discord.com/assets/31abf4145cf7c27ea0e1a2e4328283fd.svg" alt="bas"></label>
           <div>
-            <input data-aos="fade-right" data-aos-duration="3000"type="text" name="user" id="user">
-            <button data-aos="fade-left" data-aos-duration="3000" type="submit" class="submitbtn">Submit</button>
+            <input type="text" name="user" id="user">
+            <button type="submit" class="submitbtn">Submit</button>
           </div>
         </div>
       </form>
-      <div data-aos="fade-up" data-aos-duration="3000"class="users-container">
+      <div class="users-container">
         <div class="all-admin">
           <h3><img src="https://discord.com/assets/7d7c9561cc5ab5259ff8023b8ef86c99.svg" alt="admin"> Admins</h3>
           <div class="container">
-            {{$length := len .allAdmin}} 
+            {{$length := len .alladmin}} 
             {{if gt $length 0}} 
-            {{template "aUser" .allAdmin}}
+            {{template "aUser" .alladmin}}
             {{else}}
             <p>Aucun admin enregistré</p>
             {{end}}
@@ -41,9 +41,9 @@
         <div class="all-moderator">
           <h3><img src="https://discord.com/assets/bd766f88fab518680708df9935b50e85.svg" alt="modo"> Moderators</h3>
           <div class="container">
-            {{$length := len .allModerator}} 
+            {{$length := len .allmoderator}} 
             {{if gt $length 0}} 
-            {{template "aUser" .allModerator}}
+            {{template "aUser" .allmoderator}}
             {{else}}
             <p>Aucun modérateur enregistré</p>
             {{end}}
@@ -52,9 +52,9 @@
         <div class="all-users">
           <h3><img src="https://discord.com/assets/f1719ecb228ce3c17b203ca4c15115c0.svg" alt="user"> Users</h3>
           <div class="container">
-          {{$length := len .allUsers}} 
+          {{$length := len .alluser}} 
           {{if gt $length 0}} 
-          {{template "aUser" .allUsers}}
+          {{template "aUser" .alluser}}
           {{else}}
           <p>Aucun utilisateur enregistré</p>
           {{end}}

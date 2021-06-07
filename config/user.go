@@ -373,3 +373,23 @@ func SearchUserToLog(data_logIn map[string]interface{}, user_login string, passw
 	}
 	return create_cookie
 }
+
+func GetRoleForAllUsers(data_allUsers map[string]interface{}, role string) {
+	var someone [2]string
+	var everyone [][2]string
+
+	// Open the database
+	database, err := sql.Open("sqlite3", "./db-sqlite.db")
+	CheckError(err)
+	defer database.Close()
+
+	// Ajouter tous les admins
+	rows, err := database.Query("SELECT username, email FROM users WHERE role = ?", role)
+	CheckError(err)
+	defer rows.Close()
+	for rows.Next() {
+		rows.Scan(&someone[0], &someone[1])
+		everyone = append(everyone, someone)
+	}
+	data_allUsers["all"+role] = everyone
+}

@@ -1,144 +1,102 @@
 {{define "dashboard"}}
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Forum - Dashboard</title>
-    <link rel="stylesheet" href="../assets/css/index.css" />
-    <link rel="stylesheet" href="../assets/css/dashboard.css" />
-  </head>
-  <body>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Faux Rhum - Dashboard</title>
+  <link rel="stylesheet" href="../assets/css/index.css" />
+  <link rel="stylesheet" href="../assets/css/dashboard.css" />
+  <link rel="shortcut icon" href="../assets/images/logoforum.png" />
+</head>
+
+<body>
+  <section>
     {{template "header" .}}
     <div class="page">
       <h1 id="dashboard">Dashboard</h1>
       <div class="full-screen">
-        <!-- liste des admins et modo -->
-        {{if eq .role "admin"}}
-        <div class="left-screen screen">
-            {{else if eq .role "moderator"}}
-            <div class="all-screen screen">
-            {{end}}
-          <section id="upper-section">
-            <h2>Admins :</h2>
+        <div class="left-screen">
+          <!-- liste des admins et modo -->
+          <div id="upper-section">
+            <h2> <img src="https://discord.com/assets/7d7c9561cc5ab5259ff8023b8ef86c99.svg" alt="admin">Admins :</h2>
             {{range .liste.Admins}}
             <div>
-              <div>{{.Username}} {{.Role}}</div>
+              <div>{{.Username}}</div>
             </div>
             {{end}}
-            <h2>Moderators :</h2>
+            <h2> <img src="https://discord.com/assets/bd766f88fab518680708df9935b50e85.svg" alt="modo">Moderators :</h2>
             {{range .liste.Moderators}}
             <div>
-              <div>{{.Username}} {{.Role}}</div>
+              <div>{{.Username}}</div>
             </div>
-            {{end}} 
-            {{if or (eq .role "moderator") (eq .role "admin")}}
-            <h2>Users :</h2>
+            {{end}}
+            <h2> <img src="https://discord.com/assets/f1719ecb228ce3c17b203ca4c15115c0.svg" alt="user">Users :</h2>
             {{range .liste.Users}}
             <div>
-              <div>{{.Username}} {{.Role}}</div>
+              <div>{{.Username}}</div>
             </div>
-            {{end}} {{end}}
-          </section>
-          <!-- Bouton demande pour passer modo ET/OU liste des demandes -->
-          <section id="lower-section">
-            {{if eq .role "user"}}
-            <form action="" method="POST">
-              <input
-                class="button"
-                type="hidden"
-                name="user"
-                value="{{.user}}"
-              />
-              <button type="submit">Demande Moderateur</button>
-            </form>
-            {{end}} {{if eq .role "admin"}}
+            {{end}}
+          </div>
+          <div class="all-demands">
             <h2>Users wanting to be moderator :</h2>
-            <div class="all-demands">
-              
             {{range .liste_demande}}
             <div class="single-demand">
               <h4><a href="/user?user={{.}}">{{.}}</a> is asking to be moderator</h4>
               <div class="demand">
                 <form action="" method="POST">
-                  <input
-                    class="button"
-                    type="hidden"
-                    name="accepter"
-                    value="{{.}}"
-                  />
+                  <input class="button" type="hidden" name="accepter" value="{{.}}" />
                   <button type="submit">Accept</button>
                 </form>
                 <form action="" method="POST">
-                  <input
-                    class="button"
-                    type="hidden"
-                    name="refuser"
-                    value="{{.}}"
-                  />
+                  <input class="button" type="hidden" name="refuser" value="{{.}}" />
                   <button type="submit">Refuse</button>
                 </form>
               </div>
             </div>
             {{end}}
-          </div> {{end}}
-          </section>
-        </div>
-        {{if eq .role "admin"}}
-        <div class="report-section">
-          <h2 id="report-txt">Reports</h2>
-          <div class="report-container-container">
-            <div class="all-reports">
-              {{range .report}}
-              <div class="single-report-container">
-                <div class="report-container">
-                  <div class="report">
-                    <div class="report-action">
-                      <p>
-                        <a href="/user?user={{index . 0}}">{{index . 0}}</a>
-                        reported user
-                        <a href="/user?user={{index . 1}}">{{index . 1}}</a
-                        ><br />for the following reason :
-                      </p>
-                    </div>
-                    <div class="reason-reported">
-                      <p>"{{index . 2}}"</p>
-                    </div>
-                  </div>
-                </div>
-                <div class="answer-report">
-                  <h4>Give an answer to this report</h4>
-                  <h6>Checking the box will delete the user</h6>
-                  <form action="" method="POST">
-                    <input
-                      type="text"
-                      id="input-txt"
-                      name="answerReport"
-                      required
-                    />
-                    <input
-                      type="hidden"
-                      name="nameReported"
-                      value="{{index . 1}}"
-                    />
-                    <input
-                      type="checkbox"
-                      id="check-report"
-                      name="reportAccepted"
-                      value="1"
-                    />
-                    <button>Submit</button>
-                  </form>
-                </div>
-              </div>
-              {{end}}
-            </div>
           </div>
         </div>
-        {{end}}
+        <div class="right-screen">
+          <h2 id="report-txt">Reports</h2>
+          <div class="all-reports">
+            {{range .report}}
+            <div class="single-report-container">
+              <div class="report-container">
+                <div class="report-action">
+                  <p>
+                    <a href="/user?user={{index . 0}}">{{index . 0}}</a>
+                    reported user
+                    <a href="/user?user={{index . 1}}">{{index . 1}}</a><br />for the following reason :
+                  </p>
+                </div>
+                <div class="reason-reported">
+                  <p>"{{index . 2}}"</p>
+                </div>
+              </div>
+              <div class="answer-report">
+                <h4>Give an answer to this report</h4>
+                <h6>Checking the box will delete the user</h6>
+                <form action="" method="POST">
+                  <div>
+                    <input type="text" id="input-txt" name="answerReport" required />
+                    <input type="hidden" name="nameReported" value="{{index . 1}}" />
+                    <input type="checkbox" id="check-report" name="reportAccepted" value="1" />
+                  </div>
+
+                  <button>Submit</button>
+                </form>
+              </div>
+            </div>
+            {{end}}
+          </div>
+        </div>
       </div>
     </div>
     {{template "footer"}}
-  </body>
+  </section>
+</body>
+
 </html>
 {{end}}
