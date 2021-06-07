@@ -64,7 +64,9 @@
 </div>
 <script src="../assets/js/header.js"></script>
 {{end}} 
+{{if .cookieExist}}
 {{template "disconnected" .}}
+{{end}}
 {{end}} 
 
 <!-- footer -->
@@ -111,10 +113,11 @@
   <script>
     var cookieExist = "{{.cookieExist}}";
     var disconnected_container = document.getElementsByClassName("disconnected-container")[0]
-    console.log(disconnected_container)
+    var disconnected_wrapper = document.getElementsByClassName("disconnected-wrapper")[0]
     if (cookieExist) {
       setTimeout(function () {
-        disconnected_container.classList.add("disconnected-container-active")
+        disconnected_container.classList.add("activate")
+        disconnected_wrapper.classList.add("activate")
       }, 1000 * 60 * 5);
     }
   </script>

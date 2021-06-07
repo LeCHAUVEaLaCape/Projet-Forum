@@ -132,8 +132,9 @@ func DisplayPosts(r *http.Request, data_info map[string]interface{}, state strin
 }
 
 // Page posts
-func Display_post_comment(post_id string, data_post map[string]interface{}, body string) [8]string {
+func Display_post_comment(post_id string, data_post map[string]interface{}) [8]string {
 	var post [8]string
+	var body string
 	database, err := sql.Open("sqlite3", "./db-sqlite.db")
 	CheckError(err)
 	defer database.Close()

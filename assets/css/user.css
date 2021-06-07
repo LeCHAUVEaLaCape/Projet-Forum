@@ -52,6 +52,7 @@ body,
   border: solid 1px black;
   text-align: center;
   position: relative;
+  border-radius: 10px;
 }
 .page img {
   width: 230px;
@@ -258,4 +259,7 @@ button {
 .message-full {
   min-height: 175px !important;
   height: unset !important;
+}
+.mid-page-container h4 {
+  font-size: 40px;
 }

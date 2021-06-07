@@ -132,7 +132,7 @@
     top: 0;
     left: 0;
     z-index: 2;
-    display: none;
+    display: none !important;
     justify-content: center;
     align-items: center;
 }
@@ -142,6 +142,7 @@
     background-color: #eee;
     border: solid 1px black;
     border-radius: 10px;
+    display: none;
 }
 .disconnected-wrapper h2,
 .disconnected-wrapper h3 {
@@ -167,6 +168,6 @@
     background: #fff;
     margin: 10px;
 }
-.disconnected-container-active {
+.activate {
     display: flex;
 }

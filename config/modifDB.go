@@ -32,7 +32,7 @@ func GetInfoUser(w http.ResponseWriter, r *http.Request, data_user map[string]in
 	}
 }
 
-func UpdateInfoUsers(w http.ResponseWriter, r *http.Request, id int) {
+func UpdateInfoUsers(w http.ResponseWriter, r *http.Request) {
 	// get input age/address/FewWords of the user
 	add_few_words := r.FormValue("addFewWords")
 	add_age := r.FormValue("age")
@@ -133,6 +133,54 @@ func DelAccount(delete_account string) {
 	CheckError(err)
 
 	tx.Commit()
+}
+
+// supprime un commentaire
+func DelComment(w http.ResponseWriter, r *http.Request) {
+	delete_comment := r.FormValue("delComment")
+	idMainPost := r.FormValue("id-mainPost")
+	// Open the database
+	database, err := sql.Open("sqlite3", "./db-sqlite.db")
+	CheckError(err)
+	defer database.Close()
+
+	// DELETE the comments of the main post
+	tx, err := database.Begin()
+	CheckError(err)
+	stmt, err := tx.Prepare("DELETE FROM comments WHERE id = ?")
+	CheckError(err)
+	_, err = stmt.Exec(delete_comment)
+	CheckError(err)
+	tx.Commit()
+	http.Redirect(w, r, "/post?id="+idMainPost, http.StatusSeeOther)
+}
+
+func DelPost(w http.ResponseWriter, r *http.Request) {
+	delete_post := r.FormValue("delPost")
+	// Open the database
+	database, err := sql.Open("sqlite3", "./db-sqlite.db")
+	CheckError(err)
+	defer database.Close()
+
+	// delete the image
+	Delete_image("mainPost", delete_post)
+
+	// DELETE the comments of the main post
+	tx, err := database.Begin()
+	CheckError(err)
+	stmt, err := tx.Prepare("DELETE FROM comments WHERE idMainPost = ?")
+	CheckError(err)
+	_, err = stmt.Exec(delete_post)
+	CheckError(err)
+
+	// DELETE the main POST
+	stmt, err = tx.Prepare("DELETE FROM posts WHERE id = ?")
+	CheckError(err)
+	_, err = stmt.Exec(delete_post)
+	CheckError(err)
+	tx.Commit()
+
+	http.Redirect(w, r, "/index", http.StatusSeeOther)
 }
 
 // Supprime ou déplace le post s'il a été accepté ou non

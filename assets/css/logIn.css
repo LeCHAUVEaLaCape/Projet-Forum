@@ -221,3 +221,22 @@ input {
   color: white;
   background-color: black;
 }
+#logWith {
+  text-align: center;
+  font-size: 27px;
+}
+.facebook-login, .google-login {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.facebook-login img, .google-login img {
+  width: 250px;
+  margin: 15px;
+  border-radius: 25px;
+}
+.logWith {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
