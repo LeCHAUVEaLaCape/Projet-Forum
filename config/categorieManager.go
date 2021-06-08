@@ -68,6 +68,7 @@ func GetCategories() []string {
 	}
 	return res
 }
+
 func NewCategorie(w http.ResponseWriter, r *http.Request) {
 	nom_categorie := r.FormValue("newCategorie")
 	if nom_categorie == "" {
@@ -185,4 +186,18 @@ func RenommerCategorie(w http.ResponseWriter, r *http.Request) {
 	tx.Commit()
 	http.Redirect(w, r, r.Header.Get("Referer"), http.StatusFound)
 
+}
+
+// return category listed with whitespace when the category isn't "actif"
+func GetBruteCategories() []string {
+	categorie := DisplayCategories()
+	var res []string
+	for i := range categorie {
+		if categorie[i].Actif {
+			res = append(res, categorie[i].Nom)
+		} else {
+			res = append(res, "")
+		}
+	}
+	return res
 }

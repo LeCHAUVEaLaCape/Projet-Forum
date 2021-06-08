@@ -2,7 +2,6 @@ package config
 
 import (
 	"database/sql"
-	"fmt"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -136,7 +135,6 @@ func DisplayPosts(r *http.Request, data_info map[string]interface{}, state strin
 	}
 
 	data_info["allposts"] = post
-	fmt.Println(data_info["allposts"])
 	data_info["categories"] = categories
 }
 
