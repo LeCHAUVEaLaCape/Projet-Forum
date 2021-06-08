@@ -282,7 +282,6 @@ func LikedPosts(data_Info map[string]interface{}, state string) {
 func Createdposts(data_Info map[string]interface{}, state string) {
 	var all_myPosts [][]interface{}
 	var photo string
-	var categories = GetCategories()
 
 	database, err := sql.Open("sqlite3", "./db-sqlite.db")
 	CheckError(err)
@@ -296,7 +295,7 @@ func Createdposts(data_Info map[string]interface{}, state string) {
 		rows, err = database.Query("SELECT title, body, author, date, id, category FROM posts WHERE author = ?", data_Info["user"].(string))
 		CheckError(err)
 	}
-
+	categories := GetBruteCategories()
 	for rows.Next() {
 		myPosts := []interface{}{"", "", "", "", "", "", ""}
 		rows.Scan(&myPosts[0], &myPosts[1], &myPosts[2], &myPosts[3], &id, &myPosts[6])
