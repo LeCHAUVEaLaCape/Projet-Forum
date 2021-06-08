@@ -152,6 +152,7 @@ func Feed(data_Info map[string]interface{}) {
 	//Show the post created by the user
 	Createdposts(data_Info, "userpage")
 
+
 	//Show comment posted
 	// commentaires
 	var comments [][11]string
@@ -296,6 +297,8 @@ func Createdposts(data_Info map[string]interface{}, state string) {
 		rows, err = database.Query("SELECT title, body, author, date, id, category FROM posts WHERE author = ?", data_Info["user"].(string))
 		CheckError(err)
 	}
+
+	
 
 	for rows.Next() {
 		myPosts := []interface{}{"", "", "", "", "", "", ""}
