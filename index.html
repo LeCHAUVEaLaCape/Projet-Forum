@@ -1,164 +1,166 @@
 {{define "index"}}
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Faux Rhum</title>
-    <link rel="shortcut icon" href="./assets/images/logo.png" />
-    <link rel="stylesheet" href="./assets/css/index.css" />
-    <link rel="stylesheet" href="./assets/css/mainPostStyle.css" />
-  </head>
 
-  <body>
-    {{template "header" .}}
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Faux Rhum</title>
+  <link rel="shortcut icon" href="./assets/images/logoforum.png" />
+  <link rel="stylesheet" href="./assets/css/index.css" />
+  <link rel="stylesheet" href="./assets/css/mainPostStyle.css" />
+</head>
 
-    <div class="full-page">
-      <!----------------
-          CATEGORIES
-     ---------------->
-      <div class="filter">
-        <div class="filter-title">
-          <p>Trier les posts par catégories</p>
-        </div>
-        {{range $index , $value := .categories}}
-        <form action="?" method="GET">
-          <input type="hidden" name="{{$value}}" value="{{$index}}" />
-          <button class="cat {{$value}}">
-            <p>{{$value}}</p>
-          </button>
-        </form>
-        {{end}}
-        <a class="cat all" href="/index"><p>All</p></a>
-      </div>
+<body>
+  {{template "header" .}}
 
-      <!----------------------- 
+  <div class="full-page" id="pagepagepage" >
+    <!----------------------- 
               Ordre des posts / Format d'affichage / Mes posts...
        ----------------------->
-      <div class="display-post">
-        <div class="display-post-container">
-          <div class="display-title">
-            <h4>Changer l'ordre des posts</h4>
+    <div class="display-post">
+      <div class="display-post-container">
+        <div class="display-title">
+          <h4>Changer l'ordre des posts</h4>
+        </div>
+        <div class="change-order-posts">
+          <div id="newest">Anciens posts</div>
+          <div id="latest">Nouveaux posts</div>
+        </div>
+        <div class="display-title">
+          <h4>Changer le format d'affichage</h4>
+        </div>
+        <div class="change-order-posts">
+          <div id="grand" class="grand">
+            <div>Grand</div>
+            <img src="./assets/images/rectangles-couple.png" alt="grand" />
           </div>
-          <div class="change-order-posts">
-            <div id="newest">Anciens posts</div>
-            <div id="latest">Nouveaux posts</div>
+          <div id="moyen" class="moyen">
+            <div>Moyen</div>
+            <img src="./assets/images/two.png" alt="moyen" />
           </div>
-          <div class="display-title">
-            <h4>Changer le format d'affichage</h4>
+          <div id="compact" class="compact">
+            <div>Compact</div>
+            <img src="./assets/images/justify.png" alt="compact" />
           </div>
-          <div class="change-order-posts">
-            <div id="grand" class="grand">
-              <div>Grand</div>
-              <img src="./assets/images/rectangles-couple.png" alt="grand" />
+        </div>
+        {{if .cookieExist}}
+        <div class="my-post-container">
+          <h4 class="display-title">Afficher Seuleument :</h4>
+          <a href="/myPosts">Mes posts</a><br />
+          <a href="/myLikedPosts">Les posts que j'ai like</a>
+        </div>
+        {{end}}
+      </div>
+    </div>
+
+    <div class="page">
+      <!-- Ajoute le titre -->
+      <div class="latest-container">
+        <div class="latest-post">
+          <p id="post-text">Anciens Posts</p>
+        </div>
+      </div>
+
+      <!-- Ajoute le bouton pour ajouter un post -->
+      {{if .cookieExist}}
+      <div class="newpost-container">
+        <a href="/newPost" class="newpost-redirect">
+          <div>Ajouter un nouveau post</div>
+        </a>
+      </div>
+      {{else}}
+      <div class="log">
+        <p>
+          Veuillez <a href="/logIn">vous connecter</a> pour ajouter un post
+        </p>
+      </div>
+      {{end}}
+
+      <!-- ajoute les POSTS -->
+      <div class="post-container">
+        <div class="all-posts">
+          {{range .allposts}}
+          <div class="singlePost-container">
+            <!-- ajoute le titre du poste -->
+            <div class="title-post">{{.Title}}</div>
+            <!-- ajoute le corps du poste -->
+            <div class="body-post">
+              <div class="message">
+                <p>{{.Body}}</p>
+              </div>
+              <div class="see-more">
+                <form action="/post" method="GET">
+                  <button>
+                    <input type="hidden" name="id" value="{{.Id}}">
+                    <p>Lire la suite...</p>
+                  </button>
+                </form>
+              </div>
             </div>
-            <div id="moyen" class="moyen">
-              <div>Moyen</div>
-              <img src="./assets/images/two.png" alt="moyen" />
+
+            <!------------------
+              Block des POSTS 
+            ------------------->
+            <div class="author-post">
+              <!-- ajoute les catégorie de trie -->
+              <div class="categories">
+                {{range .Category_Tab}}
+                <div class="categorie">
+                  <div class="color {{.}}">
+                    <p class="each-cat">{{.}}</p>
+                  </div>
+                </div>
+                {{end}}
+              </div>
+              <!-- Ajoute le nombre de like -->
+              <div class="nb-like">
+                <p class="nb-like-comment">{{.Like}} Like(s)<br>{{.NbComments}} Commentaire(s)</p>
+              </div>
+              <!-- Ajoute l'auteur du post et le time -->
+              <div class="author-time">
+                <p class="author">
+                  <span class="created-by">posted by : </span>
+                  {{$author := .Author}} {{if ne $author "user deleted"}}
+                  <a class="user" href="/user?user={{$author}}">{{$author}}</a>
+                  <img src="{{.Photo}}" />
+                  {{else}}
+                  <a class="user">{{$author}}</a>
+                  {{end}}
+                </p>
+                <span id="time-posted">{{.Date}}</span>
+              </div>
             </div>
-            <div id="compact" class="compact">
-              <div>Compact</div>
-              <img src="./assets/images/justify.png" alt="compact" />
-            </div>
-          </div>
-          {{if .cookieExist}}
-          <div class="my-post-container">
-            <h4>Afficher Seuleument :</h4>
-            <a href="/myPosts">Mes posts</a><br />
-            <a href="/myLikedPosts">Les posts que j'ai liké</a>
           </div>
           {{end}}
         </div>
       </div>
-
-      <div class="page">
-        <!-- Ajoute le titre -->
-        <div class="latest-container">
-          <div class="latest-post">
-            <p id="post-text">Anciens Posts</p>
-          </div>
-        </div>
-
-        <!-- Ajoute le bouton pour ajouter un post -->
-        {{if .cookieExist}}
-        <div class="newpost-container">
-          <a href="/newPost" class="newpost-redirect">
-            <div>Ajouter un nouveau post</div>
-          </a>
-        </div>
-        {{else}}
-        <div class="log">
-          <p>
-            Veuillez <a href="/logIn">vous connecter</a> pour ajouter un post
-          </p>
-        </div>
-        {{end}}
-
-        <!-- ajoute les POSTS -->
-        <div class="post-container">
-          <div class="all-posts">
-            {{range .allposts}}
-            <div class="singlePost-container">
-              <!-- ajoute le titre du poste -->
-              <div class="title-post">{{.Title}}</div>
-              <!-- ajoute le corps du poste -->
-              <div class="body-post">
-                <div class="message">
-                  <p>{{.Body}}</p>
-                </div>
-                <div class="see-more">
-                  <form action="/post" method="GET">
-                    <button>
-                      <input type="hidden" name="id" value="{{.Id}}">
-                      <p>Lire la suite...</p>
-                    </button>
-                  </form>
-                </div>
-              </div>
-
-              <!------------------
-              Block des POSTS 
-            ------------------->
-              <div class="author-post">
-                <!-- ajoute les catégorie de trie -->
-                <div class="categories">
-                  {{range .Category_Tab}}
-                  <div class="categorie">
-                    <div class="color {{.}}"><p class="each-cat">{{.}}</p></div>
-                  </div>
-                  {{end}}
-                </div>
-                <!-- Ajoute le nombre de like -->
-                <div class="nb-like">
-                  <p class="nb-like-comment">{{.Like}} Like(s)<br>{{.NbComments}} Commentaire(s)</p>
-                </div>
-                <!-- Ajoute l'auteur du post et le time -->
-                <div class="author-time">
-                  <p class="author">
-                    <span class="created-by">posted by : </span>
-                    {{$author := .Author}} {{if ne $author "user deleted"}}
-                    <a class="user" href="/user?user={{$author}}"
-                      >{{$author}}</a
-                    >
-                    <img src="{{.Photo}}" />
-                    {{else}}
-                    <a class="user" style="color: black; text-decoration: none"
-                      >{{$author}}</a
-                    >
-                    {{end}}
-                  </p>
-                  <span id="time-posted">{{.Date}}</span>
-                </div>
-              </div>
-            </div>
-            {{end}}
-          </div>
-        </div>
-      </div>
+      <a class="pagepagepage" href="#pagepagepage">Top of the page</a>
     </div>
-    {{template "footer"}}
-  </body>
-  <script src="./assets/js/index.js"></script>
+    <!----------------
+          CATEGORIES
+     ---------------->
+    <div class="filter">
+      <div class="filter-title">
+        <p>Trier les posts par catégories</p>
+      </div>
+      {{range $index , $value := .categories}}
+      <form action="?" method="GET">
+        <input type="hidden" name="{{$value}}" value="{{$index}}" />
+        <button class="cat {{$value}}">
+          <p>{{$value}}</p>
+        </button>
+      </form>
+      {{end}}
+      <a class="cat all" href="/index">
+        <p>All</p>
+      </a>
+    </div>
+  </div>
+  {{template "footer"}}
+</body>
+<script src="./assets/js/index.js"></script>
+
 </html>
 {{end}}

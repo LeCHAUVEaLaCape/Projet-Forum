@@ -144,6 +144,8 @@ input {
   background-color: black;
   color: white;
   transition: all 0.5s;
+  font-size: 20px;
+  padding: 1px;
 
 }
 

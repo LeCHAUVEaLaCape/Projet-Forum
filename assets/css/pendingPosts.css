@@ -2,26 +2,67 @@ body,
 * {
   margin: 0;
   padding: 0;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   color: black;
   text-decoration: none;
   overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+section {
+  min-height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+.top{
+  color: black;
+  text-decoration: underline;
+  font-size: 20px;
+}
+.top:hover{
+  cursor: pointer;
+  color: blue;
+  text-decoration: underline;
+  font-size: 22px;
+}
+.author-time span{
+  font-family: 'Merriweather', serif;
+  font-size: 16px;
+  overflow: hidden;
+
+}
+.author-time a{
+  color: blue;
+  text-decoration: underline;
+  font-size: 20px;
+
+}
+.author-time a:hover{
+  color: darkblue;
+  cursor: pointer;
+  font-size: 22px;
+
 }
 .page {
   min-height: 1000px;
-  width: 100vw;
-  background-color: #eee;
-  font-size: 30px;
-  padding-top: 100px;
+  width: 80%;
+  margin-left: 10%;
+  margin-top: 80px;
   display: flex;
-  flex-wrap: wrap;
-}
-.author {
-  overflow: hidden;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Merriweather', serif;
+  background-color: #eee;
+  border-style: solid;
+  border-width: 4px;
+  border-image: linear-gradient(to bottom, #DFA003, brown, yellow, brown, #DFA003) 1 100%;
 }
 .title {
   width: 100%;
   text-align: center;
+  font-size: 50px;
+  text-decoration: underline ;
+  font-family: "Modusa";
 }
 .accept-reject-container {
   display: flex;
@@ -30,36 +71,39 @@ body,
     flex-wrap: wrap;
 }
 .accept-reject button {
+  font-family: "Modusa";
   width: 88%;
-  border: solid 1px black;
+  border: solid 2px black;
   padding: 13px;
   margin: 10px;
   border-radius: 10px;
+  font-size: 20px;
+  color: black;
 }
 #accept {
-  background-color: #85ec85;
+  background-color:limegreen;
 }
 #accept:hover {
-  background-color: #6ccf6c;
+  background-color: lime;
+  cursor: pointer;
+  box-shadow: 0px 0px 0px 2px darkgreen;
 }
 #reject {
-  background-color: #d47575;
+  background-color:crimson;
 }
 #reject:hover {
-  background-color: #bb5959;
+  background-color:red;
+  cursor: pointer;
+  box-shadow: 0px 0px 0px 2px darkred;
 }
 .see-more div {
   display: flex;
   justify-content: center;
 }
-.message-full {
-  min-height: 175px !important;
-  height: unset !important;
-}
+
 .all-posts {
   overflow: hidden;
   margin-bottom: 40px;
-  display: grid !important;
 }
 .img-posts{
   margin-top: 60px;
@@ -74,4 +118,40 @@ body,
 .each-posts {
   justify-content: center;
   display: flex;
+  width: 70%;
+}
+.see-more {
+  width: 72.5%;
+}
+.title-post{
+  font-family: "Modusa";
+}
+.see-more div {
+  display: flex;
+}
+.message-full {
+  min-height: 175px !important;
+  height: unset !important;
+}
+/* 
++----------------------------------------------------------------------+
+| Scroll Bar
++----------------------------------------------------------------------+
+*/
+::-webkit-scrollbar {
+  width: 10px;
+  background-color: white;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgb(0, 0, 0);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #DFA003;
+}
+
+::-webkit-scrollbar-button {
+  height: 8px;
+  background-color: black;
 }

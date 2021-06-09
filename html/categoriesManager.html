@@ -1,52 +1,62 @@
 {{define "categoriesManager"}}
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forum - categoriesManager</title>
-    <link rel="stylesheet" href="../assets/css/index.css" />
+    <title>Faux Rhum - CategoriesManager</title>
+    <link rel="shortcut icon" href="../assets/images/logoforum.png" />
+    <link rel="stylesheet" href="../assets/css/categories.css" />
 </head>
+
 <body>
-    
-{{template "header" .}}
-    <div class="page">
-        {{if eq .role "admin"}}
-            <section>
+
+    {{template "header" .}}
+    <section>
+        <div class="page">
+            {{if eq .role "admin"}}
+            <div class="ajouter">
                 <h2>Ajouter une nouvelle categorie</h2>
                 <form action="" method="POST">
-                    <input class="button" type="text" name="newCategorie" >
+                    <input class="button" type="text" name="newCategorie">
                     <button type="submit">Submit</button>
                 </form>
-            </section>
+            </div>
             <!-- liste des categories -->
-            <section>
+            <div class="gerer">
                 <h2>Liste des Categories</h2>
                 {{range $key , $value := .categories}}
-                    <div>{{$value.Nom}} {{$value.Actif}}</div>
+                <div> <strong> {{$value.Nom}}</strong> <p>{{$value.Actif}}</p>
                     {{if eq $value.Actif false}}
-                        <form action="" method="POST">
-                            <input class="button" type="hidden" name="{{$value.Nom}}_false" value="{{$value.Nom}}">
-                            <button type="submit">Activer</button>
-                        </form>
-                    {{end}}
-                    {{if eq $value.Actif true}}
-                        <form action="" method="POST">
-                            <input class="button" type="hidden" name="{{$value.Nom}}_true" value="{{$value.Nom}}">
-                            <button type="submit">Desactiver</button>
-                        </form>
-                    {{end}}
-                    {{if gt $key 8}}
                     <form action="" method="POST">
-                        <input class="button" type="text" name="{{$value.Nom}}_DEL" >
-                        <button type="submit">Rename</button>
+                        <input class="button" type="hidden" name="{{$value.Nom}}_false" value="{{$value.Nom}}">
+                        <button type="submit" class="boutton-activer">Activer</button>
                     </form>
                     {{end}}
+                    {{if eq $value.Actif true}}
+                    <form action="" method="POST">
+                        <input class="button" type="hidden" name="{{$value.Nom}}_true" value="{{$value.Nom}}">
+                        <button type="submit" class="boutton-desactiver">Desactiver</button>
+                    </form>
+                    {{end}}
+                </div>
+                {{if gt $key 8}}
+                <form action="" method="POST">
+                    <input class="button" type="text" name="{{$value.Nom}}_DEL">
+                    <button type="submit">Rename</button>
+                </form>
                 {{end}}
-            </section>
-        {{end}}
-    </div>
-{{template "footer"}}
+
+
+                {{end}}
+            </div>
+            {{end}}
+        </div>
+
+    </section>
+    {{template "footer"}}
 </body>
+
 </html>
 {{end}}

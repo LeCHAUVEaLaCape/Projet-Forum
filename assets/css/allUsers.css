@@ -2,7 +2,6 @@ body,
 * {
   margin: 0;
   padding: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: black;
   text-decoration: none;
   overflow-x: hidden;
@@ -80,6 +79,7 @@ section {
   color: white;
 }
 .search div button:hover{
+  cursor: pointer;
   box-shadow: 0px 0px 8px #000000 ,5px 5px 10px #DFA003 ;
   color: black;
   background: linear-gradient(45deg, #DFA003, brown, yellow, brown , #DFA003);
@@ -176,7 +176,6 @@ section {
 .user-card p{
   font-family: 'Merriweather', serif;
   font-size: 18px;
-  font-style: italic;
 }
 .user-card a {
   font-size: 18px;

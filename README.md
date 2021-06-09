@@ -5,6 +5,7 @@
 * First of all you have to run the main.go in the terminal
 
     - go run main.go
+    - You will may have something to install for the good sake of the website
 
 The used localhost is localhost:8000, so you need to go on "http://localhost:8000"
 

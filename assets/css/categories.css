@@ -1,0 +1,193 @@
+body,
+* {
+    margin: 0;
+    padding: 0;
+    color: black;
+    text-decoration: none;
+    overflow-x: hidden;
+}
+
+section {
+    min-height: 800px;
+    width: 100vw;
+    overflow: hidden;
+}
+
+.page {
+    min-height: 100%;
+    width: 80%;
+    margin-left: 10%;
+    margin-top: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'Merriweather', serif;
+    background-color: #eee;
+    border-style: solid;
+    border-width: 4px;
+    border-image: linear-gradient(to bottom, #DFA003, brown, yellow, brown, #DFA003) 1 100%;
+}
+.ajouter{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.ajouter form{
+    height: 120px;
+    width: 500px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.ajouter h2{
+    font-size: 60px;
+    font-family: "Modusa";
+    text-decoration: underline;
+}
+.ajouter input{
+    display: flex;
+    justify-content: center;
+    margin-right: 10px;
+    height: 40px;
+    width: 300px;
+    font-family: 'Merriweather', serif;
+    border-style: solid;
+    border-width: 4px;
+    border-image: linear-gradient(45deg, #DFA003, brown, yellow, brown , #DFA003) 1;
+    background-color: black;
+    color: white;
+    border-radius: 10px;
+    font-size: 20px;
+    padding: 2px;
+
+}
+.ajouter input:hover{
+    box-shadow: 0px 0px 8px #000000 ,5px 5px 10px #DFA003 ;
+    background-color: black;
+}
+.ajouter input:focus{
+    border-radius: 10px;
+    outline: none;
+    background-color: black;
+    box-shadow: 0px 0px 8px #000000 ,5px 5px 10px #DFA003 ;
+}
+.ajouter button{
+    transition: all 0.3s;
+    margin-left: 10px;
+    text-decoration: none;
+    border-style: solid;
+    border-width: 4px;
+    border-image: linear-gradient(45deg, #DFA003, brown, yellow, brown , #DFA003) 1;
+    height: 45px;
+    position: relative;
+    overflow: hidden;
+    font-family: "Modusa";
+    font-size: 30px;
+    background-color: black;
+    color: white;
+
+}
+.ajouter button:hover{
+    box-shadow: 0px 0px 8px #000000 ,5px 5px 10px #DFA003 ;
+    color: black;
+    background: linear-gradient(45deg, #DFA003, brown, yellow, brown , #DFA003);
+    cursor: pointer;
+
+}
+.gerer{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.gerer h2{
+    font-size: 60px;
+    font-family: "Modusa";
+    text-decoration: underline;
+
+}
+.gerer div{
+    margin-top: 20px;
+    display: flex;
+    font-size: 25px;
+    font-family: 'Merriweather', serif;
+    height: 50px;
+}
+.gerer div strong{
+    margin-right: 5px;
+}
+.gerer div p{
+    margin-right: 5px;
+    font-style: italic;
+}
+.gerer form input{
+    height: 30px;
+    width: 200px;
+    font-family: 'Merriweather', serif;
+    border-style: solid;
+    border-width: 2px;
+    border-image: linear-gradient(45deg, #DFA003, brown, yellow, brown , #DFA003) 1;
+    background-color: white;
+    color: black;
+    font-size: 20px;
+    padding: 2px;
+}
+.gerer form input:hover{
+    background: linear-gradient(45deg, #DFA003, brown, yellow, brown , #DFA003);
+
+}
+.gerer form input:focus{
+    background: linear-gradient(45deg, #DFA003, brown, yellow, brown , #DFA003);
+}
+
+.gerer form .boutton-activer:hover, .gerer form .boutton-desactiver:hover{
+    box-shadow: 0px 0px 2px #000000 ,0px 0px 4px #DFA003 ;
+    color: black;
+    background: linear-gradient(45deg, #DFA003, brown, yellow, brown , #DFA003);
+    cursor: pointer;
+}
+.boutton-activer{
+    transition: all 0.3s;
+    text-decoration: none;
+    border: black solid 2px;
+    border-radius: 10px;
+    padding: 2px;
+    font-family: "Modusa";
+    font-size: 20px;
+    background-color: forestgreen;
+    color: black;
+
+}
+.boutton-desactiver{
+    transition: all 0.3s;
+    text-decoration: none;
+    border: black solid 2px;
+    border-radius: 10px;
+    padding: 2px;
+    font-family: "Modusa";
+    font-size: 20px;
+    background-color: red;
+    color: black;
+
+}
+/* 
++----------------------------------------------------------------------+
+| Scroll Bar
++----------------------------------------------------------------------+
+*/
+::-webkit-scrollbar {
+    width: 10px;
+    background-color: white;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: rgb(0, 0, 0);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #DFA003;
+}
+
+::-webkit-scrollbar-button {
+    height: 8px;
+    background-color: black;
+}

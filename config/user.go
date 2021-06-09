@@ -296,13 +296,7 @@ func Createdposts(data_Info map[string]interface{}, state string) {
 		rows, err = database.Query("SELECT title, body, author, date, id, category FROM posts WHERE author = ?", data_Info["user"].(string))
 		CheckError(err)
 	}
-<<<<<<< HEAD
-
-	
-
-=======
 	categories := GetBruteCategories()
->>>>>>> 3bb20d7c9a840bed298138519691099b9657e1c8
 	for rows.Next() {
 		myPosts := []interface{}{"", "", "", "", "", "", ""}
 		rows.Scan(&myPosts[0], &myPosts[1], &myPosts[2], &myPosts[3], &id, &myPosts[6])

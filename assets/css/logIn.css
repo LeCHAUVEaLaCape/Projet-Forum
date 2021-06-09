@@ -95,6 +95,7 @@ span {
   border-image: linear-gradient(45deg, #DFA003, brown, yellow, brown , #DFA003)1;
   font-family: 'Merriweather', serif;
   color: black;
+  font-size: 20px;
 }
 .enter-username input:hover,
 .enter-password input:hover {
