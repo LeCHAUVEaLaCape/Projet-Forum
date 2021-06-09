@@ -32,7 +32,7 @@ func AddNewPost(title string, body string, dt string, data_newPost map[string]in
 	CheckError(err)
 	stmt, err := tx.Prepare("INSERT INTO pendingPosts (title, body, author, date, category, like, likedBy, nbComments, dislikedBy, image) VALUES (?, ?, ?, ?, ?, 0, '', 0, '', '')")
 	CheckError(err)
-	_, err = stmt.Exec(title, body, data_newPost["user"], dt, strings.Join(category, ""))
+	_, err = stmt.Exec(title, body, data_newPost["user"], dt, strings.Join(category, ","))
 	CheckError(err)
 
 	tx.Commit()
@@ -81,7 +81,7 @@ func DisplayPosts(r *http.Request, data_info map[string]interface{}, state strin
 			aPost.Body = strings.Replace(strings.Replace(aPost.Body, string('\r'), "", -1), string('\n'), "<br>", -1)
 
 			if aPost.Category != "" {
-				for _, e := range aPost.Category {
+				for _, e := range strings.Split((aPost.Category), ",") {
 					j, _ := strconv.Atoi(string(e))
 					if j >= len(categories) {
 						continue

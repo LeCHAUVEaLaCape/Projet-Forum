@@ -252,7 +252,10 @@ func newPost(w http.ResponseWriter, r *http.Request) {
 	categories := GetCategories()
 	var category []string
 	for i := range categories {
-		category = append(category, r.FormValue(categories[i]))
+		tmp := r.FormValue(categories[i])
+		if tmp != "" {
+			category = append(category, tmp)
+		}
 	}
 
 	if title != "" && body != "" {
