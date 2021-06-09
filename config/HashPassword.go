@@ -9,16 +9,9 @@ import (
 // encrypt password
 func HashPassword(password string) string {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
-	if err != nil {
-		fmt.Println(err)
-	}
+	CheckError(err)
 	return string(bytes)
 }
-func CheckPasswordHash(password, hash string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	return err == nil
-}
-
 func ComparePasswords(hashedPwd string, plainPwd []byte) bool {
 	// Since we'll be getting the hashed password from the DB it
 	// will be a string so we'll need to convert it to a byte slice

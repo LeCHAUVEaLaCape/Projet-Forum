@@ -138,7 +138,7 @@ func CheckNotif(w http.ResponseWriter, r *http.Request, data_notif map[string]in
 		tx.Commit()
 		rows.Close()
 		database.Close()
-		http.Redirect(w, r, r.Header.Get("Referer"), 302)
+		http.Redirect(w, r, r.Header.Get("Referer"), http.StatusFound)
 	}
 	rows.Close()
 	database.Close()

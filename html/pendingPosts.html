@@ -27,18 +27,15 @@
           <div class="each-posts">
             <div class="singlePost-container">
               <!-- ajoute le titre du poste -->
-              <div class="title-post">{{.Title}}</div>
-              <!-- ajoute le corps du poste -->
-              <div class="body-post">
-                <div class="message">
-                  <p>{{.Body}}</p>
-                  <div class="img-posts">
-                    {{range .Arrimage}}
-                    {{range .}}
-                    <img src="{{.}}">
-                    {{end}}
-                    {{end}}
-                  </div>
+            <div class="title-post">{{.Title}}</div>
+            <!-- ajoute le corps du poste -->
+            <div class="body-post">
+              <div class="message">
+                <p>{{.Body}}</p>
+                <div class="img-posts">
+                  {{range .Arrimage}}
+                  <img src="{{.}}">
+                  {{end}}  
                 </div>
                 <div class="see-more">
                   <div>

@@ -136,7 +136,6 @@ func Delete_image(state string, id string) {
 	image = strings.Replace(image, ",.", "", 1)
 	image = strings.Replace(image, "..", ".", -1)
 	each_image = strings.Split(image, ",")
-	fmt.Println(each_image)
 
 	for i := 0; i < len(each_image); i++ {
 		err = os.Remove(each_image[i])
