@@ -249,6 +249,6 @@ func ChangeRole(w http.ResponseWriter, r *http.Request) {
 		CheckError(err)
 		tx.Commit()
 		database.Close()
-		http.Redirect(w, r, r.Header.Get("Referer"), 302)
+		http.Redirect(w, r, r.Header.Get("Referer"), http.StatusFound)
 	}
 }

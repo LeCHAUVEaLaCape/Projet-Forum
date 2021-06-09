@@ -130,6 +130,7 @@ func RemoveLike(post_id string, data_post map[string]interface{}, likedBy string
 	defer database.Close()
 
 	tx, err := database.Begin()
+	CheckError(err)
 	// delete a like
 	rows, err := database.Query("SELECT like FROM posts WHERE id = ?", post_id)
 	CheckError(err)
@@ -313,6 +314,7 @@ func RemoveDisLike(post_id string, data_post map[string]interface{}, dislikedBy 
 	defer database.Close()
 
 	tx, err := database.Begin()
+	CheckError(err)
 	// delete a dislike
 	rows, err := database.Query("SELECT dislike FROM posts WHERE id = ?", post_id)
 	CheckError(err)
