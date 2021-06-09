@@ -21,8 +21,8 @@
         <div class="all-posts">
           {{range .allposts}}
           <div class="each-posts">
-          <div class="singlePost-container">
-            <!-- ajoute le titre du poste -->
+            <div class="singlePost-container">
+              <!-- ajoute le titre du poste -->
             <div class="title-post">{{.Title}}</div>
             <!-- ajoute le corps du poste -->
             <div class="body-post">
@@ -30,10 +30,8 @@
                 <p>{{.Body}}</p>
                 <div class="img-posts">
                   {{range .Arrimage}}
-                  {{range .}}
-                  <img src="{{.}}">  
-                  {{end}}
-                  {{end}}
+                  <img src="{{.}}">
+                  {{end}}  
                 </div>
               </div>
               <div class="see-more">

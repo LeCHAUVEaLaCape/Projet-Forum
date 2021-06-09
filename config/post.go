@@ -20,7 +20,7 @@ type Post struct {
 	LikedBy      string
 	NbComments   string
 	Photo        string
-	Arrimage     []interface{}
+	Arrimage     []string
 }
 
 func AddNewPost(title string, body string, dt string, data_newPost map[string]interface{}, category []string) {
@@ -41,11 +41,8 @@ func AddNewPost(title string, body string, dt string, data_newPost map[string]in
 // Affiche les posts pour la page INDEX et pendingPosts
 func DisplayPosts(r *http.Request, data_info map[string]interface{}, state string) {
 	var categories []string = GetCategories()
-	var id int
 	var imgstr string
 	var arrimg []string
-	var all_image [][]string
-	var arrimage []interface{}
 
 	// filtre de categorie
 	selected_categories := ""
@@ -64,9 +61,9 @@ func DisplayPosts(r *http.Request, data_info map[string]interface{}, state strin
 	//range over database
 	var query string
 	if state == "pendingPosts" {
-		query = "SELECT title, body, author, date, id, category, like, nbComments FROM pendingPosts"
+		query = "SELECT title, body, author, date, id, category, like, nbComments, image FROM pendingPosts"
 	} else if state == "index" {
-		query = "SELECT title, body, author, date, id, category, like, nbComments FROM posts"
+		query = "SELECT title, body, author, date, id, category, like, nbComments, image FROM posts"
 	}
 	rows, err := database.Query(query)
 	CheckError(err)
@@ -74,12 +71,11 @@ func DisplayPosts(r *http.Request, data_info map[string]interface{}, state strin
 	var post []Post
 	for rows.Next() {
 		var aPost Post
-		rows.Scan(&aPost.Title, &aPost.Body, &aPost.Author, &aPost.Date, &aPost.Id, &aPost.Category, &aPost.Like, &aPost.NbComments)
+		rows.Scan(&aPost.Title, &aPost.Body, &aPost.Author, &aPost.Date, &aPost.Id, &aPost.Category, &aPost.Like, &aPost.NbComments, &imgstr)
 		// si le RegExp correspond à la DB
 		if filter.MatchString(aPost.Category) {
 			// Remplace les \n par des <br> pour sauter des lignes en html
 			aPost.Body = strings.Replace(strings.Replace(aPost.Body, string('\r'), "", -1), string('\n'), "<br>", -1)
-
 			if aPost.Category != "" {
 				for _, e := range aPost.Category {
 					j, _ := strconv.Atoi(string(e))
@@ -88,39 +84,18 @@ func DisplayPosts(r *http.Request, data_info map[string]interface{}, state strin
 					}
 					aPost.Category_Tab = append(aPost.Category_Tab, categories[j])
 				}
-				//
 				if len(aPost.Category_Tab) == 0 {
 					continue
 				}
 			}
-			post = append(post, aPost)
-		}
-
-		// Ajoute les images pour la page pendingPosts seulement
-		if state == "pendingPosts" {
-			rows, err := database.Query("SELECT image FROM pendingPosts WHERE id = ?", id)
-			CheckError(err)
-			defer rows.Close()
-			for rows.Next() {
-				err := rows.Scan(&imgstr)
-				CheckError(err)
-			}
+			// Ajoute les images pour la page pendingPosts seulement
 			arrimg = strings.Split(imgstr, ",")
 			arrimg = arrimg[1:]
-			all_image = append(all_image, arrimg)
-			for i := 0; i < len(all_image); i++ {
-				if i == len(all_image)-1 {
-					arrimage = append(arrimage, all_image[i])
+			aPost.Arrimage = arrimg
 
-				}
-			}
-			CheckError(rows.Err())
-		}
-		if len(arrimage) > 0 {
-			aPost.Arrimage = arrimage[len(arrimage)-1:]
+			post = append(post, aPost)
 		}
 	}
-
 	// Ajoute le chemin de la photo qui a été choisit par l'utilisateur
 	for i := 0; i < len(post); i++ {
 		rows, err := database.Query("SELECT photo FROM users WHERE username = ?", post[i].Photo)
