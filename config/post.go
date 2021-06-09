@@ -88,17 +88,17 @@ func DisplayPosts(r *http.Request, data_info map[string]interface{}, state strin
 					continue
 				}
 			}
-			// Ajoute les images pour la page pendingPosts seulement
-			arrimg = strings.Split(imgstr, ",")
-			arrimg = arrimg[1:]
-			aPost.Arrimage = arrimg
-
-			post = append(post, aPost)
 		}
+		// Ajoute les images pour la page pendingPosts seulement
+		arrimg = strings.Split(imgstr, ",")
+		arrimg = arrimg[1:]
+		aPost.Arrimage = arrimg
+		// Ajoute le chemin de la photo qui a été choisit par l'utilisateur
+		post = append(post, aPost)
 	}
-	// Ajoute le chemin de la photo qui a été choisit par l'utilisateur
+
 	for i := 0; i < len(post); i++ {
-		rows, err := database.Query("SELECT photo FROM users WHERE username = ?", post[i].Photo)
+		rows, err := database.Query("SELECT photo FROM users WHERE username = ?", post[i].Author)
 		CheckError(err)
 		defer rows.Close()
 		for rows.Next() {
