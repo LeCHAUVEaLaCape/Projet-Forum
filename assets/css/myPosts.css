@@ -2,30 +2,61 @@ body,
 * {
   margin: 0;
   padding: 0;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   color: black;
   text-decoration: none;
   overflow-x: hidden;
+  scroll-behavior: smooth;
 }
+
 .page {
-    min-height: 1000px;
-    width: 100%;
-    background-color: #eee;
-    padding-top: 90px;
-    padding-bottom: 60px;
-    font-size: 20px;
-  }
+  min-height: 1000px;
+  width: 80%;
+  margin-left: 10%;
+  padding-top: 90px;
+  padding-bottom: 60px;
+  background-color: #eee;
+  border-style: solid;
+  border-width: 4px;
+  border-image: linear-gradient(to bottom, #DFA003, brown, yellow, brown, #DFA003) 1 100%;
+}
+.page a{
+  font-size: 20px;
+  display: flex;
+  justify-content: center;
+  color: black;
+  text-decoration: underline;
+  
+}
+.page a:hover{
+  color:  blue;
+  font-size: 22px;
+
+}
 .title {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 200px;
 }
+
+.title h1 {
+  font-family: "Modusa";
+  font-size: 80px;
+  text-decoration: underline;
+}
+
 #nb-post {
   display: flex;
-  font-size: 35px;
+  font-family: "Modusa";
+  font-size: 80px;
 }
+
 #nb-like {
   display: flex;
-  font-size: 35px;
+  font-family: "Modusa";
+  font-size: 80px;
+}
+#time-posted{
+  font-size: 18px;
+  font-family: 'Merriweather', serif;
 }
