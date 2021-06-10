@@ -152,7 +152,6 @@ func Feed(data_Info map[string]interface{}) {
 	//Show the post created by the user
 	Createdposts(data_Info, "userpage")
 
-
 	//Show comment posted
 	// commentaires
 	var comments [][11]string
@@ -202,7 +201,7 @@ func Feed(data_Info map[string]interface{}) {
 
 // get all posts liked by Someone
 func LikedPosts(data_Info map[string]interface{}, state string) {
-	var categories = GetCategories()
+	var categories = GetBruteCategories()
 	var all_myLikedPosts [][]interface{}
 	var post_liked bool
 
@@ -246,9 +245,11 @@ func LikedPosts(data_Info map[string]interface{}, state string) {
 			myLikedPosts[5] = strconv.Itoa(id)
 			if myLikedPosts[6] != nil {
 				temp := []interface{}{} // string
-				for _, e := range myLikedPosts[6].(string) {
+				for _, e := range strings.Split(myLikedPosts[6].(string), ",") {
 					j, _ := strconv.Atoi(string(e))
-					temp = append(temp, categories[j])
+					if categories[j] != "" {
+						temp = append(temp, categories[j])
+					}
 				}
 				myLikedPosts = append(myLikedPosts, temp)
 			} else {
@@ -307,9 +308,11 @@ func Createdposts(data_Info map[string]interface{}, state string) {
 		myPosts[5] = strconv.Itoa(id)
 		if myPosts[6] != nil {
 			temp := []interface{}{} // string
-			for _, e := range myPosts[6].(string) {
-				j, _ := strconv.Atoi(string(e))
-				temp = append(temp, categories[j])
+			for _, e := range strings.Split(myPosts[6].(string), ",") {
+				j, err := strconv.Atoi(string(e))
+				if err == nil && categories[j] != "" {
+					temp = append(temp, categories[j])
+				}
 			}
 			myPosts = append(myPosts, temp)
 		} else {

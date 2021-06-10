@@ -8,6 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Faux Rhum - {{index .main_post 1}}</title>
   <link rel="stylesheet" href="./assets/css/post.css" />
+  <link rel="shortcut icon" href="../assets/images/logoforum.png" />
 </head>
 
 <body>
@@ -19,20 +20,20 @@
   <!----------------------
     POST PRINCIPAL
    ---------------------->
-  <div class="page">
+  <div class="page" id="pagepagepagepagepage">
     <div class="title-post">{{index .main_post 1}}</div>
     <div class="body-post">
       <div class="message">
         <p>{{index .main_post 2}}</p>
-        <div class= "imgposts">
-        {{range index .imagepost 0}}
+        <div class="imgposts">
+          {{range index .imagepost 0}}
           <img class="each-images" src="{{.}}">
-        {{end}}
-      </div>
-      <div id="img-fullscreen-container">
+          {{end}}
+        </div>
+        <div id="img-fullscreen-container">
           <img id="img" src="">
+        </div>
       </div>
-    </div>
       {{$user := index .main_post 3}} {{if or (eq $userconnect $user) (eq $role "admin") (eq $role "moderator")}}
       <!-- Bouton pour supprimer le post -->
       <form class="form-del" action="/delPost" method="POST">
@@ -82,7 +83,7 @@
             <input type="hidden" name="liker" value="{{$userconnect}}" />
             <input type="hidden" name="action" value="like" />
             <input type="hidden" name="userToSendNotif" value="{{index .main_post 3}}" />
-            <button style="cursor: pointer">+1</button>
+            <button ><img src="/assets/images/like.svg" alt="like"></button>
           </form>
           {{end}}
 
@@ -91,7 +92,7 @@
           <!-- prettier-ignore -->
           <form class="like-button" action="/post?id={{index .main_post 0}}" method="POST">
             <input type="hidden" name="Like" value="0" />
-            <button style="cursor: pointer">-1</button>
+            <button style="cursor: pointer"><img src="/assets/images/dislike.svg" alt="dislike"></button>
           </form>
           {{end}}
 
@@ -112,7 +113,7 @@
             <input type="hidden" name="id-post" value="{{index .main_post 0}}" />
             <input type="hidden" name="disliker" value="{{$userconnect}}" />
             <input type="hidden" name="action" value="dislike" />
-            <button style="cursor: pointer">+1</button>
+            <button style="cursor: pointer"><img src="/assets/images/like.svg" alt="like"></button>
           </form>
           {{end}}
 
@@ -121,7 +122,7 @@
           <!-- prettier-ignore -->
           <form class="dislike-button" action="/post?id={{index .main_post 0}}" method="POST">
             <input type="hidden" name="DisLike" value="0" />
-            <button style="cursor: pointer">-1</button>
+            <button style="cursor: pointer"><img src="/assets/images/dislike.svg" alt="dislike"></button>
           </form>
           {{end}}
           <span class="nb-dislike">
@@ -196,24 +197,23 @@
         <div class="author-time">
           <p class="author">
             <span>commented by : </span>
-            {{$author := index . 1}} 
+            {{$author := index . 1}}
             {{if ne $author "user deleted"}}
             <a id="user" href="/user?user={{$author}}">{{$author}}</a>
             <img src="{{index . 4}}" />
             {{else}}
-            <a class="user" style="color: black; text-decoration: none"
-            >{{$author}}</a
-          >
-          {{end}}
+            <a class="user">{{$author}}</a>
+            {{end}}
           </p>
           <span>{{index . 2}}</span>
         </div>
       </div>
     </div>
     {{end}}
+    <a href="#pagepagepagepagepage" class="toptop">Top of the page</a>
   </div>
   {{template "footer"}}
-    {{template "disconnected" .}}
+  {{template "disconnected" .}}
 </body>
 <script src="../assets/js/post.js"></script>
 

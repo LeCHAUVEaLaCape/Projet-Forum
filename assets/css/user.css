@@ -65,11 +65,13 @@ body,
   color: blue;
   text-decoration: underline;
   font-family: 'Merriweather', serif;
+  font-size: 20px;
 }
 #user:hover{
   color: darkblue;
   text-decoration: underline;
   cursor: pointer;
+  font-size: 22px;
 }
 .right-page .ask-moderator{
   width: 100%;

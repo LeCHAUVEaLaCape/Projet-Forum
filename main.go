@@ -327,7 +327,6 @@ func myPosts(w http.ResponseWriter, r *http.Request) {
 	// initiate the data that will be send to html
 	data_myPosts := make(map[string]interface{})
 	SetDataToSend(w, r, data_myPosts, data, false, "")
-
 	Createdposts(data_myPosts, "indexuser") // ./config/user
 
 	t := template.New("myPosts-template")

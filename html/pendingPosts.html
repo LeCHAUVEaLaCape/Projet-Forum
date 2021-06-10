@@ -9,7 +9,6 @@
   <title>Faux Rhum - Pending Posts</title>
   <link rel="shortcut icon" href="../assets/images/logoforum.png" />
   <link rel="stylesheet" href="../assets/css/pendingPosts.css" />
-  <link rel="stylesheet" href="../assets/css/mainPostStyle.css" />
 </head>
 
 <body>
@@ -27,73 +26,74 @@
           <div class="each-posts">
             <div class="singlePost-container">
               <!-- ajoute le titre du poste -->
-            <div class="title-post">{{.Title}}</div>
-            <!-- ajoute le corps du poste -->
-            <div class="body-post">
-              <div class="message">
-                <p>{{.Body}}</p>
-                <div class="img-posts">
-                  {{range .Arrimage}}
-                  <img src="{{.}}">
-                  {{end}}  
-                </div>
-                <div class="see-more">
-                  <div>
-                    <button>
-                      <input type="hidden" name="id" value="{{.Id}}">
-                      <p class="see-more-txt">Lire la suite... </p>
-                    </button>
+              <div class="title-post">{{.Title}}</div>
+              <!-- ajoute le corps du poste -->
+              <div class="body-post">
+                <div class="message">
+                  <p>{{.Body}}</p>
+                  <div class="img-posts">
+                    {{range .Arrimage}}
+                    <img src="{{.}}">
+                    {{end}}
                   </div>
-                </div>
-              </div>
-
-              <!------------------
-                Block des POSTS 
-              ------------------->
-              <div class="author-post">
-                <!-- ajoute les catégorie de trie -->
-                <div class="categories">
-                  {{range .Category_Tab}}
-                  <div class="categorie">
-                    <div class="color {{.}}">
-                      <p class="each-cat">{{.}}</p>
+                  <div class="see-more">
+                    <div>
+                      <button>
+                        <input type="hidden" name="id" value="{{.Id}}">
+                        <p class="see-more-txt">Lire la suite... </p>
+                      </button>
                     </div>
                   </div>
-                  {{end}}
                 </div>
 
-                <!-- Ajoute l'auteur du post et le time -->
-                <div class="author-time">
-                  <p class="author">
-                    <span class="created-by">post crée par : </span>
-                    {{if ne .Author "user deleted"}}
-                    <a class="user" href="/user?user={{.Author}}">{{.Author}}</a>
-                    <img src="{{.Photo}}" />
-                    {{else}}
-                    <a class="user" style="color: black; text-decoration: none">{{.Author}}</a>
+                <!------------------
+                Block des POSTS 
+              ------------------->
+                <div class="author-post">
+                  <!-- ajoute les catégorie de trie -->
+                  <div class="categories">
+                    {{range .Category_Tab}}
+                    <div class="categorie">
+                      <div class="color {{.}}">
+                        <p class="each-cat">{{.}}</p>
+                      </div>
+                    </div>
                     {{end}}
-                  </p>
-                  <span id="time-posted">{{.Date}}</span>
+                  </div>
+
+                  <!-- Ajoute l'auteur du post et le time -->
+                  <div class="author-time">
+                    <p class="author">
+                      <span class="created-by">post crée par : </span>
+                      {{if ne .Author "user deleted"}}
+                      <a class="user" href="/user?user={{.Author}}">{{.Author}}</a>
+                      <img src="{{.Photo}}" />
+                      {{else}}
+                      <a class="user" style="color: black; text-decoration: none">{{.Author}}</a>
+                      {{end}}
+                    </p>
+                    <span id="time-posted">{{.Date}}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="accept-reject-container">
+                <div class="accept-reject">
+                  <form action="" method="POST">
+                    <input type="hidden" name="post-accepted" value="true">
+                    <input type="hidden" name="id-pendingPost" value="{{.Id}}">
+                    <button id="accept">Accepter</button>
+                  </form>
+                  <form action="" method="POST">
+                    <input type="hidden" name="post-accepted" value="false">
+                    <input type="hidden" name="id-pendingPost" value="{{.Id}}">
+                    <button id="reject">Refuser</button>
+                  </form>
                 </div>
               </div>
             </div>
-
-            <div class="accept-reject-container">
-              <div class="accept-reject">
-                <form action="" method="POST">
-                  <input type="hidden" name="post-accepted" value="true">
-                  <input type="hidden" name="id-pendingPost" value="{{.Id}}">
-                  <button id="accept">Accepter</button>
-                </form>
-                <form action="" method="POST">
-                  <input type="hidden" name="post-accepted" value="false">
-                  <input type="hidden" name="id-pendingPost" value="{{.Id}}">
-                  <button id="reject">Refuser</button>
-                </form>
-              </div>
-            </div>
+            {{end}}
           </div>
-          {{end}}
         </div>
       </div>
       <a class="top" href="#page-top"> Top of the page</a>

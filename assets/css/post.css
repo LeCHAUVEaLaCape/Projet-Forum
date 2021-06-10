@@ -2,23 +2,47 @@ body,
 * {
   margin: 0;
   padding: 0;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   color: black;
   text-decoration: none;
   overflow-x: hidden;
+  scroll-behavior: smooth;
 }
+
 .page {
+  font-family: 'Merriweather', serif;
   min-height: 1000px;
-  width: 100vw;
-  background-color: #eee;
   padding-top: 140px;
+  width: 80vw;
+  margin-left: 10vw;
+  background-color: #eee;
+  border-style: solid;
+  border-width: 4px;
+  border-image: linear-gradient(to bottom, #DFA003, brown, yellow, brown, #DFA003) 1 100%;
+}
+.text{
+  font-family: 'Merriweather', serif;
   font-size: 20px;
 }
-.title-post {
+.page .toptop {
   display: flex;
   justify-content: center;
-  font-size: 30px;
+  color: black;
+  font-size: 20px;
+  text-decoration: underline;
 }
+
+.page .toptop:hover {
+  color: blue;
+  font-size: 22px;
+}
+
+.title-post {
+  width: 100%;
+  font-size: 60px;
+  text-align: center;
+  font-family: "Modusa";
+}
+
 .body-post {
   width: 100%;
   display: flex;
@@ -26,43 +50,52 @@ body,
   align-items: center;
   position: relative;
 }
+
 .message {
   width: 55%;
   min-height: 150px;
   max-height: 90%;
-  border: black 1px solid;
+  border: black 2px solid;
   border-radius: 10px;
   padding: 10px;
-  font-size: 15px;
+  font-size: 20px;
   background: #fff;
+  font-family: 'Merriweather', serif;
 }
+
 .author-post {
   text-align: end;
   margin-right: 22%;
+  font-size: 18px;
 }
+
 .author {
   height: 28px;
   display: flex;
   justify-content: flex-end;
   align-items: center;
 }
+
 .author img {
   height: 25px;
   padding: 0px 0px 0px 10px;
 }
+
 .author span {
   height: 100%;
   display: flex;
   padding-right: 5px;
   align-items: flex-end;
 }
+
 .comment-container {
   display: flex;
   justify-content: center;
   min-height: 150px;
 }
+
 .comment {
-  border: solid 1px black;
+  border: solid 2px black;
   width: 50%;
   display: flex;
   min-height: 100px;
@@ -70,7 +103,9 @@ body,
   background: #fff;
   padding: 10px;
 }
-.auteur-comment, .date-comment {
+
+.auteur-comment,
+.date-comment {
   height: 28px;
   display: flex;
   justify-content: flex-end;
@@ -78,6 +113,7 @@ body,
   text-align: end;
   margin-right: 25%;
 }
+
 form {
   display: flex;
   justify-content: center;
@@ -87,178 +123,276 @@ form {
   text-align: end;
   margin-right: 24.5%;
 }
+
+.author-comment span {
+  font-size: 18px;
+}
+
 .author {
   height: 28px;
   display: flex;
   justify-content: flex-end;
   align-items: center;
 }
+
 .author img {
   height: 25px;
   padding: 0px 0px 0px 10px;
 }
+
 .author span {
   height: 100%;
   display: flex;
   padding-right: 5px;
   align-items: flex-end;
+  font-size: 18px;
 }
-.author-comment span, .author-post span {
-  font-size: 13px;
-}
+
 #user {
   text-decoration: underline;
-  color: rgb(0, 54, 201);
+  color: blue;
+  font-size: 20px;
 }
+
+#user:hover {
+  text-decoration: underline;
+  color: darkblue;
+  font-size: 22px;
+  cursor: pointer;
+}
+
 .log {
-  width: 100vw;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 140px;
+  font-size: 20px;
 }
+
 .log a {
   text-decoration: underline;
-  color: rgb(0, 54, 201);
+  color: blue;
+  font-size: 20px;
 }
+
+.log a:hover {
+  text-decoration: underline;
+  color: darkblue;
+  font-size: 22px;
+}
+
 .form-del {
   position: absolute;
   top: 0;
   right: 22.5vw;
 }
+
 .message button {
   border: solid 1px black;
   padding: 5px;
   cursor: pointer;
 }
+
 .like {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
+}
+.like-button button{
+  cursor: pointer;
+  height: 100%;
+  border: none;
+}
+.like-button button img{
+  height: 40px;
 }
 .like-button {
   justify-content: flex-end !important;
 }
+
 .nb-like {
   margin-left: 9px;
 }
+
 .dislike {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
+}
+.dislike-button button{
+  cursor: pointer;
+  height: 100%;
+  border: none;
+}
+.dislike-button button img{
+  height: 40px;
 }
 .dislike-button {
   justify-content: flex-end !important;
 }
+
 .nb-dislike {
   margin-left: 9px;
 }
-.comment, .comment-container {
+
+.comment,
+.comment-container {
   position: relative;
 }
+
 .full-comment {
   margin-bottom: 75px;
 }
+
 .del-comment {
   position: absolute;
   top: 0;
   right: 25vw;
-  border: solid 1px black;
+  border: solid 2px black;
   cursor: pointer;
 }
-.invisible-likers{
+
+.invisible-likers {
   display: none;
 }
+
 .nb-like:hover .invisible-likers {
   display: initial;
   position: absolute;
-  transform: translate(10px,-5px);
+  transform: translate(10px, -5px);
   background: white;
   padding: 8px;
   text-align: center;
   font-size: 15px;
-  border: solid 1px black;
+  border: solid 2px black;
   border-radius: 10px;
 }
-.invisible-dislikers{
+
+.invisible-dislikers {
   display: none;
 }
+
 .nb-dislike:hover .invisible-dislikers {
   display: initial;
   position: absolute;
-  transform: translate(10px,-5px);
+  transform: translate(10px, -5px);
   background: white;
   padding: 8px;
   text-align: center;
   font-size: 15px;
-  border: solid 1px black;
+  border: solid 2px black;
   border-radius: 10px;
 }
+
 .form-modif,
 .form-modif-comment {
   width: 55%;
-    min-height: 150px;
-    max-height: 90%;
-    border: black 1px solid;
-    border-radius: 10px;
-    padding: 10px;
-    font-size: 15px;
-    background: #fff;
-    display: none;
+  min-height: 150px;
+  max-height: 90%;
+  border: black 2px solid;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 15px;
+  background: #fff;
+  display: none;
 }
-.form-modif textarea {
-  background-color: #f5f5f5;
+
+.form-modif textarea , .form-modif-comment textarea{
+  background-color: lightskyblue;
   resize: none;
+  font-family: 'Merriweather', serif;
+  font-size: 20px;
 }
+
 .add_comment {
   min-height: 100px;
-  min-width: 250px;
+  min-width: 100px;
   max-height: 300px;
   max-width: 980px;
   border-radius: 10px 10px 0px 0px;
   padding: 10px;
+  border: solid 2px black;
+  resize: none;
+  font-size: 20px;
+  font-family: 'Merriweather', serif;
+  outline: none;
 }
+
 #form-add-comment {
   display: grid;
 }
-#form-add-comment button {    
+
+#form-add-comment button {
   border-radius: 0px 0px 10px 10px;
-  border: solid 1px black;
+  border: solid 2px black;
   cursor: pointer;
+  background-color: lightskyblue;
+  font-family: "Modusa";
+  font-size: 20px;
+  transition: all 0.5ms;
 }
+#form-add-comment button:hover{
+  background: linear-gradient(45deg, #DFA003, brown, yellow, brown, #DFA003);
+}
+
 #modif {
   height: 100%;
   width: 100%;
   border: none;
 }
+
 #display-modif {
   position: absolute;
   top: 0;
   right: 24.5vw;
   cursor: pointer;
 }
+
 .display-modif-comment img {
   position: absolute;
   top: 2px;
   right: 27vw;
   cursor: pointer;
 }
+
 .hide-message {
   display: none;
 }
+
 .see-modif {
   display: initial;
 }
+
 .del-post {
   cursor: pointer;
 }
-#display-modif img, 
-.display-modif-comment img, 
+
+#display-modif img,
+.display-modif-comment img,
 .del-post img,
 .del-comment img {
   height: 20px;
 }
-.modif-post {
+
+.modif-post , .modif-comment{
+  height: 40px;
+  width: 200px;
+  font-family: "Modusa";
+  border-style: solid;
+  border-width: 2px;
+  border-image: linear-gradient(45deg, #DFA003, brown, yellow, brown, #DFA003) 1;
+  background-color: white;
+  color: black;
+  font-size: 20px;
+  padding: 2px;
+}
+
+.modif-post:hover , .modif-comment:hover{
+  background: linear-gradient(45deg, #DFA003, brown, yellow, brown , #DFA003);
   cursor: pointer;
 }
+
 .modifComment {
   background-color: #f5f5f5;
   resize: vertical;
@@ -267,15 +401,22 @@ form {
   width: 100%;
   border: none;
 }
+
 .resize-box {
   width: 50%;
 }
+
 .text-add-comment {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100px;
 }
+.text-add-comment h3{
+  font-size: 30px;
+  text-decoration: underline;
+}
+
 .all-comments {
   display: flex;
   justify-content: center;
@@ -283,41 +424,79 @@ form {
   height: 175px;
 }
 
-.imgposts{
-  margin-top: 60px;
-    border-top: solid 1px;
-    padding-top: 30px;
+.all-comments h3 {
+  font-size: 30px;
+  text-decoration: underline;
 }
+
+.all-comments span {
+  font-size: 30px;
+}
+
+.imgposts {
+  margin-top: 60px;
+  border-top: solid 1px;
+  padding-top: 30px;
+}
+
 .imgposts img {
   height: 230px;
   border: solid 1px black;
   margin: 10px;
 }
+
 #img-fullscreen-container {
   position: fixed;
   top: 0;
   left: 0;
   height: 100vh;
   width: 100vw;
-  background-color: rgb(0,0,0,0.7);
+  background-color: rgb(0, 0, 0, 0.7);
   z-index: 1;
   display: none;
   justify-content: center;
   align-items: center;
 }
+
 .img-fullscreen {
   background-color: grey;
-  height:800px;
+  height: 800px;
   width: 800px;
 }
+
 .img-active {
   display: flex !important;
   cursor: zoom-out;
 }
+
 .each-images {
   cursor: zoom-in;
 }
+
 #img {
   min-height: 450px;
   min-width: 450px;
+}
+
+/* 
++----------------------------------------------------------------------+
+| Scroll Bar
++----------------------------------------------------------------------+
+*/
+::-webkit-scrollbar {
+  width: 10px;
+  background-color: white;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgb(0, 0, 0);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #DFA003;
+}
+
+::-webkit-scrollbar-button {
+  height: 8px;
+  background-color: black;
 }

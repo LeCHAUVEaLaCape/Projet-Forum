@@ -13,35 +13,7 @@ section {
   width: 100vw;
   overflow: hidden;
 }
-.top{
-  color: black;
-  text-decoration: underline;
-  font-size: 20px;
-}
-.top:hover{
-  cursor: pointer;
-  color: blue;
-  text-decoration: underline;
-  font-size: 22px;
-}
-.author-time span{
-  font-family: 'Merriweather', serif;
-  font-size: 16px;
-  overflow: hidden;
 
-}
-.author-time a{
-  color: blue;
-  text-decoration: underline;
-  font-size: 20px;
-
-}
-.author-time a:hover{
-  color: darkblue;
-  cursor: pointer;
-  font-size: 22px;
-
-}
 .page {
   min-height: 1000px;
   width: 80%;
@@ -57,19 +29,194 @@ section {
   border-width: 4px;
   border-image: linear-gradient(to bottom, #DFA003, brown, yellow, brown, #DFA003) 1 100%;
 }
+
+.top {
+  display: flex;
+  justify-content: center;
+  color: black;
+  text-decoration: underline;
+  font-size: 20px;
+}
+
+.top:hover {
+  cursor: pointer;
+  color: blue;
+  text-decoration: underline;
+  font-size: 22px;
+}
 .title {
   width: 100%;
   text-align: center;
   font-size: 50px;
-  text-decoration: underline ;
+  text-decoration: underline;
   font-family: "Modusa";
 }
+/* 
++----------------------------------------------------------------------+
+| POSTS EN DESSOUS
++----------------------------------------------------------------------+
+*/
+.author-post {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.categories {
+  display: flex;
+  width: 50%;
+  flex-wrap: wrap;
+  font-family: "Modusa";
+}
+
+.categorie {
+  font-family: "Modusa";
+  font-size: 16px;
+  width: 105px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.categorie div {
+  margin: 10px;
+  width: 130px;
+  height: 35px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: solid 2px black;
+  border-radius: 10px;
+  text-transform: capitalize;
+  background-color: white;
+}
+.author-time {
+  justify-content: flex-end;
+  text-align: end;
+  width: 50%;
+}
+
+.author {
+  height: 50px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  font-family: 'Merriweather', serif;
+  font-size: 20px;
+}
+
+.author img {
+  height: 25px;
+  padding: 0px 0px 0px 10px;
+}
+
+.author span {
+  margin-right: 10px;
+}
+
+
+.author-time span {
+  font-family: 'Merriweather', serif;
+  overflow: hidden;
+  font-size: 20px;
+}
+
+.author-time a {
+  color: blue;
+  text-decoration: underline;
+  font-size: 20px;
+
+}
+
+.author-time a:hover {
+  color: darkblue;
+  cursor: pointer;
+  font-size: 22px;
+
+}
+/* 
++----------------------------------------------------------------------+
+| POSTS 
++----------------------------------------------------------------------+
+*/
+.body-post {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Merriweather', serif;
+}
+
+.message {
+  border: black 2px solid;
+  border-radius: 10px 10px 0px 0px;
+  padding: 10px;
+  font-size: 18px;
+  background: white;
+  min-height: 175px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.message p {
+  overflow: auto;
+}
+.img-posts {
+  margin-top: 60px;
+  border-top: solid 1px;
+  padding-top: 30px;
+}
+
+.img-posts img {
+  height: 230px;
+  border: solid 1px black;
+  margin: 10px;
+}
+.see-more {
+  width: 100%;
+  border: solid 2px black;
+  border-radius: 0px 0px 10px 10px;
+  background-color: lightskyblue;
+}
+
+.see-more:hover {
+  cursor: pointer;
+  color: black;
+  background: linear-gradient(45deg, #DFA003, brown, yellow, brown, #DFA003);
+}
+
+.see-more div {
+  display: flex;
+  justify-content: center;
+}
+
+.see-more button {
+  width: 100%;
+  font-size: 20px;
+  font-family: "Modusa";
+  background-color: lightskyblue;
+  border: none;
+}
+
+.see-more button:hover {
+  cursor: pointer;
+  color: black;
+  background: linear-gradient(45deg, #DFA003, brown, yellow, brown, #DFA003);
+
+}
+
+/* 
++----------------------------------------------------------------------+
+| Bouton
++----------------------------------------------------------------------+
+*/
 .accept-reject-container {
   display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
 }
+
 .accept-reject button {
   font-family: "Modusa";
   width: 88%;
@@ -80,59 +227,76 @@ section {
   font-size: 20px;
   color: black;
 }
+
 #accept {
-  background-color:limegreen;
+  background-color: limegreen;
 }
+
 #accept:hover {
   background-color: lime;
   cursor: pointer;
   box-shadow: 0px 0px 0px 2px darkgreen;
 }
+
 #reject {
-  background-color:crimson;
+  background-color: crimson;
 }
+
 #reject:hover {
-  background-color:red;
+  background-color: red;
   cursor: pointer;
   box-shadow: 0px 0px 0px 2px darkred;
 }
-.see-more div {
-  display: flex;
-  justify-content: center;
-}
+/* 
++----------------------------------------------------------------------+
+| Page Globale
++----------------------------------------------------------------------+
+*/
 
 .all-posts {
   overflow: hidden;
   margin-bottom: 40px;
-}
-.img-posts{
-  margin-top: 60px;
-    border-top: solid 1px;
-    padding-top: 30px;
-}
-.img-posts img {
-  height: 230px;
-  border: solid 1px black;
-  margin: 10px;
-}
-.each-posts {
-  justify-content: center;
+  width: 100%;
   display: flex;
-  width: 70%;
+  justify-content: center;
+  flex-wrap: wrap;
 }
-.see-more {
-  width: 72.5%;
+
+
+.each-posts {
+  width: 80%;
 }
-.title-post{
+
+
+.title-post {
+  display: flex;
+  justify-content: center;
+  font-size: 30px;
   font-family: "Modusa";
 }
-.see-more div {
-  display: flex;
-}
+
 .message-full {
-  min-height: 175px !important;
-  height: unset !important;
+  min-height: 500px ;
+  height: unset ;
 }
+
+.post-container {
+  width: 100%;
+  display: flex;
+  min-height: 500px;
+  justify-content: center;
+}
+
+.singlePost-container {
+  width: 80%;
+  margin: 10px 0px 25px 0px;
+}
+
+.singlePost-container form {
+  display: flex;
+  justify-content: center;
+}
+
 /* 
 +----------------------------------------------------------------------+
 | Scroll Bar

@@ -185,7 +185,7 @@
   width: 100%;
   border: solid 2px black;
   border-radius: 0px 0px 10px 10px;
-  background-color: lightblue;
+  background-color: lightskyblue;
 }
 .see-more:hover {
   cursor: pointer;
@@ -197,7 +197,7 @@
   width: 100%;
   font-size: 20px;
   font-family: "Modusa";
-  background-color: lightblue;
+  background-color: lightskyblue;
   border: none;
 }
 
