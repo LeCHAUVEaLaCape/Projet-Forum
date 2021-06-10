@@ -22,34 +22,34 @@
     <div class="display-post">
       <div class="display-post-container">
         <div class="display-title">
-          <h4>Changer l'ordre des posts</h4>
+          <h4>Change the order :</h4>
         </div>
         <div class="change-order-posts">
-          <div id="newest">Anciens posts</div>
-          <div id="latest">Nouveaux posts</div>
+          <div id="newest">Latest posts</div>
+          <div id="latest">Newest posts</div>
         </div>
         <div class="display-title">
-          <h4>Changer le format d'affichage</h4>
+          <h4>Change display format :</h4>
         </div>
         <div class="change-order-posts">
           <div id="grand" class="grand">
-            <div>Grand</div>
+            <div>Big</div>
             <img src="./assets/images/rectangles-couple.png" alt="grand" />
           </div>
           <div id="moyen" class="moyen">
-            <div>Moyen</div>
+            <div>Medium</div>
             <img src="./assets/images/two.png" alt="moyen" />
           </div>
           <div id="compact" class="compact">
-            <div>Compact</div>
+            <div>Small</div>
             <img src="./assets/images/justify.png" alt="compact" />
           </div>
         </div>
         {{if .cookieExist}}
         <div class="my-post-container">
-          <h4 class="display-title">Afficher Seuleument :</h4>
-          <a href="/myPosts">Mes posts</a><br />
-          <a href="/myLikedPosts">Les posts que j'ai like</a>
+          <h4 class="display-title">Show only :</h4>
+          <a href="/myPosts">My posts</a><br />
+          <a href="/myLikedPosts">Posts liked</a>
         </div>
         {{end}}
       </div>
@@ -59,7 +59,7 @@
       <!-- Ajoute le titre -->
       <div class="latest-container">
         <div class="latest-post">
-          <p id="post-text">Anciens Posts</p>
+          <p id="post-text">Latest Posts</p>
         </div>
       </div>
 
@@ -67,13 +67,13 @@
       {{if .cookieExist}}
       <div class="newpost-container">
         <a href="/newPost" class="newpost-redirect">
-          <div>Ajouter un nouveau post</div>
+          <div>Add a new post</div>
         </a>
       </div>
       {{else}}
       <div class="log">
         <p>
-          Veuillez <a href="/logIn">vous connecter</a> pour ajouter un post
+          Please <a href="/logIn"> login</a> to add a new post
         </p>
       </div>
       {{end}}
@@ -95,7 +95,7 @@
                 <form action="/post" method="GET">
                   <button>
                     <input type="hidden" name="id" value="{{.Id}}">
-                    <p>Lire la suite...</p>
+                    <p>See more...</p>
                   </button>
                 </form>
               </div>
@@ -117,7 +117,7 @@
               </div>
               <!-- Ajoute le nombre de like -->
               <div class="nb-like">
-                <p class="nb-like-comment">{{.Like}} Like(s)<br>{{.NbComments}} Commentaire(s)</p>
+                <p class="nb-like-comment">{{.Like}} Like(s)<br>{{.NbComments}} Comments(s)</p>
               </div>
               <!-- Ajoute l'auteur du post et le time -->
               <div class="author-time">
@@ -144,7 +144,7 @@
      ---------------->
     <div class="filter">
       <div class="filter-title">
-        <p>Trier les posts par catégories</p>
+        <p>Filter by Categories</p>
       </div>
       <div id="cat-cat">
         {{range $index , $value := .categories}}

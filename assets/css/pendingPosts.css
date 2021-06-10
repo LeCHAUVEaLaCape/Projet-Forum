@@ -9,16 +9,15 @@ body,
 }
 
 section {
-  min-height: 100vh;
   width: 100vw;
   overflow: hidden;
 }
 
 .page {
+  margin-top: 80px;
   min-height: 1000px;
   width: 80%;
   margin-left: 10%;
-  margin-top: 80px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -30,7 +29,8 @@ section {
   border-image: linear-gradient(to bottom, #DFA003, brown, yellow, brown, #DFA003) 1 100%;
 }
 
-.top {
+.toptop {
+  margin-top: 20px;
   display: flex;
   justify-content: center;
   color: black;
@@ -38,7 +38,7 @@ section {
   font-size: 20px;
 }
 
-.top:hover {
+.toptop:hover {
   cursor: pointer;
   color: blue;
   text-decoration: underline;
@@ -72,7 +72,7 @@ section {
 .categorie {
   font-family: "Modusa";
   font-size: 16px;
-  width: 105px;
+  width: 120px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -144,7 +144,9 @@ section {
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-wrap: wrap;
   font-family: 'Merriweather', serif;
+  height: 100%;
 }
 
 .message {
@@ -153,7 +155,7 @@ section {
   padding: 10px;
   font-size: 18px;
   background: white;
-  min-height: 175px;
+  height: 150px;
   overflow: hidden;
   width: 100%;
 }
@@ -177,6 +179,7 @@ section {
   border: solid 2px black;
   border-radius: 0px 0px 10px 10px;
   background-color: lightskyblue;
+  height: 100%;
 }
 
 .see-more:hover {
@@ -212,14 +215,14 @@ section {
 */
 .accept-reject-container {
   display: flex;
-  justify-content: center;
+  justify-content: space-around;
   align-items: center;
-  flex-wrap: wrap;
+  margin-top: 20px;
 }
 
 .accept-reject button {
   font-family: "Modusa";
-  width: 88%;
+  width: 100%;
   border: solid 2px black;
   padding: 13px;
   margin: 10px;
@@ -227,7 +230,9 @@ section {
   font-size: 20px;
   color: black;
 }
-
+.accept-reject{
+  display: flex;
+}
 #accept {
   background-color: limegreen;
 }
@@ -259,12 +264,18 @@ section {
   width: 100%;
   display: flex;
   justify-content: center;
+  align-items: center;
   flex-wrap: wrap;
 }
 
 
 .each-posts {
-  width: 80%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 50px;
 }
 
 
@@ -276,19 +287,18 @@ section {
 }
 
 .message-full {
-  min-height: 500px ;
-  height: unset ;
+  min-height: 200px ;
+  height: unset;
 }
 
 .post-container {
   width: 100%;
-  display: flex;
   min-height: 500px;
   justify-content: center;
 }
 
 .singlePost-container {
-  width: 80%;
+  width: 70%;
   margin: 10px 0px 25px 0px;
 }
 
