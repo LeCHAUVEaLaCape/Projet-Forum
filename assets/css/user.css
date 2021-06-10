@@ -379,6 +379,10 @@ body,
 .author {
   text-align: end;
 }
+#time-posted {
+  font-family: 'Merriweather', serif;
+  font-size: 18px;
+}
 .comment {
   display: flex;
   flex-direction: column;
@@ -391,7 +395,8 @@ body,
   height: 100px;
 }
 .date {
-  font-size: 12px;
+  font-size: 18px;
+  font-family: 'Merriweather', serif;
   text-align: end;
   margin: 10px 155px 0px 0px;
 }

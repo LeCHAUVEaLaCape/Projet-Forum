@@ -29,7 +29,7 @@ var created_by = document.getElementsByClassName("created-by")
 // Quand l'affichage = grand
 document.getElementById("grand").addEventListener("click", () => {
   for (let i = 0; i < posts_container.length; i++) {
-    posts_container[i].style.width = "70%";
+    posts_container[i].style.width = "80%";
     posts_container[i].style.margin = "10px 0px 25px 0px";
     message[i].style.height = "175px";
     message[i].style.borderRadius = "10px 10px 0px 0px";
@@ -44,7 +44,7 @@ document.getElementById("grand").addEventListener("click", () => {
     see_more[i].style.width = "100%"
   }
   for (let i = 0; i < each_cat.length; i++) {
-    color[i].style.height = "27px";
+    color[i].style.height = "30px";
     each_cat[i].style.display = "initial";
   }
 });
@@ -75,7 +75,7 @@ document.getElementById("moyen").addEventListener("click", () => {
 // Quand l'affichage = compact
 document.getElementById("compact").addEventListener("click", () => {
   for (i = 0; i < posts_container.length; i++) {
-    posts_container[i].style.width = "70%";
+    posts_container[i].style.width = "90%";
     posts_container[i].style.margin = "0px";
     message[i].style.height = "32px";
     message[i].style.borderRadius = "0px";
@@ -94,3 +94,28 @@ document.getElementById("compact").addEventListener("click", () => {
       each_cat[i].style.display = "none";
   }
 });
+
+function colorCat(){
+  var tab = document.getElementById("cat-cat").querySelectorAll("form")
+  var tableau = []
+  var couleurs = []
+  for (let i=0;i<tab.length;i++){
+    var randomColor = "#"+((1<<24)*Math.random()|0).toString(16); 
+    tab[i].lastElementChild.style.background = randomColor;
+    //
+    tableau.push(tab[i].lastElementChild.name)
+    couleurs.push(randomColor)
+  }
+  //
+  console.log(tableau,couleurs)
+
+  var posts = document.querySelectorAll("div.singlePost-container")
+  for(let k=0;k<posts.length;k++){
+    var tab_post = posts[k].querySelectorAll("div.color")
+    for(let i=0;i<tab_post.length;i++){
+      tab_post[i].style.background = couleurs[tableau.indexOf(tab_post[i].lastElementChild.innerHTML)]
+    }
+  }
+}
+
+colorCat()

@@ -108,7 +108,6 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  justify-content: center;
   font-family: 'Merriweather', serif;
   font-size: 18px;
 }
@@ -180,42 +179,6 @@
   border: solid 2px black;
   border-radius: 10px;
   text-transform: capitalize;
-}
-
-.gaming {
-  background-color: #8a57a5;
-}
-
-.informatique {
-  background-color: #FABD00;
-}
-
-.sport {
-  background-color: #2DA49E;
-}
-
-.culture {
-  background-color: #A58A77;
-}
-
-.politique {
-  background-color: #738e9e;
-}
-
-.loisir {
-  background-color: #BC0B27;
-}
-
-.sciences {
-  background-color: #009BC4;
-}
-
-.sexualite {
-  background-color: #FF5E5E;
-}
-
-.finance {
-  background-color: #941066;
 }
 
 .see-more {

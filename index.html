@@ -81,6 +81,7 @@
       <!-- ajoute les POSTS -->
       <div class="post-container">
         <div class="all-posts">
+
           {{range .allposts}}
           <div class="singlePost-container">
             <!-- ajoute le titre du poste -->
@@ -105,10 +106,10 @@
             ------------------->
             <div class="author-post">
               <!-- ajoute les catégorie de trie -->
-              <div class="categories">
+              <div id="cat-post" class="categories">
                 {{range .Category_Tab}}
-                <div class="categorie">
-                  <div class="color {{.}}">
+                <div  class="categorie">
+                  <div name="{{.}}" class="color">
                     <p class="each-cat">{{.}}</p>
                   </div>
                 </div>
@@ -145,17 +146,22 @@
       <div class="filter-title">
         <p>Trier les posts par catégories</p>
       </div>
-      {{range $index , $value := .categories}}
-      <form action="?" method="GET">
+      <div id="cat-cat">
+        {{range $index , $value := .categories}}
+      <form  action="?" method="GET">
         <input type="hidden" name="{{$value}}" value="{{$index}}" />
-        <button class="cat {{$value}}">
+        <button class="cat {{$value}}" name="{{$value}}">
           <p>{{$value}}</p>
         </button>
       </form>
       {{end}}
-      <a class="cat all" href="/index">
-        <p>All</p>
-      </a>
+
+      </div>
+      <button class="cat all">
+        <a href="/index">
+          <p>All</p>
+        </a>
+      </button>
     </div>
   </div>
   {{template "footer"}}

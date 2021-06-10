@@ -24,11 +24,10 @@ body,
 }
 .filter{
   width: 30%;
-  height: 100%;
+  height:100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-wrap: wrap;
   flex-direction: column;
   background-color: white;
   margin-top: 150px;
@@ -70,18 +69,28 @@ body,
 }
 .filter form {
   width: 155px;
+  margin-top: 5px;
 }
 .filter-title {
   font-size: 25px;
+  font-family: "Modusa";
+  text-decoration: underline;
+  text-align: center;
 }
 .cat {
-  height: 48px;
-  width: 145px;
+  height: 50px;
+  width: 155px;
   border: solid 1px black;
   border-radius: 5px;
   padding: 10px;
-  font-size: 19px;
+  font-size: 20px;
   text-transform: capitalize;
+  margin-top: 5px;
+  font-family: "Modusa";
+  cursor: pointer;
+}
+.cat:hover{
+  filter: brightness(250%);
 }
 .log {
   width: 100%;
@@ -106,20 +115,33 @@ body,
   font-size: 26px;
 }
 .all {
-  padding: 0 ;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  height: 50px;
+  width: 155px;
+  border: solid 1px black;
+  border-radius: 5px;
+  padding: 10px;
+  font-size: 20px;
+  text-transform: capitalize;
   background-color: black;
+  margin-top: 5px;
+  font-family: "Modusa";
+  cursor: pointer;
+}
+.all:hover {
+  filter: brightness(250%);
+  font-size: 22px;
 }
 .all p {
   color: white;
 }
 #time-posted {
+  height: 50px;
   display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    margin-left: 15px;
+  justify-content: flex-end;
+  align-items: center;
+  font-family: 'Merriweather', serif;
+  font-size: 18px;
+
 }
 .change-order-posts {
   margin-bottom: 50px;
