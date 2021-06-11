@@ -7,9 +7,9 @@ import (
 	"text/template"
 	"time"
 
-	. "./config"
-	. "./cookies"
-	. "./oauth"
+	config "./config"
+	cookie "./cookies"
+	oauth "./oauth"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -19,8 +19,8 @@ var data = make(map[string]interface{})
 func main() {
 	data["user"] = ""
 
-	CreateDB() // ./config/CreateDB
-	InitCategoriePrincipale()
+	config.CreateDB() // ./config/CreateDB
+	config.InitCategoriePrincipale()
 	fmt.Println("Please connect to http://localhost:8000")
 	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets")))) // Join Assets Directory to the server
 	http.HandleFunc("/", index)
@@ -32,8 +32,8 @@ func main() {
 	http.HandleFunc("/user", user)
 	http.HandleFunc("/newPost", newPost)
 	http.HandleFunc("/post", post)
-	http.HandleFunc("/delPost", DelPost)       // ./config/modifDB.go
-	http.HandleFunc("/delComment", DelComment) // ./config/modifDB.go
+	http.HandleFunc("/delPost", config.DelPost)       // ./config/modifDB.go
+	http.HandleFunc("/delComment", config.DelComment) // ./config/modifDB.go
 	http.HandleFunc("/myPosts", myPosts)
 	http.HandleFunc("/myLikedPosts", myLikedPosts)
 	http.HandleFunc("/pendingPosts", PendingPosts)
@@ -41,15 +41,15 @@ func main() {
 	http.HandleFunc("/categories", CategoriesHandleur)
 
 	// Login with facebook
-	http.HandleFunc("/loginFB", HandleFacebookLogin) // ./oauth/facebook.go
-	http.HandleFunc("/FBloginCallBack", HandleFacebookCallback)
+	http.HandleFunc("/loginFB", oauth.HandleFacebookLogin) // ./oauth/facebook.go
+	http.HandleFunc("/FBloginCallBack", oauth.HandleFacebookCallback)
 
 	// Login with google
-	http.HandleFunc("/loginGoogle", HandleGoogleLogin) // ./oauth/google.go
-	http.HandleFunc("/GoogleCallBack", HandleGoogleCallback)
+	http.HandleFunc("/loginGoogle", oauth.HandleGoogleLogin) // ./oauth/google.go
+	http.HandleFunc("/GoogleCallBack", oauth.HandleGoogleCallback)
 
 	err := http.ListenAndServe(":8000", nil)
-	CheckError(err)
+	config.CheckError(err)
 }
 
 // Generate the main page when first loading the site
@@ -59,7 +59,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 	SetDataToSend(w, r, data_index, data, false, "")
 
 	// Print posts to the index page
-	DisplayPosts(r, data_index, "index") // ./config/post.go
+	config.DisplayPosts(r, data_index, "index") // ./config/post.go
 
 	t := template.New("index-template")
 	t = template.Must(t.ParseFiles("index.html", "./html/header&footer.html"))
@@ -82,18 +82,18 @@ func logIn(w http.ResponseWriter, r *http.Request) {
 	// Get user input to log in
 	user_login := r.FormValue("user-login")
 	password_login := r.FormValue("password-login")
-	if FB_google_user.Name != "" { // when the user wants to log in from FB or Google
-		AddUser(FB_google_user.Name, FB_google_user.Email, "", data_logIn)                                   // ./config/user.go
-		create_cookie = SearchUserToLog(data_logIn, FB_google_user.Name, "", "logFromExternalWebsite", data) // ./config/user.go
-		data["user"] = FB_google_user.Name
+	if oauth.FB_google_user.Name != "" { // when the user wants to log in from FB or Google
+		config.AddUser(oauth.FB_google_user.Name, oauth.FB_google_user.Email, "", data_logIn)                             // ./config/user.go
+		create_cookie = config.SearchUserToLog(data_logIn, oauth.FB_google_user.Name, "", "logFromExternalWebsite", data) // ./config/user.go
+		data["user"] = oauth.FB_google_user.Name
 		data["cookieExist"] = true
 	} else { // when he logs from a created account
-		create_cookie = SearchUserToLog(data_logIn, user_login, password_login, "logFromInternalDB", data) // ./config/user.go
+		create_cookie = config.SearchUserToLog(data_logIn, user_login, password_login, "logFromInternalDB", data) // ./config/user.go
 	}
 
 	// Créé un cookie si user bien authentifié
 	if create_cookie {
-		CreateCookie(w, r) // ./cookies/createCookie.go
+		cookie.CreateCookie(w, r) // ./cookies/createCookie.go
 		data_logIn["wrongPassword"] = false
 		http.Redirect(w, r, "/index", http.StatusSeeOther)
 	}
@@ -125,11 +125,11 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	input_password := r.FormValue("password")
 
 	// Crypt the password
-	hash := HashPassword(input_password) // ./config/HashPassword.go
+	hash := config.HashPassword(input_password) // ./config/HashPassword.go
 
 	// Call the function to add users
 	if input_email != "" || input_username != "" || input_password != "" {
-		AddUser(input_username, input_email, hash, data_SignUp) // ./config/AddUser.go
+		config.AddUser(input_username, input_email, hash, data_SignUp) // ./config/AddUser.go
 	}
 
 	t := template.New("SignUp-template")
@@ -157,12 +157,12 @@ func user(w http.ResponseWriter, r *http.Request) {
 
 	if data["user"] != nil {
 		// Change un role lorsqu'un Admin submit le formulaire
-		ChangeRole(w, r) // ./config/modifDB.go
+		config.ChangeRole(w, r) // ./config/modifDB.go
 	}
 
 	// Récupère les infos de l'utilisateur
-	GetInfoUser(w, r, data_user) // ./config/modifDB.go
-	Feed(data_user)              // ./config/user.go
+	config.GetInfoUser(w, r, data_user) // ./config/modifDB.go
+	config.Feed(data_user)              // ./config/user.go
 
 	// Check if the user logged is on his personnal page
 	if data_user["username"] == data_user["user"] && data_user["cookieExist"] != false {
@@ -172,14 +172,14 @@ func user(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Change the photo / info of users
-	UpdateInfoUsers(w, r) // ./config/modifDB.go
+	config.UpdateInfoUsers(w, r) // ./config/modifDB.go
 
 	// Supprime le compte d'une personne
 	delete_account := r.FormValue("del-account")
 	if delete_account != "" {
-		DelAccount(delete_account)         // ./config/modifDB.go
+		config.DelAccount(delete_account)  // ./config/modifDB.go
 		if data_user["sameUser"] == true { // si l'utilisateur supprime son propre compte, détruit le cookie et le déconnecte
-			DeleteCookie(w) // ./cookies/deleteCookie.go
+			cookie.DeleteCookie(w) // ./cookies/deleteCookie.go
 		}
 		http.Redirect(w, r, "/index", http.StatusSeeOther)
 	}
@@ -187,7 +187,7 @@ func user(w http.ResponseWriter, r *http.Request) {
 	// Add the user that ask for being moderator
 	userAskingForModo := r.FormValue("askingToBeModo")
 	if userAskingForModo != "" {
-		ResquestForModo(userAskingForModo)
+		config.ResquestForModo(userAskingForModo)
 	}
 
 	// Add the user when a moderator reports him
@@ -195,7 +195,7 @@ func user(w http.ResponseWriter, r *http.Request) {
 	nameReporter := r.FormValue("nameReporter")
 	reasonReport := r.FormValue("reasonReport")
 	if nameUser != "" && nameReporter != "" && reasonReport != "" {
-		Report(nameUser, nameReporter, reasonReport)
+		config.Report(nameUser, nameReporter, reasonReport)
 	}
 
 	t := template.New("user-template")
@@ -210,9 +210,9 @@ func allUsers(w http.ResponseWriter, r *http.Request) {
 	SetDataToSend(w, r, data_allUsers, data, false, "")
 
 	// Enregistrer tous les admins, moderateurs et users pour les trier sur la page
-	GetRoleForAllUsers(data_allUsers, "admin")
-	GetRoleForAllUsers(data_allUsers, "moderator") // ./config/user
-	GetRoleForAllUsers(data_allUsers, "user")
+	config.GetRoleForAllUsers(data_allUsers, "admin")
+	config.GetRoleForAllUsers(data_allUsers, "moderator") // ./config/user
+	config.GetRoleForAllUsers(data_allUsers, "user")
 
 	t := template.New("allUsers-template")
 	t = template.Must(t.ParseFiles("./html/allUsers.html", "./html/header&footer.html"))
@@ -226,10 +226,10 @@ func logOut(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/index", http.StatusSeeOther)
 	}
 
-	DeleteCookie(w)
+	cookie.DeleteCookie(w)
 
 	// reset the login from FB
-	FB_google_user.Name = ""
+	oauth.FB_google_user.Name = ""
 	http.Redirect(w, r, "/index", http.StatusSeeOther)
 	delete(data, "user")
 }
@@ -249,7 +249,7 @@ func newPost(w http.ResponseWriter, r *http.Request) {
 	title := r.FormValue("title")
 	body := r.FormValue("body")
 
-	categories := GetCategories()
+	categories := config.GetCategories()
 	var category []string
 	for i := range categories {
 		tmp := r.FormValue(categories[i])
@@ -259,11 +259,11 @@ func newPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if title != "" && body != "" {
-		dt := time.Now()                                                                  // Capture la date de submit
-		AddNewPost(title, body, dt.Format("02-01-2006 15:04:05"), data_newPost, category) // ./config/post.go
-		UploadHandler(w, r)                                                               // ./config/images.go
+		dt := time.Now()                                                                         // Capture la date de submit
+		config.AddNewPost(title, body, dt.Format("02-01-2006 15:04:05"), data_newPost, category) // ./config/post.go
+		config.UploadHandler(w, r)                                                               // ./config/images.go
 	}
-	data_newPost["categorie"] = GetCategories()
+	data_newPost["categorie"] = config.GetCategories()
 
 	t := template.New("newPost-template")
 	t = template.Must(t.ParseFiles("./html/newPost.html", "./html/header&footer.html"))
@@ -283,22 +283,22 @@ func post(w http.ResponseWriter, r *http.Request) {
 	data_post["already_disliked"] = false
 
 	// Affiche les posts et commentaires
-	var post = Display_post_comment(post_id, data_post) // ./config/post.go
-	Display_comments(data_post, post_id)                // ./config/post.go
+	var post = config.Display_post_comment(post_id, data_post) // ./config/post.go
+	config.Display_comments(data_post, post_id)                // ./config/post.go
 
 	// Ajoute un commentaire
 	add_comment := r.FormValue("add_comment")
 	if add_comment != "" {
-		Adding_comment(w, r, add_comment, &post, data_post["user"].(string)) // ./config/comment.go
+		config.Adding_comment(w, r, add_comment, &post, data_post["user"].(string)) // ./config/comment.go
 		http.Redirect(w, r, "/post?id="+post_id, http.StatusSeeOther)
 	}
 
 	// Système de Like
 	change_nmb_like := r.FormValue("Like")
-	likedBy = Like(change_nmb_like, data_post, post_id, w, r) // ./config/like.go
+	likedBy = config.Like(change_nmb_like, data_post, post_id, w, r) // ./config/like.go
 	// Système de disLike
 	change_nmb_dislike := r.FormValue("DisLike")
-	dislikedBy = DisLike(change_nmb_dislike, data_post, post_id, w, r) // ./config/like.go
+	dislikedBy = config.DisLike(change_nmb_dislike, data_post, post_id, w, r) // ./config/like.go
 
 	// Modification de post
 	modif_post := r.FormValue("modifPost")
@@ -306,7 +306,7 @@ func post(w http.ResponseWriter, r *http.Request) {
 	modif_comment := r.FormValue("modifComment")
 	id_comment := r.FormValue("id-comment")
 	if modif_post != "" && id_mainPost != "" || modif_comment != "" && id_comment != "" {
-		ModifPostAndComment(modif_post, id_mainPost, modif_comment, id_comment) // ./config/modifDB
+		config.ModifPostAndComment(modif_post, id_mainPost, modif_comment, id_comment) // ./config/modifDB
 		http.Redirect(w, r, "/post?id="+post_id, http.StatusSeeOther)
 	}
 
@@ -327,7 +327,7 @@ func myPosts(w http.ResponseWriter, r *http.Request) {
 	// initiate the data that will be send to html
 	data_myPosts := make(map[string]interface{})
 	SetDataToSend(w, r, data_myPosts, data, false, "")
-	Createdposts(data_myPosts, "indexuser") // ./config/user
+	config.Createdposts(data_myPosts, "indexuser") // ./config/user
 
 	t := template.New("myPosts-template")
 	t = template.Must(t.ParseFiles("./html/myPosts.html", "./html/header&footer.html"))
@@ -340,7 +340,7 @@ func myLikedPosts(w http.ResponseWriter, r *http.Request) {
 	data_myLikedPosts := make(map[string]interface{})
 	SetDataToSend(w, r, data_myLikedPosts, data, false, "")
 
-	LikedPosts(data_myLikedPosts, "indexlike")
+	config.LikedPosts(data_myLikedPosts, "indexlike")
 
 	t := template.New("myLikedPosts-template")
 	t = template.Must(t.ParseFiles("./html/myLikedPosts.html", "./html/header&footer.html"))
@@ -359,13 +359,13 @@ func PendingPosts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Affiche les posts
-	DisplayPosts(r, data_pendingPosts, "pendingPosts") // ./config/post.go
+	config.DisplayPosts(r, data_pendingPosts, "pendingPosts") // ./config/post.go
 
 	// Supprime ou déplace le post s'il est accepté ou non
 	post_accepted := r.FormValue("post-accepted")
 	id_pendingPost := r.FormValue("id-pendingPost")
 	if post_accepted != "" && id_pendingPost != "" {
-		PostAcceptedOrNot(post_accepted, id_pendingPost) // ./config/modifDB.go
+		config.PostAcceptedOrNot(post_accepted, id_pendingPost) // ./config/modifDB.go
 		http.Redirect(w, r, "/pendingPosts", http.StatusSeeOther)
 	}
 
@@ -380,13 +380,13 @@ func Dashboard(w http.ResponseWriter, r *http.Request) {
 	SetDataToSend(w, r, data_dashboard, data, false, "")
 
 	// Affiche les roles des users, les requetes
-	DisplayAdminModo(&data_dashboard)      // ./config/modo.go
-	DisplayPendingForModo(&data_dashboard) // ./config/modo.go
-	SelectReport(data_dashboard)           // ./ config/modo.go
+	config.DisplayAdminModo(&data_dashboard)      // ./config/modo.go
+	config.DisplayPendingForModo(&data_dashboard) // ./config/modo.go
+	config.SelectReport(data_dashboard)           // ./ config/modo.go
 
 	// Accepter ou non la demande d'un user pour devenir modo
-	RefuserDemande(w, r)  // ./config/modo.go
-	AccepterDemande(w, r) // ./config/modo.go
+	config.RefuserDemande(w, r)  // ./config/modo.go
+	config.AccepterDemande(w, r) // ./config/modo.go
 
 	// get inputs of the admin that accept or not the report
 	answerReport := r.FormValue("answerReport")
@@ -396,7 +396,7 @@ func Dashboard(w http.ResponseWriter, r *http.Request) {
 		if reportAccepted == "" {
 			reportAccepted = "0"
 		}
-		DeleteUserFromReport(answerReport, nameReported, reportAccepted) // ./config/report.go
+		config.DeleteUserFromReport(answerReport, nameReported, reportAccepted) // ./config/report.go
 		http.Redirect(w, r, "/dashboard", http.StatusSeeOther)
 	}
 
@@ -413,11 +413,11 @@ func SetDataToSend(w http.ResponseWriter, r *http.Request, data_info map[string]
 	}
 	data_info["cookieExist"] = false
 	data_info["username"] = ""
-	GetCookie(w, data_info, r) // ./cookies/getCookies.go
+	cookie.GetCookie(w, data_info, r) // ./cookies/getCookies.go
 
 	if data["user"] != nil {
-		CheckNotif(w, r, data_info)
-		GetRole(data_info, on_user_page, user_page)
+		config.CheckNotif(w, r, data_info)
+		config.GetRole(data_info, on_user_page, user_page)
 	} else {
 		data_info["cookieExist"] = false
 	}
@@ -425,11 +425,11 @@ func SetDataToSend(w http.ResponseWriter, r *http.Request, data_info map[string]
 func CategoriesHandleur(w http.ResponseWriter, r *http.Request) {
 	dataCategorie := make(map[string]interface{})
 	SetDataToSend(w, r, dataCategorie, data, false, "")
-	NewCategorie(w, r)
-	dataCategorie["categories"] = DisplayCategories()
-	ActiverCategorie(w, r)
-	DesactiverCategorie(w, r)
-	RenommerCategorie(w, r)
+	config.NewCategorie(w, r)
+	dataCategorie["categories"] = config.DisplayCategories()
+	config.ActiverCategorie(w, r)
+	config.DesactiverCategorie(w, r)
+	config.RenommerCategorie(w, r)
 	t := template.New("categoriesManager-template")
 	t = template.Must(t.ParseFiles("./html/categoriesManager.html", "./html/header&footer.html"))
 	t.ExecuteTemplate(w, "categoriesManager", dataCategorie)
