@@ -10,11 +10,11 @@ for (let i = 0 ; i < see_more.length ; i++) {
         if (click) {
             click = false
             console.log(click)
-            see_more_txt[i].innerHTML = "Lire la suite..."
+            see_more_txt[i].innerHTML = "See more..."
             console.log(see_more_txt.innerHTML)
         } else {
             click = true
-            see_more_txt[i].innerHTML = "Lire moins..."
+            see_more_txt[i].innerHTML = "See less..."
             console.log(click)
             console.log(see_more_txt.innerHTML)
         }

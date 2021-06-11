@@ -138,7 +138,7 @@
    ---------------------->
     {{if .cookieExist}}
     <div class="text-add-comment">
-      <h3>Répondez à ce post</h3>
+      <h3>Answer to the post</h3>
     </div>
     <div>
       <form action="/post?id={{index .main_post 0}}" method="POST" id="form-add-comment">
@@ -148,14 +148,13 @@
         <input type="hidden" name="action" value="comment" />
         <input type="hidden" name="userToSendNotif" value="{{index .main_post 3}}" />
 
-        <button type="submit">Commenter</button>
+        <button type="submit">Comments</button>
       </form>
     </div>
     {{else}}
     <div class="log">
       <p>
-        Veuillez <a href="/logIn">vous connecter</a> pour poster un
-        commentaire
+        Please <a href="/logIn">log in</a> to post a comment
       </p>
     </div>
     {{end}}
@@ -164,7 +163,7 @@
             TOUS LES COMMENTAIRES
            ---------------------->
     <div class="all-comments">
-      <h3>Tous les commentaires (<span id="nb-comment">0</span>)</h3>
+      <h3>All comments (<span id="nb-comment">0</span>)</h3>
     </div>
     {{range .comments}} {{$author := index . 1}}
     <div class="full-comment">

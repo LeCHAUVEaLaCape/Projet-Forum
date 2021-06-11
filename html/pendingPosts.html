@@ -14,7 +14,6 @@
 <body>
   <section id="page-top">
     {{template "header" .}}
-
     <div class="page">
       <h1 class="title">Pending posts</h1>
       <h2 class="title">Accept a post to publish it</h2>
@@ -36,13 +35,13 @@
                     <img src="{{.}}">
                     {{end}}
                   </div>
-                  <div class="see-more">
-                    <div>
-                      <button>
-                        <input type="hidden" name="id" value="{{.Id}}">
-                        <p class="see-more-txt">Lire la suite... </p>
-                      </button>
-                    </div>
+                </div>
+                <div class="see-more">
+                  <div>
+                    <button>
+                      <input type="hidden" name="id" value="{{.Id}}">
+                      <p class="see-more-txt">See More... </p>
+                    </button>
                   </div>
                 </div>
 
@@ -50,7 +49,7 @@
                 Block des POSTS 
               ------------------->
                 <div class="author-post">
-                  <!-- ajoute les catégorie de trie -->
+                  <!-- ajoute les catÃ©gorie de trie -->
                   <div class="categories">
                     {{range .Category_Tab}}
                     <div class="categorie">
@@ -64,7 +63,7 @@
                   <!-- Ajoute l'auteur du post et le time -->
                   <div class="author-time">
                     <p class="author">
-                      <span class="created-by">post crée par : </span>
+                      <span class="created-by">posted by : </span>
                       {{if ne .Author "user deleted"}}
                       <a class="user" href="/user?user={{.Author}}">{{.Author}}</a>
                       <img src="{{.Photo}}" />
@@ -82,12 +81,12 @@
                   <form action="" method="POST">
                     <input type="hidden" name="post-accepted" value="true">
                     <input type="hidden" name="id-pendingPost" value="{{.Id}}">
-                    <button id="accept">Accepter</button>
+                    <button id="accept">Accept</button>
                   </form>
                   <form action="" method="POST">
                     <input type="hidden" name="post-accepted" value="false">
                     <input type="hidden" name="id-pendingPost" value="{{.Id}}">
-                    <button id="reject">Refuser</button>
+                    <button id="reject">Deny</button>
                   </form>
                 </div>
               </div>
@@ -95,10 +94,9 @@
             {{end}}
           </div>
         </div>
+        <a class="toptop" href="#page-top"> Top of the page</a>
       </div>
-      <a class="top" href="#page-top"> Top of the page</a>
     </div>
-
   </section>
   {{template "footer"}}
 </body>

@@ -9,12 +9,12 @@ for (let i = 0 ; i < see_more.length ; i++) {
         message[i].classList.toggle("message-full")
         if (click) {
             click = false
-            see_more_txt[i].innerHTML = "Lire la suite..."
+            see_more_txt[i].innerHTML = "See more..."
             console.log(click)
             console.log(see_more_txt.innerHTML)
         } else {
             click = true
-            see_more_txt[i].innerHTML = "Lire moins..."
+            see_more_txt[i].innerHTML = "See less..."
             console.log(click)
             console.log(see_more_txt.innerHTML)
         }

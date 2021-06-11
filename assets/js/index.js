@@ -6,11 +6,11 @@ var latest = document.getElementById("latest");
 
 newest.addEventListener("click", () => {
   order.style.flexWrap = "wrap";
-  change_text_post.innerHTML = "Anciens Posts";
+  change_text_post.innerHTML = "Latest Posts";
 });
 latest.addEventListener("click", () => {
   order.style.flexWrap = "wrap-reverse";
-  change_text_post.innerHTML = "Nouveaux Posts";
+  change_text_post.innerHTML = "Newest Posts";
 });
 
 // initialisation des éléments qui doivent être changé 

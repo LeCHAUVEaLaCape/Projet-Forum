@@ -16,7 +16,7 @@
     <div class="page" id="pagepagepage">
 
       <div class="title">
-        <h1>Mes posts&nbsp;</h1>
+        <h1>My Posts&nbsp;</h1>
         <span id="nb-post">(<p id="nb-posts"></p>)</span>
       </div>
 
@@ -37,7 +37,7 @@
                 <form action="/post" method="GET">
                   <button>
                   <input type="hidden" name="id" value="{{index . 5}}">
-                   <p>Lire la suite... </p></button>
+                   <p>See more... </p></button>
                 </form>
                 
               </div>
@@ -56,7 +56,7 @@
               <!-- Ajoute l'auteur du post et le time -->
               <div class="author-time">
                 <p class="author">
-                  <span>post crée par : </span
+                  <span>posted by : </span
                   ><a id="user" href="/user?user={{index . 2}}">{{index . 2}}</a>
                   <img src="{{index . 4}}">
                 </p>
