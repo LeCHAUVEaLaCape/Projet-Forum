@@ -69,13 +69,13 @@ func DisplayPosts(r *http.Request, data_info map[string]interface{}, state strin
 		categorie_post := strings.Split((aPost.Category), ",")
 
 		filtered := true
-		// Si Filtrer, verifie que la catégorie correspond
+		// When user wants to filter the posts
 		if r.FormValue("categorie") != "" {
-			for i := 0; i < len(categorie_post); i++ {
+			for i := 0; i < len(categorie_post); i++ { // range over each categories of all posts
 				if categorie_post[i] == r.FormValue("categorie") {
-					break
+					break // when one category is the one the user is looking for
 				} else if categorie_post[i] != r.FormValue("categorie") && i == len(categorie_post)-1 {
-					filtered = false
+					filtered = false // if none of the post's categories match the user was looking for
 				}
 			}
 		}
