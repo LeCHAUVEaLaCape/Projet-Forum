@@ -19,7 +19,6 @@ var googleOauthConfig = &oauth2.Config{
 	Endpoint:     google.Endpoint,
 }
 
-// TODO: randomize it
 var oauthStateString = "pseudo-random"
 
 func HandleGoogleLogin(w http.ResponseWriter, r *http.Request) {
