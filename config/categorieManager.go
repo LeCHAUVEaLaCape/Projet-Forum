@@ -2,21 +2,24 @@ package config
 
 import (
 	"database/sql"
-	"net/http"
 )
 
 type Categorie struct {
 	Nom   string
-	Actif bool
+	Color string
+	Id    string
 }
 
 //gaming informatique sport culture polititque loisir sciences sexualite finance
 func InitCategoriePrincipale() {
 	categories := []string{"gaming", "informatique", "sport", "culture", "politique", "loisir", "sciences", "sexualite", "finance"}
+	color_categories := []string{"#ff0000", "#6485ff", "#0de20d", "#ffff00", "#9e9e9e", "#00ffff", "#ffa500", "#e44dff", "#8c9638"}
+
 	// Open the database
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
 	defer database.Close()
-	//
+
+	// Check if the table is already filled
 	rows, err := database.Query("SELECT categorie FROM categories WHERE categorie = ?", "gaming")
 	CheckError(err)
 	defer rows.Close()
@@ -28,58 +31,65 @@ func InitCategoriePrincipale() {
 			return
 		}
 	}
-	CheckError(rows.Err())
+
 	for i := range categories {
 		// add the category
 		tx, err := database.Begin()
 		CheckError(err)
-		stmt, err := tx.Prepare("INSERT INTO categories (categorie, actif) VALUES (?, 0)")
+		stmt, err := tx.Prepare("INSERT INTO categories (categorie, color) VALUES (?, ?)")
 		CheckError(err)
-		_, err = stmt.Exec(categories[i])
+		_, err = stmt.Exec(categories[i], color_categories[i])
 		CheckError(err)
 		tx.Commit()
 	}
 }
+
 func DisplayCategories() []Categorie {
 	var resultat []Categorie
 	// Open the database
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
 	defer database.Close()
+
 	// range over the database and check if there is double categorie
-	rows, err := database.Query("SELECT categorie, actif FROM categories")
-	if err != nil {
-		return resultat
-	}
+	rows, err := database.Query("SELECT categorie, color, id FROM categories")
+	CheckError(err)
+	defer rows.Close()
 	for rows.Next() {
 		var tmp Categorie
-		rows.Scan(&tmp.Nom, &tmp.Actif)
+		rows.Scan(&tmp.Nom, &tmp.Color, &tmp.Id)
 		resultat = append(resultat, tmp)
 	}
-	rows.Close()
 	return resultat
 }
-func GetCategories() []string {
+
+func GetCategories() [][3]string {
 	categorie := DisplayCategories()
-	var res []string
+	var categories [3]string
+	var all_categories [][3]string
 	for i := range categorie {
-		if categorie[i].Actif {
-			res = append(res, categorie[i].Nom)
-		}
+		cat := categorie[i].Nom
+		col := categorie[i].Color
+		categories[0] = cat
+		categories[1] = col
+		categories[2] = col
+		all_categories = append(all_categories, categories)
 	}
-	return res
+	return all_categories
 }
 
-func NewCategorie(w http.ResponseWriter, r *http.Request) {
-	nom_categorie := r.FormValue("newCategorie")
+func NewCategorie(nom_categorie string, color_cat string) {
+
 	if nom_categorie == "" {
 		return
 	}
 	// Open the database
 	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
 	defer database.Close()
+
 	// range over the database and check if there is double categorie
 	rows, err := database.Query("SELECT categorie FROM categories")
 	CheckError(err)
+	defer rows.Close()
 	for rows.Next() {
 		tmp := ""
 		rows.Scan(&tmp)
@@ -89,103 +99,15 @@ func NewCategorie(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	rows.Close()
+
 	// add the category
 	tx, err := database.Begin()
 	CheckError(err)
-	stmt, err := tx.Prepare("INSERT INTO categories (categorie, actif) VALUES (?, 0)")
+	stmt, err := tx.Prepare("INSERT INTO categories (categorie, color) VALUES (?, ?)")
 	CheckError(err)
-	_, err = stmt.Exec(nom_categorie)
-	CheckError(err)
-	tx.Commit()
-	http.Redirect(w, r, r.Header.Get("Referer"), http.StatusFound)
-}
-func ActiverCategorie(w http.ResponseWriter, r *http.Request) {
-	tmp := func() string {
-		categorie := DisplayCategories()
-		for i := range categorie {
-			categorie_selec := r.FormValue(categorie[i].Nom + "_false")
-			if categorie_selec != "" {
-				return categorie_selec
-			}
-		}
-		return ""
-	}
-
-	categorie_selec := tmp()
-	if categorie_selec == "" {
-		return
-	}
-	// Open the database
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
-	defer database.Close()
-	tx, err := database.Begin()
-	CheckError(err)
-	stmt, err := tx.Prepare("UPDATE categories SET actif = ? WHERE categorie = ?")
-	CheckError(err)
-	_, err = stmt.Exec(1, categorie_selec)
+	_, err = stmt.Exec(nom_categorie, color_cat)
 	CheckError(err)
 	tx.Commit()
-	http.Redirect(w, r, r.Header.Get("Referer"), http.StatusFound)
-
-}
-func DesactiverCategorie(w http.ResponseWriter, r *http.Request) {
-	tmp := func() string {
-		categorie := DisplayCategories()
-		for i := range categorie {
-			categorie_selec := r.FormValue(categorie[i].Nom + "_true")
-			if categorie_selec != "" {
-				return categorie_selec
-			}
-		}
-		return ""
-	}
-	categorie_selec := tmp()
-	if categorie_selec == "" {
-		return
-	}
-	// Open the database
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
-	defer database.Close()
-	tx, err := database.Begin()
-	CheckError(err)
-	stmt, err := tx.Prepare("UPDATE categories SET actif = ? WHERE categorie = ?")
-	CheckError(err)
-	_, err = stmt.Exec(0, categorie_selec)
-	CheckError(err)
-	tx.Commit()
-	http.Redirect(w, r, r.Header.Get("Referer"), http.StatusFound)
-
-}
-func RenommerCategorie(w http.ResponseWriter, r *http.Request) {
-	// name , new name
-	tmp := func() (string, string) {
-		categorie := DisplayCategories()
-		for i := range categorie {
-			categorie_selec := r.FormValue(categorie[i].Nom + "_DEL")
-			if categorie_selec != "" {
-				return categorie_selec, categorie[i].Nom
-			}
-		}
-		return "", ""
-	}
-	categorie_selec, categorie := tmp()
-	if categorie_selec == "" {
-		return
-	}
-	// Open the database
-	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
-	defer database.Close()
-	// UPDATE the categorie from de table categories
-	tx, err := database.Begin()
-	CheckError(err)
-	stmt, err := tx.Prepare("UPDATE categories SET categorie = ? WHERE categorie = ?")
-	CheckError(err)
-	_, err = stmt.Exec(categorie_selec, categorie)
-	CheckError(err)
-	tx.Commit()
-	http.Redirect(w, r, r.Header.Get("Referer"), http.StatusFound)
-
 }
 
 // return category listed with whitespace when the category isn't "actif"
@@ -193,11 +115,22 @@ func GetBruteCategories() []string {
 	categorie := DisplayCategories()
 	var res []string
 	for i := range categorie {
-		if categorie[i].Actif {
-			res = append(res, categorie[i].Nom)
-		} else {
-			res = append(res, "")
-		}
+		res = append(res, categorie[i].Nom)
 	}
 	return res
+}
+
+func Del_Categorie(del_categorie string) {
+	// Open the database
+	database, _ := sql.Open("sqlite3", "./db-sqlite.db")
+	defer database.Close()
+
+	tx, err := database.Begin()
+
+	stmt, err := tx.Prepare("DELETE FROM categories WHERE id = ?")
+	CheckError(err)
+	_, err = stmt.Exec(del_categorie)
+	CheckError(err)
+
+	tx.Commit()
 }

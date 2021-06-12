@@ -3,8 +3,6 @@ package config
 import (
 	"database/sql"
 	"net/http"
-	"regexp"
-	"strconv"
 	"strings"
 )
 
@@ -40,20 +38,12 @@ func AddNewPost(title string, body string, dt string, data_newPost map[string]in
 
 // Affiche les posts pour la page INDEX et pendingPosts
 func DisplayPosts(r *http.Request, data_info map[string]interface{}, state string) {
-	var categories []string = GetCategories()
+	categories := GetCategories()
+
 	var imgstr string
 	var arrimg []string
 
 	// filtre de categorie
-	selected_categories := ""
-	for i := range categories {
-		tmp := r.FormValue(categories[i])
-		if tmp != "" {
-			selected_categories += tmp
-		}
-	}
-	// RegExp
-	var filter = regexp.MustCompile(selected_categories)
 
 	database, err := sql.Open("sqlite3", "./db-sqlite.db")
 	CheckError(err)
@@ -72,29 +62,44 @@ func DisplayPosts(r *http.Request, data_info map[string]interface{}, state strin
 	for rows.Next() {
 		var aPost Post
 		rows.Scan(&aPost.Title, &aPost.Body, &aPost.Author, &aPost.Date, &aPost.Id, &aPost.Category, &aPost.Like, &aPost.NbComments, &imgstr)
-		// si le RegExp correspond à la DB
-		if filter.MatchString(aPost.Category) {
-			// Remplace les \n par des <br> pour sauter des lignes en html
-			aPost.Body = strings.Replace(strings.Replace(aPost.Body, string('\r'), "", -1), string('\n'), "<br>", -1)
-			if aPost.Category != "" {
-				for _, e := range strings.Split((aPost.Category), ",") {
-					j, _ := strconv.Atoi(string(e))
-					if j >= len(categories) {
-						continue
-					}
-					aPost.Category_Tab = append(aPost.Category_Tab, categories[j])
-				}
-				if len(aPost.Category_Tab) == 0 {
-					continue
+		// Remplace les \n par des <br> pour sauter des lignes en html
+		aPost.Body = strings.Replace(strings.Replace(aPost.Body, string('\r'), "", -1), string('\n'), "<br>", -1)
+
+		// Split pour avoir toutes les catégories du post
+		categorie_post := strings.Split((aPost.Category), ",")
+
+		filtered := true
+		// Si Filtrer, verifie que la catégorie correspond
+		if r.FormValue("categorie") != "" {
+			for i := 0; i < len(categorie_post); i++ {
+				if categorie_post[i] == r.FormValue("categorie") {
+					break
+				} else if categorie_post[i] != r.FormValue("categorie") && i == len(categorie_post)-1 {
+					filtered = false
 				}
 			}
 		}
+
+		// ajoute toutes les catégories dans un array
+		if aPost.Category != "" {
+			for i := 0; i < len(categories); i++ {
+				for j := 0; j < len(categorie_post); j++ {
+					// Compare les catégories et ajoute celles qui correspondent
+					if categories[i][0] == categorie_post[j] {
+						aPost.Category_Tab = append(aPost.Category_Tab, categorie_post[j])
+					}
+				}
+			}
+		}
+
 		// Ajoute les images pour la page pendingPosts seulement
 		arrimg = strings.Split(imgstr, ",")
 		arrimg = arrimg[1:]
 		aPost.Arrimage = arrimg
-		// Ajoute le chemin de la photo qui a été choisit par l'utilisateur
-		post = append(post, aPost)
+
+		if filtered {
+			post = append(post, aPost)
+		}
 	}
 
 	for i := 0; i < len(post); i++ {

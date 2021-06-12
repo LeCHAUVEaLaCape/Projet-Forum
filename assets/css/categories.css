@@ -34,7 +34,7 @@ section {
 }
 .ajouter form{
     height: 120px;
-    width: 500px;
+    width: 700px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -49,7 +49,7 @@ section {
     justify-content: center;
     margin-right: 10px;
     height: 40px;
-    width: 300px;
+    width: 250px;
     font-family: 'Merriweather', serif;
     border-style: solid;
     border-width: 4px;
@@ -85,6 +85,7 @@ section {
     font-size: 30px;
     background-color: black;
     color: white;
+    padding: 0px 10px
 
 }
 .ajouter button:hover{
@@ -93,11 +94,6 @@ section {
     background: linear-gradient(45deg, #DFA003, brown, yellow, brown , #DFA003);
     cursor: pointer;
 
-}
-.gerer{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
 }
 .gerer h2{
     font-size: 60px;
@@ -110,7 +106,7 @@ section {
     display: flex;
     font-size: 25px;
     font-family: 'Merriweather', serif;
-    height: 50px;
+    height: 100px;
 }
 .gerer div strong{
     margin-right: 5px;
@@ -208,4 +204,28 @@ section {
 ::-webkit-scrollbar-button {
     height: 8px;
     background-color: black;
+}
+.cat-container button {
+    height: 55px;
+    border: solid 1px;
+    padding: 8px;
+    border-radius: 10px;
+    margin-left: 30px;
+    cursor: pointer;
+}
+.cat-container img {
+    height: 100%;
+}
+.txt-cat {
+    background-color: #0de20d;
+    padding: 20px 30px;
+    border-radius: 9px;
+    font-size: 45px;
+    text-transform: capitalize;
+}
+.cat-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100px;
 }

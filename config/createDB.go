@@ -38,7 +38,7 @@ func CreateDB() {
 	CheckError(err)
 	statement.Exec()
 	// Create categories table in the database
-	statement, err = database.Prepare("CREATE TABLE IF NOT EXISTS categories (categorie TEXT,actif INTEGER)")
+	statement, err = database.Prepare("CREATE TABLE IF NOT EXISTS categories (id INTEGER PRIMARY KEY, categorie TEXT, color TEXT)")
 	CheckError(err)
 	statement.Exec()
 }

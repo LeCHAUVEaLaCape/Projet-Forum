@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 	"text/template"
 	"time"
@@ -19,8 +20,9 @@ var data = make(map[string]interface{})
 func main() {
 	data["user"] = ""
 
-	config.CreateDB() // ./config/CreateDB
-	config.InitCategoriePrincipale()
+	config.CreateDB()                // ./config/CreateDB
+	config.InitCategoriePrincipale() // ./config/categorieManager
+
 	fmt.Println("Please connect to http://localhost:8000")
 	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets")))) // Join Assets Directory to the server
 	http.HandleFunc("/", index)
@@ -251,10 +253,11 @@ func newPost(w http.ResponseWriter, r *http.Request) {
 
 	categories := config.GetCategories()
 	var category []string
-	for i := range categories {
-		tmp := r.FormValue(categories[i])
-		if tmp != "" {
-			category = append(category, tmp)
+	for i := 0; i < len(categories); i++ {
+		query := "categorie" + strconv.Itoa(i)
+		test := r.FormValue(query)
+		if test != "" {
+			category = append(category, test)
 		}
 	}
 
@@ -422,14 +425,27 @@ func SetDataToSend(w http.ResponseWriter, r *http.Request, data_info map[string]
 		data_info["cookieExist"] = false
 	}
 }
+
 func CategoriesHandleur(w http.ResponseWriter, r *http.Request) {
 	dataCategorie := make(map[string]interface{})
 	SetDataToSend(w, r, dataCategorie, data, false, "")
-	config.NewCategorie(w, r)
+
+	// Add new Categorie
+	nom_categorie := r.FormValue("newCategorie")
+	color_cat := r.FormValue("color-categorie")
+	if nom_categorie != "" && color_cat != "" {
+		config.NewCategorie(nom_categorie, color_cat)
+		http.Redirect(w, r, r.Header.Get("Referer"), http.StatusFound)
+	}
+
+	// delete categorie
+	del_categorie := r.FormValue("del-cat")
+	if del_categorie != "" {
+		config.Del_Categorie(del_categorie) // ./config/categorieManager.go
+	}
+
 	dataCategorie["categories"] = config.DisplayCategories()
-	config.ActiverCategorie(w, r)
-	config.DesactiverCategorie(w, r)
-	config.RenommerCategorie(w, r)
+
 	t := template.New("categoriesManager-template")
 	t = template.Must(t.ParseFiles("./html/categoriesManager.html", "./html/header&footer.html"))
 	t.ExecuteTemplate(w, "categoriesManager", dataCategorie)

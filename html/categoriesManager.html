@@ -1,62 +1,47 @@
 {{define "categoriesManager"}}
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Faux Rhum - CategoriesManager</title>
     <link rel="shortcut icon" href="../assets/images/logoforum.png" />
     <link rel="stylesheet" href="../assets/css/categories.css" />
-</head>
+  </head>
 
-<body>
-
+  <body>
     {{template "header" .}}
     <section>
-        <div class="page">
-            {{if eq .role "admin"}}
-            <div class="ajouter">
-                <h2>Ajouter une nouvelle categorie</h2>
-                <form action="" method="POST">
-                    <input class="button" type="text" name="newCategorie">
-                    <button type="submit">Submit</button>
-                </form>
-            </div>
-            <!-- liste des categories -->
-            <div class="gerer">
-                <h2>Liste des Categories</h2>
-                {{range $key , $value := .categories}}
-                <div> <strong> {{$value.Nom}}</strong> <p>{{$value.Actif}}</p>
-                    {{if eq $value.Actif false}}
-                    <form action="" method="POST">
-                        <input class="button" type="hidden" name="{{$value.Nom}}_false" value="{{$value.Nom}}">
-                        <button type="submit" class="boutton-activer">Activer</button>
-                    </form>
-                    {{end}}
-                    {{if eq $value.Actif true}}
-                    <form action="" method="POST">
-                        <input class="button" type="hidden" name="{{$value.Nom}}_true" value="{{$value.Nom}}">
-                        <button type="submit" class="boutton-desactiver">Desactiver</button>
-                    </form>
-                    {{end}}
-                </div>
-                {{if gt $key 8}}
-                <form action="" method="POST">
-                    <input class="button" type="text" name="{{$value.Nom}}_DEL">
-                    <button type="submit" class="rename-button">Rename</button>
-                </form>
-                {{end}}
-
-
-                {{end}}
-            </div>
-            {{end}}
+      <div class="page">
+        {{if eq .role "admin"}}
+        <div class="ajouter">
+          <h2>Ajouter une nouvelle categorie</h2>
+          <form action="" method="POST">
+            <input class="button" type="text" name="newCategorie" />
+            <input type="color" name="color-categorie" value="#ffffff"/>
+            <button type="submit">Submit</button>
+          </form>
         </div>
-
+        <!-- liste des categories -->
+        <div class="gerer">
+          {{range .categories}}
+          
+          
+          <div class="cat-container">
+            <span style="background-color: {{.Color}}" class="txt-cat">{{.Nom}}</span>
+            <form action="" method="post">
+              <button>
+                <input type="hidden" name="del-cat" value="{{.Id}}">
+                <img src="../assets/images/trash.png" alt="delete" class="img-del" />
+              </button>
+            </form>
+          </div>
+          {{end}}
+        </div>
+        {{end}}
+      </div>
     </section>
     {{template "footer"}}
-</body>
-
+  </body>
 </html>
 {{end}}
