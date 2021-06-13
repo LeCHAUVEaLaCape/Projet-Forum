@@ -8,9 +8,9 @@ import (
 	"text/template"
 	"time"
 
-	config "./config"
-	cookie "./cookies"
-	oauth "./oauth"
+	config "main/config"
+	cookie "main/cookies"
+	oauth "main/oauth"
 
 	_ "github.com/mattn/go-sqlite3"
 )

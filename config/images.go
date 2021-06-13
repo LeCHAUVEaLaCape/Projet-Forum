@@ -67,7 +67,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		name, _ := uuid.NewV4()
+		name := uuid.NewV4()
 		f, err := os.Create(fmt.Sprintf("./assets/uploads/%s%s", name, filepath.Ext(fileHeader.Filename)))
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
