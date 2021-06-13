@@ -135,7 +135,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	t := template.New("SignUp-template")
-	t = template.Must(t.ParseFiles("./html/SignUp.html", "./html/header&footer.html"))
+	t = template.Must(t.ParseFiles("./html/signUp.html", "./html/header&footer.html"))
 	t.ExecuteTemplate(w, "SignUp", data_SignUp)
 }
 
