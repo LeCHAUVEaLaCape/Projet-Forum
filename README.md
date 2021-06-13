@@ -58,13 +58,11 @@ Code writted by *Captain* **PEYRE Brian**, **DOCKX Sven**, **BOUQUIER Baptiste**
 ------------------------
 
 # DockerFile
-  - Installer Docker https://docs.docker.com/get-docker/
+  - Install Docker https://docs.docker.com/get-docker/
 
-  - Lancer Docker
+  - Launch Docker
 
-  - Construire l'image du conteneur ```docker build -t forum-BPEYRE .```
-  
-  - DÃ©marrer le conteneur ```docker run -dp 8000:8000 forum-bpeyre```
+  - Build image : ```docker image build -t serveur-forum:1.0 .```
 
 ------------------------
 
