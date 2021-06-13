@@ -13,7 +13,7 @@ func GetCookie(w http.ResponseWriter, data_info map[string]interface{}, r *http.
 	if err == nil && data_info["user"] != "" {
 		data_info["cookieExist"] = true
 		// Recréé un cookie pour réinitialiser le temps d'expéritation
-		id := uuid.NewV4()
+		id, _ := uuid.NewV4()
 		cookie = &http.Cookie{
 			Name:     "session",   // nom du cookie
 			Value:    id.String(), // uuid pour le cookie
